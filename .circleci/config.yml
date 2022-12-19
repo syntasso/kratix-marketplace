@@ -53,10 +53,10 @@ jobs:
             cd ${PROMISE}
             kubectl apply --filename promise.yaml
 
-            ./scripts/docker.sh build
-            ./scripts/docker.sh load
+            ./internal/scripts/docker.sh build
+            ./internal/scripts/docker.sh load
       - retry/run-with-retry:
-          command: << parameters.promise >>/scripts/test.sh promise
+          command: << parameters.promise >>/internal/scripts/test.sh promise
           sleep: 3
           retry-count: 30
       - run:
@@ -67,7 +67,7 @@ jobs:
             cd ${PROMISE}
             kubectl apply --filename resource-request.yaml
       - retry/run-with-retry:
-          command: << parameters.promise >>/scripts/test.sh resource-request
+          command: << parameters.promise >>/internal/scripts/test.sh resource-request
           sleep: 3
           retry-count: 30
 
