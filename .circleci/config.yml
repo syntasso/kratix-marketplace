@@ -70,6 +70,13 @@ jobs:
           command: << parameters.promise >>/internal/scripts/test.sh resource-request
           sleep: 3
           retry-count: 30
+      - run:
+          name: GHCR Push
+          environment:
+            PROMISE: << parameters.promise >>
+          command: |
+            echo "$GITHUB_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
+            ${PROMISE}/internal/scripts/docker.sh push
 
 workflows:
   promises:
