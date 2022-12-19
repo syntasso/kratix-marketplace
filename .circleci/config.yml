@@ -1,0 +1,80 @@
+version: 2.1
+
+orbs:
+  k8s: circleci/kubernetes@1.3.1
+  retry: kimh/run-with-retry@1.0.0
+
+executors:
+  machine-medium:
+    machine: true
+    resource_class: medium
+    working_directory: ~/repo
+  machine-large:
+    machine: true
+    resource_class: large
+    working_directory: ~/repo
+
+commands:
+  install_software:
+    steps:
+      - k8s/install
+      - run:
+          name: Install Kind
+          command: |
+            if [ ! -f ~/bin/kind ]; then
+              curl -L https://github.com/kubernetes-sigs/kind/releases/download/v0.14.0/kind-linux-amd64 -o ~/bin/kind
+              chmod +x ~/bin/kind
+            fi
+      - run:
+          name: Install Kratix
+          command: |
+            kind create cluster --name platform
+            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml
+            sleep 5
+            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
+            sleep 5
+      - attach_workspace:
+          at: .
+
+jobs:
+  test-and-push:
+    parameters:
+      promise:
+        type: string
+    executor: machine-large
+    steps:
+      - install_software
+      - checkout
+      - run:
+          name: Install Promise
+          environment:
+            PROMISE: << parameters.promise >>
+          command: |
+            cd ${PROMISE}
+            kubectl apply --filename promise.yaml
+
+            ./internal/scripts/docker.sh build
+            ./internal/scripts/docker.sh load
+      - retry/run-with-retry:
+          command: << parameters.promise >>/internal/scripts/test.sh promise
+          sleep: 3
+          retry-count: 30
+      - run:
+          name: Apply resource-request
+          environment:
+            PROMISE: << parameters.promise >>
+          command: |
+            cd ${PROMISE}
+            kubectl apply --filename resource-request.yaml
+      - retry/run-with-retry:
+          command: << parameters.promise >>/internal/scripts/test.sh resource-request
+          sleep: 3
+          retry-count: 30
+
+workflows:
+  promises:
+    jobs:
+      - test-and-push:
+          matrix:
+            parameters:
+              promise: [redis]
