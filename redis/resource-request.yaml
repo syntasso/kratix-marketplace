@@ -3,4 +3,4 @@ kind: redis
 metadata:
   name: example
 spec:
-  name: my-redis
+  size: small

@@ -3280,8 +3280,9 @@ spec:
             properties:
               spec:
                 properties:
-                  name:
+                  size:
                     type: string
+                    pattern: '^(small|large)$'
                 type: object
             type: object
         served: true

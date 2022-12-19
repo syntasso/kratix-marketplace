@@ -1,8 +1,8 @@
-FROM "ruby"
+FROM "mikefarah/yq:4"
 RUN [ "mkdir", "/tmp/transfer" ]
 
 ADD resources/redis-instance.yaml /tmp/transfer/redis-instance.yaml
-ADD execute-pipeline.rb execute-pipeline.rb
+ADD execute-pipeline.sh execute-pipeline.sh
 
-CMD [ "ruby", "./execute-pipeline.rb"]
+CMD [ "sh", "-c", "./execute-pipeline.sh" ]
 ENTRYPOINT []

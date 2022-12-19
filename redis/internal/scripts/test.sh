@@ -3,11 +3,11 @@ set -e
 
 test_promise() {
   kubectl get crd redisfailovers.databases.spotahome.com
-  kubectl wait --for=condition=Available --timeout=30s deployment/redisoperator
+  kubectl wait --for=condition=Available --timeout=5s deployment/redisoperator
 }
 
 test_resource_request() {
-  kubectl wait --for=condition=Available --timeout=30s deployment/rfs-my-redis
+  kubectl wait --for=condition=Available --timeout=5s deployment/rfs-example
 }
 
 
