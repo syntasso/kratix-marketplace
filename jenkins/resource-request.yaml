@@ -4,3 +4,6 @@ metadata:
   name: example
 spec:
   env: dev
+  plugins:
+    - name: greenballs
+      version: 1.15.1

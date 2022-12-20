@@ -5,8 +5,11 @@ set -x
 # Read current values from the provided resource request
 export name="$(yq eval '.metadata.name' /input/object.yaml)"
 
+
+export plugins="$(yq eval '.spec.plugins // []' /input/object.yaml)"
 env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
 base_instance="/tmp/transfer/${env_type}-jenkins-instance.yaml"
 
 # Replace defaults with user provided values
-sed "s/NAME/${name}/g" "${base_instance}" > /output/jenkins-instance.yaml
+yq eval '.spec.master.plugins = env(plugins)' ${base_instance} |
+  sed "s/NAME/${name}/g" > /output/jenkins-instance.yaml
