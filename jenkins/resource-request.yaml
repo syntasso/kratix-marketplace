@@ -1,0 +1,6 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: jenkins
+metadata:
+  name: example
+spec:
+  env: dev

@@ -88,4 +88,4 @@ workflows:
       - test-and-push:
           matrix:
             parameters:
-              promise: [redis]
+              promise: [redis, jenkins]

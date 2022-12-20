@@ -5,12 +5,12 @@ which can be `small` or `large`.
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/marketplace/main/redis/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/promise.yaml
 ```
 
 To make a resource request (small by default):
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/marketplace/main/redis/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/resource-request.yaml
 ```
 
 ## Development
