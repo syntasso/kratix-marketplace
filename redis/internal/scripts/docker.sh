@@ -5,7 +5,7 @@ set -x
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
 promise_name="$(basename "$(dirname "${PWD}")")"
-pipeline_image="ghcr.io/syntasso/marketplace/${promise_name}-request-pipeline:v0.1.0"
+pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-request-pipeline:v0.1.0"
 
 case "$1" in
   build)

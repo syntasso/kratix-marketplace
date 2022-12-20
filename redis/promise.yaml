@@ -3281,12 +3281,15 @@ spec:
               spec:
                 properties:
                   size:
+                    description: |
+                      Size of this Redis deployment. If small, it deploy redis with a single replica; if large, deploy redis with 3 replicas.
                     type: string
                     pattern: '^(small|large)$'
+                    default: small
                 type: object
             type: object
         served: true
         storage: true
   xaasRequestPipeline:
-  - ghcr.io/syntasso/marketplace/redis-request-pipeline:v0.1.0
+  - ghcr.io/syntasso/kratix-marketplace/redis-request-pipeline:v0.1.0
 status: {}
