@@ -44,17 +44,16 @@ jobs:
     parameters:
       promise:
         type: string
-    executor: machine-large
+    executor:
+      name: machine-large
     steps:
       - install_software
       - checkout
       - run:
+          working_directory: ~/repo/<< parameters.promise >>
           name: Validate no pending changes
-          environment:
-            PROMISE: << parameters.promise >>
           command: |
-            cd ${PROMISE}
-            ./internal/scripts/inject-wcr.sh
+            ./internal/scripts/inject-wcr
 
             if ! git diff --exit-code .; then
               echo ""
@@ -64,27 +63,23 @@ jobs:
             fi
       - run:
           name: Install Promise
-          environment:
-            PROMISE: << parameters.promise >>
+          working_directory: ~/repo/<< parameters.promise >>
           command: |
-            cd ${PROMISE}
             kubectl apply --filename promise.yaml
 
-            ./internal/scripts/docker.sh build
-            ./internal/scripts/docker.sh load
+            ./internal/scripts/docker build
+            ./internal/scripts/docker load
       - retry/run-with-retry:
-          command: << parameters.promise >>/internal/scripts/test.sh promise
+          command: << parameters.promise >>/internal/scripts/test promise
           sleep: 3
           retry-count: 30
       - run:
           name: Apply resource-request
-          environment:
-            PROMISE: << parameters.promise >>
+          working_directory: ~/repo/<< parameters.promise >>
           command: |
-            cd ${PROMISE}
             kubectl apply --filename resource-request.yaml
       - retry/run-with-retry:
-          command: << parameters.promise >>/internal/scripts/test.sh resource-request
+          command: << parameters.promise >>/internal/scripts/test resource-request
           sleep: 3
           retry-count: 30
       - when:
@@ -93,11 +88,16 @@ jobs:
           steps:
             - run:
                 name: GHCR Push
-                environment:
-                  PROMISE: << parameters.promise >>
+                working_directory: ~/repo/<< parameters.promise >>
                 command: |
                   echo "$GITHUB_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
-                  ${PROMISE}/internal/scripts/docker.sh push
+                  ./internal/scripts/docker push
+            - run:
+                name: Verify package is public
+                working_directory: ~/repo/<< parameters.promise >>
+                command: |
+                  docker logout
+                  ./internal/scripts/docker pull
 
 workflows:
   promises:
