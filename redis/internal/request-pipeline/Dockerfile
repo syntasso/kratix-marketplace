@@ -1,12 +1,12 @@
-FROM "mikefarah/yq:4"
-RUN [ "mkdir", "/tmp/transfer" ]
+FROM "alpine"
 
-MAINTAINER "kratix@syntasso.io"
 LABEL org.opencontainers.image.authors "kratix@syntasso.io"
 LABEL org.opencontainers.image.source https://github.com/syntasso/kratix-marketplace
-LABEL org.opencontainers.image.description="Pipeline image for the Redis Promise"
 
-ADD resources/redis-instance.yaml /tmp/transfer/redis-instance.yaml
+RUN [ "mkdir", "/tmp/transfer" ]
+RUN apk update && apk add --no-cache yq
+
+ADD resources/* /tmp/transfer/
 ADD execute-pipeline.sh execute-pipeline.sh
 
 CMD [ "sh", "-c", "./execute-pipeline.sh" ]
