@@ -57,7 +57,7 @@ jobs:
             ./internal/scripts/inject-wcr.sh
 
             if ! git diff . --exit-code; then
-              echo """
+              echo ""
               echo "Changes in the WCR were detected"
               echo "Injection of WCR via CI is not supported. Please commit and push them manually."
               exit 1
