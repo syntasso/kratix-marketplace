@@ -19,6 +19,9 @@ while [ $# -gt 0 ]; do
     push)
       docker push "${pipeline_image}" ;;
 
+    rmi)
+      docker rmi --force "${pipeline_image}" ;;
+
     pull)
       docker pull "${pipeline_image}" ;;
 

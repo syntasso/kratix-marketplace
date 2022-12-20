@@ -67,8 +67,7 @@ jobs:
           command: |
             kubectl apply --filename promise.yaml
 
-            ./internal/scripts/docker build
-            ./internal/scripts/docker load
+            ./internal/scripts/docker build load
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test promise
           sleep: 3
@@ -97,7 +96,7 @@ jobs:
                 working_directory: ~/repo/<< parameters.promise >>
                 command: |
                   docker logout
-                  ./internal/scripts/docker pull
+                  ./internal/scripts/docker rmi pull
 
 workflows:
   promises:
