@@ -95,7 +95,7 @@ jobs:
                 name: Verify package is public
                 working_directory: ~/repo/<< parameters.promise >>
                 command: |
-                  docker logout
+                  docker logout ghcr.io
                   ./internal/scripts/docker rmi pull
 
 workflows:
