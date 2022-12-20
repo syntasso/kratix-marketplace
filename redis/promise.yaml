@@ -3281,11 +3281,11 @@ spec:
               spec:
                 properties:
                   size:
+                    default: small
                     description: |
                       Size of this Redis deployment. If small, it deploy redis with a single replica; if large, deploy redis with 3 replicas.
+                    pattern: ^(small|large)$
                     type: string
-                    pattern: '^(small|large)$'
-                    default: small
                 type: object
             type: object
         served: true
