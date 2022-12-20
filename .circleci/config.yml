@@ -46,6 +46,20 @@ jobs:
       - install_software
       - checkout
       - run:
+          name: Validate no pending changes
+          environment:
+            PROMISE: << parameters.promise >>
+          command: |
+            cd ${PROMISE}
+            ./internal/scripts/inject-wcr.sh
+
+            if ! git diff . --exit-code; then
+              echo """
+              echo "Changes in the WCR were detected"
+              echo "Injection of WCR via CI is not supported. Please commit and push them manually."
+              exit 1
+            fi
+      - run:
           name: Install Promise
           environment:
             PROMISE: << parameters.promise >>
