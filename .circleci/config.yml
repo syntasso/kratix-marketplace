@@ -19,12 +19,15 @@ commands:
     steps:
       - k8s/install
       - run:
-          name: Install Kind
+          name: Install tools and deps
           command: |
             if [ ! -f ~/bin/kind ]; then
               curl -L https://github.com/kubernetes-sigs/kind/releases/download/v0.14.0/kind-linux-amd64 -o ~/bin/kind
               chmod +x ~/bin/kind
             fi
+
+            curl -L https://github.com/syntasso/kratix/releases/download/v0.0.1/worker-resource-builder-v0.0.0-1-linux-amd64 -o ~/bin/worker-resource-builder
+            chmod +x ~/bin/worker-resource-builder
       - run:
           name: Install Kratix
           command: |
