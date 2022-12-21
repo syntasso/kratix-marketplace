@@ -2,7 +2,7 @@
 set -e
 
 test_promise() {
-  kubectl get crds --context kind-worker | grep knative >/dev/null
+  kubectl get crds | grep knative >/dev/null
 }
 
 test_resource_request() {
