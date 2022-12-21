@@ -1,8 +1,8 @@
 apiVersion: marketplace.kratix.io/v1alpha1
 kind: postgresql
 metadata:
-  name: prod
+  name: example
 spec:
-  env: prod
-  teamId: acido
-  dbName: prod
+  env: dev
+  teamId: acid
+  dbName: bestdb
