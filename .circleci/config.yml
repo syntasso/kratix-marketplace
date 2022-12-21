@@ -107,4 +107,5 @@ workflows:
               promise:
                 - jenkins
                 - knative
+                - postgresql
                 - redis
