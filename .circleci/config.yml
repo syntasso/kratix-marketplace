@@ -104,4 +104,7 @@ workflows:
       - test-and-push:
           matrix:
             parameters:
-              promise: [redis, jenkins]
+              promise:
+                - jenkins
+                - knative
+                - redis

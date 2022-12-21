@@ -1,0 +1,6 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: knative
+metadata:
+  name: example
+spec:
+  env: dev

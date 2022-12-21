@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crds --context kind-worker | grep knative >/dev/null
+}
+
+test_resource_request() {
+  kubectl wait --for=condition=Available --timeout=5s --namespace knative-serving deployment/controller
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
