@@ -71,7 +71,7 @@ jobs:
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test promise
           sleep: 3
-          retry-count: 30
+          retry-count: 45
       - run:
           name: Apply resource-request
           working_directory: ~/repo/<< parameters.promise >>
@@ -80,7 +80,7 @@ jobs:
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test resource-request
           sleep: 3
-          retry-count: 30
+          retry-count: 45
       - when:
           condition:
             equal: [ main, << pipeline.git.branch >> ]
