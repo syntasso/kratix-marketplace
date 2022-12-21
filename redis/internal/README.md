@@ -8,20 +8,20 @@ the `workerClusterResources`. To build run:
 ./scripts/inject-wcr
 ```
 
-## Docker image
+## Pipeline image
 To build the image:
 ```
-./scripts/docker build
+./scripts/pipeline-image build
 ```
 
 To load the image to the local kind platform cluster:
 ```
-./scripts/docker load
+./scripts/pipeline-image load
 ```
 
 To push the image to ghcr.io:
 ```
-./scripts/docker push
+./scripts/pipeline-image push
 ```
 
 

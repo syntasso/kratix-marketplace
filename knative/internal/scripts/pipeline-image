@@ -2,4 +2,4 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-source ${PWD}/../../scripts/docker
+source ${PWD}/../../scripts/pipeline-image

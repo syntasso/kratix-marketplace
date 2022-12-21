@@ -67,7 +67,7 @@ jobs:
           command: |
             kubectl apply --filename promise.yaml
 
-            ./internal/scripts/docker build load
+            ./internal/scripts/pipeline-image build load
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test promise
           sleep: 3
@@ -90,13 +90,13 @@ jobs:
                 working_directory: ~/repo/<< parameters.promise >>
                 command: |
                   echo "$GITHUB_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
-                  ./internal/scripts/docker push
+                  ./internal/scripts/pipeline-image push
             - run:
                 name: Verify package is public
                 working_directory: ~/repo/<< parameters.promise >>
                 command: |
                   docker logout ghcr.io
-                  ./internal/scripts/docker rmi pull
+                  ./internal/scripts/pipeline-image rmi pull
 
 workflows:
   promises:
