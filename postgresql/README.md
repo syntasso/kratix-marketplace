@@ -1,4 +1,4 @@
-# Jenkins
+# PostgreSQL
 
 This Promise provides Postgresql-as-a-Service. The Promise has 3 fields:
 * `.spec.env`
