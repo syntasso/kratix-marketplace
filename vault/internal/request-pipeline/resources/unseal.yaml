@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: vault-autounseal
+---
+# Source: vault-autounseal/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-autounseal
+  namespace: vault-autounseal
+  labels:
+    helm.sh/chart: vault-autounseal-0.2.0
+    app.kubernetes.io/name: vault-autounseal
+    app.kubernetes.io/instance: vault-autounseal
+    app.kubernetes.io/version: "main"
+    app.kubernetes.io/managed-by: Helm
+---
+# Source: vault-autounseal/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-autounseal
+  namespace: vault-autounseal
+  labels:
+    helm.sh/chart: vault-autounseal-0.2.0
+    app.kubernetes.io/name: vault-autounseal
+    app.kubernetes.io/instance: vault-autounseal
+    app.kubernetes.io/version: "main"
+    app.kubernetes.io/managed-by: Helm
+data:
+  VAULT_URL: http://vault.default:8200
+  VAULT_SECRET_SHARES: 	"3"
+  VAULT_SECRET_THRESHOLD: "2"
+  NAMESPACE: vault-autounseal
+  VAULT_ROOT_TOKEN_SECRET: vault-root-token
+  VAULT_KEYS_SECRET: vault-keys
+---
+# Source: vault-autounseal/templates/rbac.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: vault-autounseal
+  namespace: vault-autounseal
+  labels:
+    helm.sh/chart: vault-autounseal-0.2.0
+    app.kubernetes.io/name: vault-autounseal
+    app.kubernetes.io/instance: vault-autounseal
+    app.kubernetes.io/version: "main"
+    app.kubernetes.io/managed-by: Helm  
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create 
+  - delete
+  - update
+---
+# Source: vault-autounseal/templates/rbac.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-autounseal
+  namespace: vault-autounseal
+  labels:
+    helm.sh/chart: vault-autounseal-0.2.0
+    app.kubernetes.io/name: vault-autounseal
+    app.kubernetes.io/instance: vault-autounseal
+    app.kubernetes.io/version: "main"
+    app.kubernetes.io/managed-by: Helm  
+subjects:
+  - kind: ServiceAccount
+    name: vault-autounseal
+    namespace: vault-autounseal
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: vault-autounseal
+---
+# Source: vault-autounseal/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vault-autounseal
+  namespace: vault-autounseal
+  labels:
+    helm.sh/chart: vault-autounseal-0.2.0
+    app.kubernetes.io/name: vault-autounseal
+    app.kubernetes.io/instance: vault-autounseal
+    app.kubernetes.io/version: "main"
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: vault-autounseal
+      app.kubernetes.io/instance: vault-autounseal
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: vault-autounseal
+        app.kubernetes.io/instance: vault-autounseal
+    spec:
+      serviceAccountName: vault-autounseal
+      securityContext:
+        {}
+      containers:
+        - name: vault-autounseal
+          securityContext:
+            {}
+          image: "ghcr.io/pytoshka/vault-autounseal:main"
+          imagePullPolicy: IfNotPresent
+          envFrom:
+          - configMapRef:
+              name: vault-autounseal
+              optional: false
+          resources:
+            {}

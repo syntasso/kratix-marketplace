@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+set -x
+
+# Read current values from the provided resource request
+env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
+
+cp /tmp/transfer/*.yaml /output
+
+# This statement is designed to represent a difference in deployment complexity 
+# in a dev vs prod environment. In the case of Vault we unseal our dev instance, 
+# we leave prod sealed.
+if [ "${env_type}" = "prod" ];
+then
+  rm /output/unseal.yaml
+fi
