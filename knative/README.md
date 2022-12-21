@@ -14,7 +14,7 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 To make a resource request (small by default):
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/knative/resource-request.yaml
-``
+```
 
 ## Development
 
