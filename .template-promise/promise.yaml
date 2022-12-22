@@ -1,0 +1,31 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  name: # TODO
+spec:
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: # TODO <plural name>.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: # TODO
+        plural: # TODO
+        singular: # TODO
+      scope: Namespaced
+      versions:
+        - name: # TODO
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  properties:
+                  # TODO
+                  type: object
+              type: object
+          served: true
+          storage: true
+  xaasRequestPipeline:
+  # - TODO: set pipeline image
