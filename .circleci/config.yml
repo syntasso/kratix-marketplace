@@ -116,3 +116,4 @@ workflows:
                 - postgresql
                 - redis
                 - vault
+                - observability
