@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+urls=(
+    "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
+)
+
+for url in "${urls[@]}"; do
+    curl -sL -o $PWD/resources/$(basename $url) $url
+done
+
+echo """---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: argocd
+""" > $PWD/resources/namespace.yaml

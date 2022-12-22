@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl wait --for=condition=Available --timeout=5s --namespace argocd deployment/argocd-server
+}
+
+test_resource_request() {
+  kubectl wait --for=condition=Available --timeout=5s --namespace default deployment/guestbook-ui
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

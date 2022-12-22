@@ -110,6 +110,7 @@ workflows:
           matrix:
             parameters:
               promise:
+                - argocd-application
                 - jenkins
                 - knative
                 - observability

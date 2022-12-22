@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+mkdir -p $PWD/request-pipeline/resources
+
+# Based on example from:
+#   https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications
+echo """---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: NAME
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: REPO_URL
+    targetRevision: REVISION
+    path: PATH
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated: {}
+""" > $PWD/request-pipeline/resources/application.yaml
