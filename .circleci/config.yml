@@ -32,9 +32,9 @@ commands:
           name: Install Kratix
           command: |
             kind create cluster --name platform
-            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml
+            kubectl create --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml
             sleep 5
-            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
+            kubectl create --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
             sleep 5
       - attach_workspace:
           at: .
@@ -65,7 +65,7 @@ jobs:
           name: Install Promise
           working_directory: ~/repo/<< parameters.promise >>
           command: |
-            kubectl apply --filename promise.yaml
+            kubectl create --filename promise.yaml
 
             ./internal/scripts/pipeline-image build load
       - retry/run-with-retry:
@@ -73,10 +73,10 @@ jobs:
           sleep: 3
           retry-count: 45
       - run:
-          name: Apply resource-request
+          name: create resource-request
           working_directory: ~/repo/<< parameters.promise >>
           command: |
-            kubectl apply --filename resource-request.yaml
+            kubectl create --filename resource-request.yaml
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test resource-request
           sleep: 3
