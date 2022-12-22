@@ -9,6 +9,10 @@ if ! which worker-resource-builder >/dev/null; then
 	exit 1
 fi
 
+if [ ! -d "${PWD}/resources" ]; then
+  exit 0
+fi
+
 promise_contents=$(worker-resource-builder \
   -k8s-resources-directory "${PWD}/resources" \
 	-promise "${PWD}/../promise.yaml")
