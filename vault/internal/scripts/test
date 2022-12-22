@@ -3,7 +3,7 @@ set -e
 
 test_promise() {
   # vault has no WCR
-  exit 0
+  kubectl get crd vaults.marketplace.kratix.io
 }
 
 test_resource_request() {
