@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.36.1
   name: prometheus-k8s
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 spec:
   egress:
   - {}

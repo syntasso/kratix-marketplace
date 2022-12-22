@@ -1,5 +1,21 @@
 #!/usr/bin/env sh
 
-set -x
+set -ex
+
+namespace="$(yq eval '.spec.namespace' /input/object.yaml)"
+env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
+
+prometheus=1
+alertmanager=1
+
+if [ "${env_type}" = "prod" ]; then
+	prometheus=2
+	alertmanager=3
+fi
+
+sed -ibkp "s/TBDNAMESPACE/${namespace}/g" /tmp/transfer/*
+sed -ibkp "s/PROMETHEUS_REPLICAS/${prometheus}/g" /tmp/transfer/*
+sed -ibkp "s/ALERTMANAGER_REPLICAS/${alertmanager}/g" /tmp/transfer/*
+rm /tmp/transfer/*bkp
 
 cp /tmp/transfer/* /output/

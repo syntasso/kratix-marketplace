@@ -24,4 +24,4 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 8.5.5
   name: grafana-dashboards
-  namespace: monitoring
+  namespace: TBDNAMESPACE

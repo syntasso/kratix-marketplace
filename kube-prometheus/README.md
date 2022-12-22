@@ -1,16 +1,16 @@
-# Jenkins
+# Observability
 
-This Promise provides Jenkins-as-a-Service. The Promise has 1 field `.spec.env`
-which can be `dev` or `prod`.
+This Promise provides Observability-as-a-Service by deploying [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus). The Promise has 2 field `.spec.namespace`,
+which is the namespace the Grafana and Prometheus installation and `.spec.env` which can be `dev` or `prod`.
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/jenkins/promise.yaml
+kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/observability/promise.yaml
 ```
 
-To make a resource request (small by default):
+To make a resource request (dev by default):
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/jenkins/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/observability/resource-request.yaml
 ```
 
 ## Development

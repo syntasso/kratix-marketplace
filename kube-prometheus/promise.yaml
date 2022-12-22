@@ -28616,6 +28616,9 @@ spec:
                     default: dev
                     pattern: ^(dev|prod)$
                     type: string
+                  namespace:
+                    type: string
+                required: [namespace]
                 type: object
             type: object
         served: true

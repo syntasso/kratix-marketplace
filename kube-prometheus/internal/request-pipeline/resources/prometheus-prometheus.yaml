@@ -8,13 +8,13 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.36.1
   name: k8s
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 spec:
   alerting:
     alertmanagers:
     - apiVersion: v2
       name: alertmanager-main
-      namespace: monitoring
+      namespace: TBDNAMESPACE
       port: web
   enableFeatures: []
   externalLabels: {}
@@ -32,7 +32,7 @@ spec:
   podMonitorSelector: {}
   probeNamespaceSelector: {}
   probeSelector: {}
-  replicas: 2
+  replicas: PROMETHEUS_REPLICAS
   resources:
     requests:
       memory: 400Mi

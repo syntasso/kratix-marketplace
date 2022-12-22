@@ -4,3 +4,4 @@ metadata:
   name: example
 spec:
   env: dev
+  namespace: monitoring

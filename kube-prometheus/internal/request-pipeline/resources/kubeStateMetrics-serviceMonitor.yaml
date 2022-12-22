@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.5.0
   name: kube-state-metrics
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 spec:
   endpoints:
   - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token

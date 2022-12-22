@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 2.36.1
   name: prometheus-k8s-config
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -16,4 +16,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: prometheus-k8s
-  namespace: monitoring
+  namespace: TBDNAMESPACE

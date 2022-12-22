@@ -9,7 +9,7 @@ metadata:
     prometheus: k8s
     role: alert-rules
   name: grafana-rules
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 spec:
   groups:
   - name: GrafanaAlerts

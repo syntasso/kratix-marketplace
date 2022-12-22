@@ -13,6 +13,6 @@ spec:
   insecureSkipTLSVerify: true
   service:
     name: prometheus-adapter
-    namespace: monitoring
+    namespace: TBDNAMESPACE
   version: v1beta1
   versionPriority: 100

@@ -18,7 +18,7 @@ items:
   subjects:
   - kind: ServiceAccount
     name: prometheus-k8s
-    namespace: monitoring
+    namespace: TBDNAMESPACE
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: RoleBinding
   metadata:
@@ -37,7 +37,7 @@ items:
   subjects:
   - kind: ServiceAccount
     name: prometheus-k8s
-    namespace: monitoring
+    namespace: TBDNAMESPACE
 - apiVersion: rbac.authorization.k8s.io/v1
   kind: RoleBinding
   metadata:
@@ -48,7 +48,7 @@ items:
       app.kubernetes.io/part-of: kube-prometheus
       app.kubernetes.io/version: 2.36.1
     name: prometheus-k8s
-    namespace: monitoring
+    namespace: TBDNAMESPACE
   roleRef:
     apiGroup: rbac.authorization.k8s.io
     kind: Role
@@ -56,5 +56,5 @@ items:
   subjects:
   - kind: ServiceAccount
     name: prometheus-k8s
-    namespace: monitoring
+    namespace: TBDNAMESPACE
 kind: RoleBindingList

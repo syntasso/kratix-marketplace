@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 8.5.5
   name: grafana
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 spec:
   endpoints:
   - interval: 15s

@@ -10,7 +10,7 @@ metadata:
     prometheus: k8s
     role: alert-rules
   name: prometheus-k8s-prometheus-rules
-  namespace: monitoring
+  namespace: TBDNAMESPACE
 spec:
   groups:
   - name: prometheus
