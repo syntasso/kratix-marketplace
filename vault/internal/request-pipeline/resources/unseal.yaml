@@ -29,7 +29,7 @@ metadata:
     app.kubernetes.io/version: "main"
     app.kubernetes.io/managed-by: Helm
 data:
-  VAULT_URL: http://vault.default:8200
+  VAULT_URL: http://vault-NAMETBD.default:8200
   VAULT_SECRET_SHARES: 	"3"
   VAULT_SECRET_THRESHOLD: "2"
   NAMESPACE: vault-autounseal

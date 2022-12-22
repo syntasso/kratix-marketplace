@@ -7,7 +7,7 @@ test_promise() {
 }
 
 test_resource_request() {
-  kubectl wait --for=condition=ready --timeout=5s pod/vault-0
+  kubectl wait --for=condition=ready --timeout=5s pod/vault-example-0
 }
 
 if [ "$1" = "promise" ]; then

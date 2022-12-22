@@ -3,10 +3,10 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vault-agent-injector
+  name: vault-NAMETBD-agent-injector
   namespace: default
   labels:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 ---
@@ -14,11 +14,11 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vault
+  name: vault-NAMETBD
   namespace: default
   labels:
     helm.sh/chart: vault-0.23.0
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 ---
@@ -26,11 +26,11 @@ metadata:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vault-config
+  name: vault-NAMETBD-config
   namespace: default
   labels:
     helm.sh/chart: vault-0.23.0
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 data:
@@ -71,9 +71,9 @@ data:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: vault-agent-injector-clusterrole
+  name: vault-NAMETBD-agent-injector-clusterrole
   labels:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 rules:
@@ -89,28 +89,28 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: vault-agent-injector-binding
+  name: vault-NAMETBD-agent-injector-binding
   labels:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: vault-agent-injector-clusterrole
+  name: vault-NAMETBD-agent-injector-clusterrole
 subjects:
 - kind: ServiceAccount
-  name: vault-agent-injector
+  name: vault-NAMETBD-agent-injector
   namespace: default
 ---
 # Source: vault/templates/server-clusterrolebinding.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: vault-server-binding
+  name: vault-NAMETBD-server-binding
   labels:
     helm.sh/chart: vault-0.23.0
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 roleRef:
@@ -119,17 +119,17 @@ roleRef:
   name: system:auth-delegator
 subjects:
 - kind: ServiceAccount
-  name: vault
+  name: vault-NAMETBD
   namespace: default
 ---
 # Source: vault/templates/injector-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: vault-agent-injector-svc
+  name: vault-NAMETBD-agent-injector-svc
   namespace: default
   labels:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
   
@@ -139,7 +139,7 @@ spec:
     port: 443
     targetPort: 8080
   selector:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     component: webhook
 ---
@@ -148,11 +148,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: vault-internal
+  name: vault-NAMETBD-internal
   namespace: default
   labels:
     helm.sh/chart: vault-0.23.0
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
     vault-internal: "true"
@@ -169,7 +169,7 @@ spec:
       port: 8201
       targetPort: 8201
   selector:
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     component: server
 ---
@@ -178,11 +178,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: vault
+  name: vault-NAMETBD
   namespace: default
   labels:
     helm.sh/chart: vault-0.23.0
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
   annotations:
@@ -199,7 +199,7 @@ spec:
       port: 8201
       targetPort: 8201
   selector:
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     component: server
 ---
@@ -208,10 +208,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vault-agent-injector
+  name: vault-NAMETBD-agent-injector
   namespace: default
   labels:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
     component: webhook
@@ -219,14 +219,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: vault-agent-injector
+      app.kubernetes.io/name: NAMETBD-agent-injector
       app.kubernetes.io/instance: vault
       component: webhook
   
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: vault-agent-injector
+        app.kubernetes.io/name: NAMETBD-agent-injector
         app.kubernetes.io/instance: vault
         component: webhook
     spec:
@@ -236,7 +236,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  app.kubernetes.io/name: vault-agent-injector
+                  app.kubernetes.io/name: NAMETBD-agent-injector
                   app.kubernetes.io/instance: "vault"
                   component: webhook
               topologyKey: kubernetes.io/hostname
@@ -244,7 +244,7 @@ spec:
       
       
       
-      serviceAccountName: "vault-agent-injector"
+      serviceAccountName: "vault-NAMETBD-agent-injector"
       
       securityContext:
         runAsNonRoot: true
@@ -268,15 +268,15 @@ spec:
             - name: AGENT_INJECT_LOG_LEVEL
               value: info
             - name: AGENT_INJECT_VAULT_ADDR
-              value: http://vault.default.svc:8200
+              value: http://vault-NAMETBD.default.svc:8200
             - name: AGENT_INJECT_VAULT_AUTH_PATH
               value: auth/kubernetes
             - name: AGENT_INJECT_VAULT_IMAGE
               value: "hashicorp/vault:1.12.1"
             - name: AGENT_INJECT_TLS_AUTO
-              value: vault-agent-injector-cfg
+              value: vault-NAMETBD-agent-injector-cfg
             - name: AGENT_INJECT_TLS_AUTO_HOSTS
-              value: vault-agent-injector-svc,vault-agent-injector-svc.default,vault-agent-injector-svc.default.svc
+              value: vault-NAMETBD-agent-injector-svc,vault-NAMETBD-agent-injector-svc.default,vault-NAMETBD-agent-injector-svc.default.svc
             - name: AGENT_INJECT_LOG_FORMAT
               value: standard
             - name: AGENT_INJECT_REVOKE_ON_SHUTDOWN
@@ -327,28 +327,28 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: vault
+  name: vault-NAMETBD
   namespace: default
   labels:
-    app.kubernetes.io/name: vault
+    app.kubernetes.io/name: NAMETBD
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 spec:
-  serviceName: vault-internal
+  serviceName: vault-NAMETBD-internal
   podManagementPolicy: Parallel
   replicas: 1
   updateStrategy:
     type: OnDelete
   selector:
     matchLabels:
-      app.kubernetes.io/name: vault
+      app.kubernetes.io/name: NAMETBD
       app.kubernetes.io/instance: vault
       component: server
   template:
     metadata:
       labels:
         helm.sh/chart: vault-0.23.0
-        app.kubernetes.io/name: vault
+        app.kubernetes.io/name: NAMETBD
         app.kubernetes.io/instance: vault
         component: server
     spec:
@@ -358,7 +358,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  app.kubernetes.io/name: vault
+                  app.kubernetes.io/name: NAMETBD
                   app.kubernetes.io/instance: "vault"
                   component: server
               topologyKey: kubernetes.io/hostname
@@ -367,7 +367,7 @@ spec:
       
       
       terminationGracePeriodSeconds: 10
-      serviceAccountName: vault
+      serviceAccountName: vault-NAMETBD
       
       securityContext:
         runAsNonRoot: true
@@ -379,7 +379,7 @@ spec:
         
         - name: config
           configMap:
-            name: vault-config
+            name: vault-NAMETBD-config
   
         - name: home
           emptyDir: {}
@@ -434,7 +434,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: VAULT_CLUSTER_ADDR
-              value: "https://$(HOSTNAME).vault-internal:8201"
+              value: "https://$(HOSTNAME).vault-NAMETBD-internal:8201"
             - name: HOME
               value: "/home/vault"
             
@@ -505,9 +505,9 @@ spec:
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
 metadata:
-  name: vault-agent-injector-cfg
+  name: vault-NAMETBD-agent-injector-cfg
   labels:
-    app.kubernetes.io/name: vault-agent-injector
+    app.kubernetes.io/name: NAMETBD-agent-injector
     app.kubernetes.io/instance: vault
     app.kubernetes.io/managed-by: Helm
 webhooks:
@@ -519,7 +519,7 @@ webhooks:
     admissionReviewVersions: ["v1", "v1beta1"]
     clientConfig:
       service:
-        name: vault-agent-injector-svc
+        name: vault-NAMETBD-agent-injector-svc
         namespace: default
         path: "/mutate"
       caBundle: ""
@@ -533,7 +533,7 @@ webhooks:
       - key: app.kubernetes.io/name
         operator: NotIn
         values:
-        - vault-agent-injector
+        - NAMETBD-agent-injector
 ---
 # Source: vault/templates/tests/server-test.yaml
 apiVersion: v1
@@ -551,7 +551,7 @@ spec:
       imagePullPolicy: IfNotPresent
       env:
         - name: VAULT_ADDR
-          value: http://vault.default.svc:8200
+          value: http://vault-NAMETBD.default.svc:8200
         
       command:
         - /bin/sh

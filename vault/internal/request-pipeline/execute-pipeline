@@ -4,13 +4,14 @@ set -x
 
 # Read current values from the provided resource request
 env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
+name="$(yq eval '.metadata.name' /input/object.yaml)"
 
-cp /tmp/transfer/*.yaml /output
+sed "s/NAMETBD/${name}/g" /tmp/transfer/vault.yaml > /output/vault.yaml
 
 # This statement is designed to represent a difference in deployment complexity 
 # in a dev vs prod environment. In the case of Vault we unseal our dev instance, 
 # we leave prod sealed.
-if [ "${env_type}" = "prod" ];
+if [ "${env_type}" = "dev" ];
 then
-  rm /output/unseal.yaml
+  sed "s/NAMETBD/${name}/g" /tmp/transfer/unseal.yaml > /output/unseal.yaml
 fi
