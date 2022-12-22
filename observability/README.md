@@ -13,6 +13,27 @@ To make a resource request (dev by default):
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/observability/resource-request.yaml
 ```
 
+
+## Accessing UI
+
+Prometheus and Grafana dashboards can be accessed quickly using `kubectl port-forward`
+
+### Prometheus
+
+```shell
+$ kubectl --namespace monitoring port-forward svc/prometheus-k8s 9090
+```
+
+Then access via [http://localhost:9090](http://localhost:9090)
+
+### Grafana
+
+```shell
+$ kubectl --namespace monitoring port-forward svc/grafana 3000
+```
+
+Then access via [http://localhost:3000](http://localhost:3000) and use the default grafana user:password of `admin:admin`.
+
 ## Development
 
 For development see [README.md](./internal/README.md)
