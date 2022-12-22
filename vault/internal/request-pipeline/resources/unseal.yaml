@@ -14,7 +14,7 @@ metadata:
     app.kubernetes.io/name: vault-autounseal
     app.kubernetes.io/instance: vault-autounseal
     app.kubernetes.io/version: "main"
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: Kratix
 ---
 # Source: vault-autounseal/templates/configmap.yaml
 apiVersion: v1
@@ -27,7 +27,7 @@ metadata:
     app.kubernetes.io/name: vault-autounseal
     app.kubernetes.io/instance: vault-autounseal
     app.kubernetes.io/version: "main"
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: Kratix
 data:
   VAULT_URL: http://vault-NAMETBD.default:8200
   VAULT_SECRET_SHARES: 	"3"
@@ -47,7 +47,7 @@ metadata:
     app.kubernetes.io/name: vault-autounseal
     app.kubernetes.io/instance: vault-autounseal
     app.kubernetes.io/version: "main"
-    app.kubernetes.io/managed-by: Helm  
+    app.kubernetes.io/managed-by: Kratix  
 rules:
 - apiGroups:
   - ""
@@ -70,7 +70,7 @@ metadata:
     app.kubernetes.io/name: vault-autounseal
     app.kubernetes.io/instance: vault-autounseal
     app.kubernetes.io/version: "main"
-    app.kubernetes.io/managed-by: Helm  
+    app.kubernetes.io/managed-by: Kratix  
 subjects:
   - kind: ServiceAccount
     name: vault-autounseal
@@ -91,7 +91,7 @@ metadata:
     app.kubernetes.io/name: vault-autounseal
     app.kubernetes.io/instance: vault-autounseal
     app.kubernetes.io/version: "main"
-    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/managed-by: Kratix
 spec:
   replicas: 1
   selector:
