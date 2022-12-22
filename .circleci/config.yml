@@ -65,8 +65,7 @@ jobs:
           name: Install Promise
           working_directory: ~/repo/<< parameters.promise >>
           command: |
-            kubectl apply --filename promise.yaml
-
+            kubectl create --filename promise.yaml
             ./internal/scripts/pipeline-image build load
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test promise
