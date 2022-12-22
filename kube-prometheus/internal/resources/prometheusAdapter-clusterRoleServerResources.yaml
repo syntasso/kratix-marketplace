@@ -7,7 +7,6 @@ metadata:
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.9.1
   name: resource-metrics-server-resources
-  namespace: TBDNAMESPACE
 rules:
 - apiGroups:
   - metrics.k8s.io

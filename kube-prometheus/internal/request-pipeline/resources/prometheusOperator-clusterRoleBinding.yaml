@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/name: prometheus-operator
     app.kubernetes.io/part-of: kube-prometheus
     app.kubernetes.io/version: 0.57.0
-  name: prometheus-operator
+  name: prometheus-operator-TBDROLENAME
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

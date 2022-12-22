@@ -2,6 +2,7 @@
 
 set -ex
 
+name="$(yq eval '.metadata.name' /input/object.yaml)"
 namespace="$(yq eval '.spec.namespace' /input/object.yaml)"
 env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
 
@@ -16,6 +17,7 @@ fi
 sed -ibkp "s/TBDNAMESPACE/${namespace}/g" /tmp/transfer/*
 sed -ibkp "s/PROMETHEUS_REPLICAS/${prometheus}/g" /tmp/transfer/*
 sed -ibkp "s/ALERTMANAGER_REPLICAS/${alertmanager}/g" /tmp/transfer/*
+sed -ibkp "s/TBDROLENAME/${name}/g" /tmp/transfer/*
 rm /tmp/transfer/*bkp
 
 cp /tmp/transfer/* /output/
