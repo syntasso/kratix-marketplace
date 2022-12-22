@@ -115,3 +115,4 @@ workflows:
                 - knative
                 - postgresql
                 - redis
+                - vault
