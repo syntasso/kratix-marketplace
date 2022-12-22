@@ -28916,5 +28916,5 @@ spec:
         served: true
         storage: true
   xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/kube-prometheus-request-pipeline:v0.1.0
+  - ghcr.io/syntasso/kratix-marketplace/observability-request-pipeline:v0.1.0
 status: {}
