@@ -112,7 +112,7 @@ workflows:
               promise:
                 - jenkins
                 - knative
+                - observability
                 - postgresql
                 - redis
                 - vault
-                - observability
