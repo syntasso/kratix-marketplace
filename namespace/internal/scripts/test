@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crds namespaces.marketplace.kratix.io
+}
+
+test_resource_request() {
+  kubectl get namespace promised-namespace
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

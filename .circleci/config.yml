@@ -113,9 +113,10 @@ workflows:
                 - argocd-application
                 - elasticcloud
                 - jenkins
+                - kafka
                 - knative
+                - namespace
                 - observability
                 - postgresql
                 - redis
                 - vault
-                - kafka

@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+resources=$PWD/request-pipeline/resources
+mkdir -p ${resources}
+
+cat > $resources/namespace.yaml <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: TBDNAMESPACE
+EOF
