@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
+mkdir -p ${PWD}/resources
 
 urls=(
     # TODO: set URLs to download resources. Ideally use pinned version URLs.

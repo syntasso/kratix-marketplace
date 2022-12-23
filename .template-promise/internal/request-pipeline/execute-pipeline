@@ -2,4 +2,7 @@
 
 set -x
 
-# TODO: Set logic for request pipeline
+# Add logic for pipeline here.
+# Example:
+# name="$(yq eval '.metadata.name' /input/object.yaml)"
+# sed "s/TBDNAME/${name}/g" /tmp/transfer/filename.yaml > /output/filename.yaml

@@ -16,7 +16,7 @@ spec:
         singular: # TODO
       scope: Namespaced
       versions:
-        - name: # TODO
+        - name: v1alpha1
           schema:
             openAPIV3Schema:
               properties:
@@ -28,4 +28,4 @@ spec:
           served: true
           storage: true
   xaasRequestPipeline:
-  # - TODO: set pipeline image
+  - ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-request-pipeline:v0.1.0
