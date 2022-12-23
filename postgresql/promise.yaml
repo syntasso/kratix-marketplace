@@ -1,9 +1,57 @@
+---
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: postgresql
 spec:
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: postgresqls.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: postgresql
+        plural: postgresqls
+        singular: postgresql
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  dbName:
+                    default: postgres
+                    description: 'Database name. A database will be created with this
+                      name. The owner of the database will be the teamId.
+
+'
+                    type: string
+                  env:
+                    default: dev
+                    description: 'Configures and deploys this PostgreSQL with environment
+                      specific configuration. Prod PostgreSQL are configured with
+                      backups and more resources.
+
+'
+                    pattern: "^(dev|prod)$"
+                    type: string
+                  teamId:
+                    default: acid
+                    description: 'Team ID. A superuser role will be created with this
+                      name.
+
+'
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  xaasRequestPipeline:
+  - ghcr.io/syntasso/kratix-marketplace/postgresql-request-pipeline:v0.1.0
   workerClusterResources:
   - apiVersion: v1
     kind: ServiceAccount
@@ -26,7 +74,7 @@ spec:
       name: postgres-pod
     rules:
     - apiGroups:
-      - ""
+      - ''
       resources:
       - endpoints
       verbs:
@@ -39,7 +87,7 @@ spec:
       - update
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - pods
       verbs:
@@ -49,7 +97,7 @@ spec:
       - update
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - services
       verbs:
@@ -97,7 +145,7 @@ spec:
       - patch
       - update
     - apiGroups:
-      - ""
+      - ''
       resources:
       - events
       verbs:
@@ -108,13 +156,13 @@ spec:
       - update
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - configmaps
       verbs:
       - get
     - apiGroups:
-      - ""
+      - ''
       resources:
       - endpoints
       verbs:
@@ -127,7 +175,7 @@ spec:
       - update
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - secrets
       verbs:
@@ -136,7 +184,7 @@ spec:
       - get
       - update
     - apiGroups:
-      - ""
+      - ''
       resources:
       - nodes
       verbs:
@@ -144,7 +192,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - persistentvolumeclaims
       verbs:
@@ -154,14 +202,14 @@ spec:
       - patch
       - update
     - apiGroups:
-      - ""
+      - ''
       resources:
       - persistentvolumes
       verbs:
       - get
       - list
     - apiGroups:
-      - ""
+      - ''
       resources:
       - pods
       verbs:
@@ -172,13 +220,13 @@ spec:
       - update
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - pods/exec
       verbs:
       - create
     - apiGroups:
-      - ""
+      - ''
       resources:
       - services
       verbs:
@@ -210,7 +258,7 @@ spec:
       - patch
       - update
     - apiGroups:
-      - ""
+      - ''
       resources:
       - namespaces
       verbs:
@@ -224,7 +272,7 @@ spec:
       - delete
       - get
     - apiGroups:
-      - ""
+      - ''
       resources:
       - serviceaccounts
       verbs:
@@ -326,7 +374,7 @@ spec:
         aws_region: eu-central-1
         enable_ebs_gp3_migration: false
       connection_pooler:
-        connection_pooler_default_cpu_limit: "1"
+        connection_pooler_default_cpu_limit: '1'
         connection_pooler_default_cpu_request: 500m
         connection_pooler_default_memory_limit: 100Mi
         connection_pooler_default_memory_request: 100Mi
@@ -347,7 +395,7 @@ spec:
       enable_pgversion_env_var: true
       enable_shm_volume: true
       enable_spilo_wal_path_compat: false
-      etcd_host: ""
+      etcd_host: ''
       kubernetes:
         cluster_domain: cluster.local
         cluster_labels:
@@ -365,11 +413,11 @@ spec:
         pod_role_label: spilo-role
         pod_service_account_name: postgres-pod
         pod_terminate_grace_period: 5m
-        secret_name_template: '{username}.{cluster}.credentials.{tprkind}.{tprgroup}'
+        secret_name_template: "{username}.{cluster}.credentials.{tprkind}.{tprgroup}"
         spilo_allow_privilege_escalation: true
         spilo_privileged: false
         storage_resize_mode: pvc
-        watched_namespace: '*'
+        watched_namespace: "*"
       load_balancer:
         db_hosted_zone: db.example.com
         enable_master_load_balancer: false
@@ -377,8 +425,8 @@ spec:
         enable_replica_load_balancer: false
         enable_replica_pooler_load_balancer: false
         external_traffic_policy: Cluster
-        master_dns_name_format: '{cluster}.{team}.{hostedzone}'
-        replica_dns_name_format: '{cluster}-repl.{team}.{hostedzone}'
+        master_dns_name_format: "{cluster}.{team}.{hostedzone}"
+        replica_dns_name_format: "{cluster}-repl.{team}.{hostedzone}"
       logging_rest_api:
         api_port: 8080
         cluster_history_entries: 1000
@@ -387,22 +435,22 @@ spec:
         logical_backup_docker_image: registry.opensource.zalan.do/acid/logical-backup:v1.8.0
         logical_backup_job_prefix: logical-backup-
         logical_backup_provider: s3
-        logical_backup_s3_access_key_id: ""
+        logical_backup_s3_access_key_id: ''
         logical_backup_s3_bucket: my-bucket-url
-        logical_backup_s3_endpoint: ""
-        logical_backup_s3_region: ""
-        logical_backup_s3_retention_time: ""
-        logical_backup_s3_secret_access_key: ""
+        logical_backup_s3_endpoint: ''
+        logical_backup_s3_region: ''
+        logical_backup_s3_retention_time: ''
+        logical_backup_s3_secret_access_key: ''
         logical_backup_s3_sse: AES256
         logical_backup_schedule: 30 00 * * *
       major_version_upgrade:
-        major_version_upgrade_mode: "off"
-        minimal_major_version: "9.6"
-        target_major_version: "14"
+        major_version_upgrade_mode: 'off'
+        minimal_major_version: '9.6'
+        target_major_version: '14'
       max_instances: -1
       min_instances: -1
       postgres_pod_resources:
-        default_cpu_limit: "1"
+        default_cpu_limit: '1'
         default_cpu_request: 100m
         default_memory_limit: 500Mi
         default_memory_request: 100Mi
@@ -471,22 +519,22 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: Spilo image to be used for Pods
-          jsonPath: .configuration.docker_image
+          jsonPath: ".configuration.docker_image"
           name: Image
           type: string
         - description: Label for K8s resources created by operator
-          jsonPath: .configuration.kubernetes.cluster_name_label
+          jsonPath: ".configuration.kubernetes.cluster_name_label"
           name: Cluster-Label
           type: string
         - description: Name of service account to be used
-          jsonPath: .configuration.kubernetes.pod_service_account_name
+          jsonPath: ".configuration.kubernetes.pod_service_account_name"
           name: Service-Account
           type: string
         - description: Minimum number of instances per Postgres cluster
-          jsonPath: .configuration.min_instances
+          jsonPath: ".configuration.min_instances"
           name: Min-Instances
           type: integer
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: Age
           type: date
         name: v1
@@ -504,7 +552,7 @@ spec:
                       additional_secret_mount:
                         type: string
                       additional_secret_mount_path:
-                        default: /meta/credentials
+                        default: "/meta/credentials"
                         type: string
                       aws_region:
                         default: eu-central-1
@@ -531,20 +579,20 @@ spec:
                   connection_pooler:
                     properties:
                       connection_pooler_default_cpu_limit:
-                        default: "1"
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        default: '1'
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       connection_pooler_default_cpu_request:
                         default: 500m
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       connection_pooler_default_memory_limit:
                         default: 100Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       connection_pooler_default_memory_request:
                         default: 100Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       connection_pooler_image:
                         default: registry.opensource.zalan.do/acid/pgbouncer:master-24
@@ -609,7 +657,7 @@ spec:
                     default: false
                     type: boolean
                   etcd_host:
-                    default: ""
+                    default: ''
                     type: string
                   ignore_instance_limits_annotation_key:
                     type: string
@@ -738,19 +786,19 @@ spec:
                         default: spilo-role
                         type: string
                       pod_service_account_definition:
-                        default: ""
+                        default: ''
                         type: string
                       pod_service_account_name:
                         default: postgres-pod
                         type: string
                       pod_service_account_role_binding_definition:
-                        default: ""
+                        default: ''
                         type: string
                       pod_terminate_grace_period:
                         default: 5m
                         type: string
                       secret_name_template:
-                        default: '{username}.{cluster}.credentials.{tprkind}.{tprgroup}'
+                        default: "{username}.{cluster}.credentials.{tprkind}.{tprgroup}"
                         type: string
                       spilo_allow_privilege_escalation:
                         default: true
@@ -770,7 +818,7 @@ spec:
                         - ebs
                         - mixed
                         - pvc
-                        - "off"
+                        - 'off'
                         type: string
                       toleration:
                         additionalProperties:
@@ -810,10 +858,10 @@ spec:
                         - Local
                         type: string
                       master_dns_name_format:
-                        default: '{cluster}.{namespace}.{hostedzone}'
+                        default: "{cluster}.{namespace}.{hostedzone}"
                         type: string
                       replica_dns_name_format:
-                        default: '{cluster}-repl.{namespace}.{hostedzone}'
+                        default: "{cluster}-repl.{namespace}.{hostedzone}"
                         type: string
                     type: object
                   logging_rest_api:
@@ -857,33 +905,33 @@ spec:
                         type: string
                       logical_backup_schedule:
                         default: 30 00 * * *
-                        pattern: ^(\d+|\*)(/\d+)?(\s+(\d+|\*)(/\d+)?){4}$
+                        pattern: "^(\\d+|\\*)(/\\d+)?(\\s+(\\d+|\\*)(/\\d+)?){4}$"
                         type: string
                     type: object
                   major_version_upgrade:
                     properties:
                       major_version_upgrade_mode:
-                        default: "off"
+                        default: 'off'
                         type: string
                       major_version_upgrade_team_allow_list:
                         items:
                           type: string
                         type: array
                       minimal_major_version:
-                        default: "11"
+                        default: '11'
                         type: string
                       target_major_version:
-                        default: "14"
+                        default: '14'
                         type: string
                     type: object
                   max_instances:
                     default: -1
-                    description: -1 = disabled
+                    description: "-1 = disabled"
                     minimum: -1
                     type: integer
                   min_instances:
                     default: -1
-                    description: -1 = disabled
+                    description: "-1 = disabled"
                     minimum: -1
                     type: integer
                   patroni:
@@ -895,34 +943,34 @@ spec:
                   postgres_pod_resources:
                     properties:
                       default_cpu_limit:
-                        default: "1"
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        default: '1'
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       default_cpu_request:
                         default: 100m
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       default_memory_limit:
                         default: 500Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       default_memory_request:
                         default: 100Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       max_cpu_request:
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       max_memory_request:
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       min_cpu_limit:
                         default: 250m
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       min_memory_limit:
                         default: 250Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                     type: object
                   repair_period:
@@ -936,22 +984,22 @@ spec:
                       scalyr_api_key:
                         type: string
                       scalyr_cpu_limit:
-                        default: "1"
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        default: '1'
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       scalyr_cpu_request:
                         default: 100m
-                        pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                        pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                         type: string
                       scalyr_image:
                         type: string
                       scalyr_memory_limit:
                         default: 500Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       scalyr_memory_request:
                         default: 50Mi
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       scalyr_server_url:
                         default: https://upload.eu.scalyr.com
@@ -1115,34 +1163,34 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: Team responsible for Postgres cluster
-          jsonPath: .spec.teamId
+          jsonPath: ".spec.teamId"
           name: Team
           type: string
         - description: PostgreSQL version
-          jsonPath: .spec.postgresql.version
+          jsonPath: ".spec.postgresql.version"
           name: Version
           type: string
         - description: Number of Pods per Postgres cluster
-          jsonPath: .spec.numberOfInstances
+          jsonPath: ".spec.numberOfInstances"
           name: Pods
           type: integer
         - description: Size of the bound volume
-          jsonPath: .spec.volume.size
+          jsonPath: ".spec.volume.size"
           name: Volume
           type: string
         - description: Requested CPU for Postgres containers
-          jsonPath: .spec.resources.requests.cpu
+          jsonPath: ".spec.resources.requests.cpu"
           name: CPU-Request
           type: string
         - description: Requested memory for Postgres containers
-          jsonPath: .spec.resources.requests.memory
+          jsonPath: ".spec.resources.requests.memory"
           name: Memory-Request
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: Age
           type: date
         - description: Current sync status of postgresql resource
-          jsonPath: .status.PostgresClusterStatus
+          jsonPath: ".status.PostgresClusterStatus"
           name: Status
           type: string
         name: v1
@@ -1184,7 +1232,7 @@ spec:
                     type: array
                   allowedSourceRanges:
                     items:
-                      pattern: ^(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\/(\d|[1-2]\d|3[0-2])$
+                      pattern: "^(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])\\.(\\d|[1-9]\\d|1\\d\\d|2[0-4]\\d|25[0-5])\\/(\\d|[1-2]\\d|3[0-2])$"
                       type: string
                     nullable: true
                     type: array
@@ -1203,7 +1251,7 @@ spec:
                       s3_wal_path:
                         type: string
                       timestamp:
-                        pattern: ^([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\.[0-9]+)?(([+-]([01][0-9]|2[0-3]):[0-5][0-9]))$
+                        pattern: "^([0-9]+)-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9]|60)(\\.[0-9]+)?(([+-]([01][0-9]|2[0-3]):[0-5][0-9]))$"
                         type: string
                       uid:
                         format: uuid
@@ -1230,19 +1278,19 @@ spec:
                           limits:
                             properties:
                               cpu:
-                                pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                                pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                                 type: string
                               memory:
-                                pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                                pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                                 type: string
                             type: object
                           requests:
                             properties:
                               cpu:
-                                pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                                pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                                 type: string
                               memory:
-                                pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                                pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                                 type: string
                             type: object
                         type: object
@@ -1293,12 +1341,12 @@ spec:
                     nullable: true
                     type: array
                   logicalBackupSchedule:
-                    pattern: ^(\d+|\*)(/\d+)?(\s+(\d+|\*)(/\d+)?){4}$
+                    pattern: "^(\\d+|\\*)(/\\d+)?(\\s+(\\d+|\\*)(/\\d+)?){4}$"
                     type: string
                   maintenanceWindows:
                     items:
-                      pattern: ^\ *((Mon|Tue|Wed|Thu|Fri|Sat|Sun):(2[0-3]|[01]?\d):([0-5]?\d)|(2[0-3]|[01]?\d):([0-5]?\d))-((Mon|Tue|Wed|Thu|Fri|Sat|Sun):(2[0-3]|[01]?\d):([0-5]?\d)|(2[0-3]|[01]?\d):([0-5]?\d))\
-                        *$
+                      pattern: "^\\ *((Mon|Tue|Wed|Thu|Fri|Sat|Sun):(2[0-3]|[01]?\\d):([0-5]?\\d)|(2[0-3]|[01]?\\d):([0-5]?\\d))-((Mon|Tue|Wed|Thu|Fri|Sat|Sun):(2[0-3]|[01]?\\d):([0-5]?\\d)|(2[0-3]|[01]?\\d):([0-5]?\\d))\\
+                        *$"
                       type: string
                     type: array
                   nodeAffinity:
@@ -1445,12 +1493,12 @@ spec:
                         type: object
                       version:
                         enum:
-                        - "10"
-                        - "11"
-                        - "12"
-                        - "13"
-                        - "14"
-                        - "15"
+                        - '10'
+                        - '11'
+                        - '12'
+                        - '13'
+                        - '14'
+                        - '15'
                         type: string
                     required:
                     - version
@@ -1485,19 +1533,19 @@ spec:
                       limits:
                         properties:
                           cpu:
-                            pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                            pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                             type: string
                           memory:
-                            pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                            pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                             type: string
                         type: object
                       requests:
                         properties:
                           cpu:
-                            pattern: ^(\d+m|\d+(\.\d{1,3})?)$
+                            pattern: "^(\\d+m|\\d+(\\.\\d{1,3})?)$"
                             type: string
                           memory:
-                            pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                            pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                             type: string
                         type: object
                     type: object
@@ -1689,7 +1737,7 @@ spec:
                             x-kubernetes-preserve-unknown-fields: true
                         type: object
                       size:
-                        pattern: ^(\d+(e\d+)?|\d+(\.\d+)?(e\d+)?[EPTGMK]i?)$
+                        pattern: "^(\\d+(e\\d+)?|\\d+(\\.\\d+)?(e\\d+)?[EPTGMK]i?)$"
                         type: string
                       storageClass:
                         type: string
@@ -1790,45 +1838,3 @@ spec:
         storage: true
         subresources:
           status: {}
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: postgresqls.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: postgresql
-        plural: postgresqls
-        singular: postgresql
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  dbName:
-                    default: postgres
-                    description: |
-                      Database name. A database will be created with this name. The owner of the database will be the teamId.
-                    type: string
-                  env:
-                    default: dev
-                    description: |
-                      Configures and deploys this PostgreSQL with environment specific configuration. Prod PostgreSQL are configured with backups and more resources.
-                    pattern: ^(dev|prod)$
-                    type: string
-                  teamId:
-                    default: acid
-                    description: |
-                      Team ID. A superuser role will be created with this name.
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/postgresql-request-pipeline:v0.1.0
-status: {}

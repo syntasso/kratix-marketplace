@@ -1,16 +1,49 @@
+---
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: observability
 spec:
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: observabilities.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: observability
+        plural: observabilities
+        singular: observability
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  env:
+                    default: dev
+                    pattern: "^(dev|prod)$"
+                    type: string
+                  namespace:
+                    type: string
+                required:
+                - namespace
+                type: object
+            type: object
+        served: true
+        storage: true
+  xaasRequestPipeline:
+  - ghcr.io/syntasso/kratix-marketplace/observability-request-pipeline:v0.1.0
   workerClusterResources:
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: alertmanagerconfigs.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -76,10 +109,10 @@ spec:
                                   >= v0.22.0 and takes precedence over Regex (deprecated)
                                   if non-empty.
                                 enum:
-                                - '!='
-                                - =
-                                - =~
-                                - '!~'
+                                - "!="
+                                - "="
+                                - "=~"
+                                - "!~"
                                 type: string
                               name:
                                 description: Label to match.
@@ -109,10 +142,10 @@ spec:
                                   >= v0.22.0 and takes precedence over Regex (deprecated)
                                   if non-empty.
                                 enum:
-                                - '!='
-                                - =
-                                - =~
-                                - '!~'
+                                - "!="
+                                - "="
+                                - "=~"
+                                - "!~"
                                 type: string
                               name:
                                 description: Label to match.
@@ -173,7 +206,7 @@ spec:
                                     can be specified by name (e.g 'January') by numerical
                                     month (e.g '1') or as an inclusive range (e.g
                                     'January:March', '1:3', '1:March')
-                                  pattern: ^((?i)january|february|march|april|may|june|july|august|september|october|november|december|[1-12])(?:((:((?i)january|february|march|april|may|june|july|august|september|october|november|december|[1-12]))$)|$)
+                                  pattern: "^((?i)january|february|march|april|may|june|july|august|september|october|november|december|[1-12])(?:((:((?i)january|february|march|april|may|june|july|august|september|october|november|december|[1-12]))$)|$)"
                                   type: string
                                 type: array
                               times:
@@ -185,12 +218,12 @@ spec:
                                     endTime:
                                       description: EndTime is the end time in 24hr
                                         format.
-                                      pattern: ^((([01][0-9])|(2[0-3])):[0-5][0-9])$|(^24:00$)
+                                      pattern: "^((([01][0-9])|(2[0-3])):[0-5][0-9])$|(^24:00$)"
                                       type: string
                                     startTime:
                                       description: StartTime is the start time in
                                         24hr format.
-                                      pattern: ^((([01][0-9])|(2[0-3])):[0-5][0-9])$|(^24:00$)
+                                      pattern: "^((([01][0-9])|(2[0-3])):[0-5][0-9])$|(^24:00$)"
                                       type: string
                                   type: object
                                 type: array
@@ -201,7 +234,7 @@ spec:
                                     of days of the week beginning on Sunday Days can
                                     be specified by name (e.g 'Sunday') or as an inclusive
                                     range (e.g 'Monday:Friday')
-                                  pattern: ^((?i)sun|mon|tues|wednes|thurs|fri|satur)day(?:((:(sun|mon|tues|wednes|thurs|fri|satur)day)$)|$)
+                                  pattern: "^((?i)sun|mon|tues|wednes|thurs|fri|satur)day(?:((:(sun|mon|tues|wednes|thurs|fri|satur)day)$)|$)"
                                   type: string
                                 type: array
                               years:
@@ -209,7 +242,7 @@ spec:
                                 items:
                                   description: YearRange is an inclusive range of
                                     years
-                                  pattern: ^2\d{3}(?::2\d{3}|$)
+                                  pattern: "^2\\d{3}(?::2\\d{3}|$)"
                                   type: string
                                 type: array
                             type: object
@@ -1420,7 +1453,7 @@ spec:
                                 description: How long your notification will continue
                                   to be retried for, unless the user acknowledges
                                   the notification.
-                                pattern: ^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$
+                                pattern: "^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$"
                                 type: string
                               html:
                                 description: Whether notification message is HTML
@@ -1778,7 +1811,7 @@ spec:
                                 description: How often the Pushover servers will send
                                   the same notification to the user. Must be at least
                                   30 seconds.
-                                pattern: ^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$
+                                pattern: "^(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?$"
                                 type: string
                               sendResolved:
                                 description: Whether or not to notify about resolved
@@ -4433,10 +4466,10 @@ spec:
                                 >= v0.22.0 and takes precedence over Regex (deprecated)
                                 if non-empty.
                               enum:
-                              - '!='
-                              - =
-                              - =~
-                              - '!~'
+                              - "!="
+                              - "="
+                              - "=~"
+                              - "!~"
                               type: string
                             name:
                               description: Label to match.
@@ -4490,8 +4523,8 @@ spec:
         storage: true
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -4499,7 +4532,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: alertmanagers.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -4516,14 +4549,14 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The version of Alertmanager
-          jsonPath: .spec.version
+          jsonPath: ".spec.version"
           name: Version
           type: string
         - description: The desired replicas number of Alertmanagers
-          jsonPath: .spec.replicas
+          jsonPath: ".spec.replicas"
           name: Replicas
           type: integer
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: Age
           type: date
         name: v1
@@ -5685,7 +5718,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -6342,7 +6375,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -6352,7 +6385,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -6992,7 +7025,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -7649,7 +7682,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -7659,7 +7692,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -8128,14 +8161,14 @@ spec:
                   logFormat:
                     description: Log format for Alertmanager to be configured with.
                     enum:
-                    - ""
+                    - ''
                     - logfmt
                     - json
                     type: string
                   logLevel:
                     description: Log level for Alertmanager to be configured with.
                     enum:
-                    - ""
+                    - ''
                     - debug
                     - info
                     - warn
@@ -8209,7 +8242,7 @@ spec:
                           anyOf:
                           - type: integer
                           - type: string
-                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                           x-kubernetes-int-or-string: true
                         description: 'Limits describes the maximum amount of compute
                           resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -8219,7 +8252,7 @@ spec:
                           anyOf:
                           - type: integer
                           - type: string
-                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                           x-kubernetes-int-or-string: true
                         description: 'Requests describes the minimum amount of compute
                           resources required. If Requests is omitted for a container,
@@ -8462,7 +8495,7 @@ spec:
                               specified here and the sum of memory limits of all containers
                               in a pod. The default is nil which means that the limit
                               is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
-                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                             x-kubernetes-int-or-string: true
                         type: object
                       ephemeral:
@@ -8603,7 +8636,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Limits describes the maximum
                                           amount of compute resources allowed. More
@@ -8614,7 +8647,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Requests describes the minimum
                                           amount of compute resources required. If
@@ -8834,7 +8867,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: 'Limits describes the maximum amount
                                       of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -8844,7 +8877,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: 'Requests describes the minimum amount
                                       of compute resources required. If Requests is
@@ -8933,7 +8966,7 @@ spec:
                                   anyOf:
                                   - type: integer
                                   - type: string
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 description: The storage resource within AllocatedResources
                                   tracks the capacity allocated to a PVC. It may be
@@ -8954,7 +8987,7 @@ spec:
                                   anyOf:
                                   - type: integer
                                   - type: string
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 description: Represents the actual resources of the
                                   underlying volume.
@@ -9570,7 +9603,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -9604,7 +9637,7 @@ spec:
                                 specified here and the sum of memory limits of all
                                 containers in a pod. The default is nil which means
                                 that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                               x-kubernetes-int-or-string: true
                           type: object
                         ephemeral:
@@ -9763,7 +9796,7 @@ spec:
                                             anyOf:
                                             - type: integer
                                             - type: string
-                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                             x-kubernetes-int-or-string: true
                                           description: 'Limits describes the maximum
                                             amount of compute resources allowed. More
@@ -9774,7 +9807,7 @@ spec:
                                             anyOf:
                                             - type: integer
                                             - type: string
-                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                             x-kubernetes-int-or-string: true
                                           description: 'Requests describes the minimum
                                             amount of compute resources required.
@@ -10349,7 +10382,7 @@ spec:
                                                   description: Specifies the output
                                                     format of the exposed resources,
                                                     defaults to "1"
-                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                                   x-kubernetes-int-or-string: true
                                                 resource:
                                                   description: 'Required: resource
@@ -10793,8 +10826,8 @@ spec:
         subresources: {}
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -10802,7 +10835,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: podmonitors.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -10999,7 +11032,7 @@ spec:
                           description: Interval at which metrics should be scraped
                             If not specified Prometheus' global scrape interval is
                             used.
-                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                           type: string
                         metricRelabelings:
                           description: MetricRelabelConfigs to apply to samples before
@@ -11051,7 +11084,7 @@ spec:
                                   description: LabelName is a valid Prometheus label
                                     name which may only contain ASCII letters, numbers,
                                     as well as underscores.
-                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                   type: string
                                 type: array
                               targetLabel:
@@ -11221,7 +11254,7 @@ spec:
                                   description: LabelName is a valid Prometheus label
                                     name which may only contain ASCII letters, numbers,
                                     as well as underscores.
-                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                   type: string
                                 type: array
                               targetLabel:
@@ -11238,7 +11271,7 @@ spec:
                           description: Timeout after which the scrape is ended If
                             not specified, the Prometheus global scrape interval is
                             used.
-                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                           type: string
                         targetPort:
                           anyOf:
@@ -11442,8 +11475,8 @@ spec:
         storage: true
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -11451,7 +11484,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: probes.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -11582,7 +11615,7 @@ spec:
                     description: Interval at which targets are probed using the configured
                       prober. If not specified Prometheus' global scrape interval
                       is used.
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   jobName:
                     description: The job name assigned to scraped metrics by default.
@@ -11653,7 +11686,7 @@ spec:
                             description: LabelName is a valid Prometheus label name
                               which may only contain ASCII letters, numbers, as well
                               as underscores.
-                            pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                            pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                             type: string
                           type: array
                         targetLabel:
@@ -11782,7 +11815,7 @@ spec:
                     description: Timeout for scraping metrics from the Prometheus
                       exporter. If not specified, the Prometheus global scrape interval
                       is used.
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   targetLimit:
                     description: TargetLimit defines a limit on the number of scraped
@@ -11866,7 +11899,7 @@ spec:
                                     description: LabelName is a valid Prometheus label
                                       name which may only contain ASCII letters, numbers,
                                       as well as underscores.
-                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                    pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                     type: string
                                   type: array
                                 targetLabel:
@@ -11986,7 +12019,7 @@ spec:
                                     description: LabelName is a valid Prometheus label
                                       name which may only contain ASCII letters, numbers,
                                       as well as underscores.
-                                    pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                    pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                     type: string
                                   type: array
                                 targetLabel:
@@ -12127,8 +12160,8 @@ spec:
         storage: true
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -12136,7 +12169,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: prometheuses.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -12153,14 +12186,14 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The version of Prometheus
-          jsonPath: .spec.version
+          jsonPath: ".spec.version"
           name: Version
           type: string
         - description: The desired replicas number of Prometheuses
-          jsonPath: .spec.replicas
+          jsonPath: ".spec.replicas"
           name: Replicas
           type: integer
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: Age
           type: date
         name: v1
@@ -13734,7 +13767,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -14391,7 +14424,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -14401,7 +14434,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -14902,7 +14935,7 @@ spec:
                       experimental feature, this behaviour could change or be removed
                       in the future. Only valid in Prometheus versions 2.28.0 and
                       newer.'
-                    pattern: (^0|([0-9]*[.])?[0-9]+((K|M|G|T|E|P)i?)?B)$
+                    pattern: "(^0|([0-9]*[.])?[0-9]+((K|M|G|T|E|P)i?)?B)$"
                     type: string
                   enforcedLabelLimit:
                     description: Per-scrape limit on number of labels that will be
@@ -14961,7 +14994,7 @@ spec:
                     default: 30s
                     description: 'Interval between consecutive evaluations. Default:
                       `30s`'
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   excludedFromEnforcement:
                     description: List of references to PodMonitor, ServiceMonitor,
@@ -15189,7 +15222,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -15846,7 +15879,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -15856,7 +15889,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -16324,14 +16357,14 @@ spec:
                   logFormat:
                     description: Log format for Prometheus to be configured with.
                     enum:
-                    - ""
+                    - ''
                     - logfmt
                     - json
                     type: string
                   logLevel:
                     description: Log level for Prometheus to be configured with.
                     enum:
-                    - ""
+                    - ''
                     - debug
                     - info
                     - warn
@@ -16442,9 +16475,9 @@ spec:
                         type: object
                     type: object
                   podMonitorSelector:
-                    description: '*Experimental* PodMonitors to be selected for target
+                    description: "*Experimental* PodMonitors to be selected for target
                       discovery. *Deprecated:* if neither this nor serviceMonitorSelector
-                      are specified, configuration is unmanaged.'
+                      are specified, configuration is unmanaged."
                     properties:
                       matchExpressions:
                         description: matchExpressions is a list of label selector
@@ -16495,8 +16528,8 @@ spec:
                     description: Priority class assigned to the Pods
                     type: string
                   probeNamespaceSelector:
-                    description: '*Experimental* Namespaces to be selected for Probe
-                      discovery. If nil, only check own namespace.'
+                    description: "*Experimental* Namespaces to be selected for Probe
+                      discovery. If nil, only check own namespace."
                     properties:
                       matchExpressions:
                         description: matchExpressions is a list of label selector
@@ -16540,8 +16573,8 @@ spec:
                         type: object
                     type: object
                   probeSelector:
-                    description: '*Experimental* Probes to be selected for target
-                      discovery.'
+                    description: "*Experimental* Probes to be selected for target
+                      discovery."
                     properties:
                       matchExpressions:
                         description: matchExpressions is a list of label selector
@@ -16634,7 +16667,7 @@ spec:
                         type: integer
                       timeout:
                         description: Maximum time a query may take before being aborted.
-                        pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                        pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                         type: string
                     type: object
                   queryLogFile:
@@ -16851,7 +16884,7 @@ spec:
                           type: boolean
                         remoteTimeout:
                           description: Timeout for requests to the remote read endpoint.
-                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                           type: string
                         requiredMatchers:
                           additionalProperties:
@@ -17108,7 +17141,7 @@ spec:
                             sendInterval:
                               description: How frequently metric metadata is sent
                                 to the remote storage.
-                              pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                              pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                               type: string
                           type: object
                         name:
@@ -17252,7 +17285,7 @@ spec:
                           type: object
                         remoteTimeout:
                           description: Timeout for requests to the remote write endpoint.
-                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                           type: string
                         sendExemplars:
                           description: Enables sending of exemplars over remote write.
@@ -17505,7 +17538,7 @@ spec:
                                   description: LabelName is a valid Prometheus label
                                     name which may only contain ASCII letters, numbers,
                                     as well as underscores.
-                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                   type: string
                                 type: array
                               targetLabel:
@@ -17539,7 +17572,7 @@ spec:
                           anyOf:
                           - type: integer
                           - type: string
-                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                           x-kubernetes-int-or-string: true
                         description: 'Limits describes the maximum amount of compute
                           resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -17549,7 +17582,7 @@ spec:
                           anyOf:
                           - type: integer
                           - type: string
-                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                           x-kubernetes-int-or-string: true
                         description: 'Requests describes the minimum amount of compute
                           resources required. If Requests is omitted for a container,
@@ -17562,11 +17595,11 @@ spec:
                       is '24h' if retentionSize is not set, and must match the regular
                       expression `[0-9]+(ms|s|m|h|d|w|y)` (milliseconds seconds minutes
                       hours days weeks years).
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   retentionSize:
                     description: Maximum amount of disk space used by blocks.
-                    pattern: (^0|([0-9]*[.])?[0-9]+((K|M|G|T|E|P)i?)?B)$
+                    pattern: "(^0|([0-9]*[.])?[0-9]+((K|M|G|T|E|P)i?)?B)$"
                     type: string
                   routePrefix:
                     description: The route prefix Prometheus registers HTTP handlers
@@ -17671,10 +17704,10 @@ spec:
                         type: object
                     type: object
                   rules:
-                    description: /--rules.*/ command-line arguments.
+                    description: "/--rules.*/ command-line arguments."
                     properties:
                       alert:
-                        description: /--rules.alert.*/ command-line arguments
+                        description: "/--rules.alert.*/ command-line arguments"
                         properties:
                           forGracePeriod:
                             description: Minimum duration between alert and restored
@@ -17694,12 +17727,12 @@ spec:
                   scrapeInterval:
                     default: 30s
                     description: 'Interval between consecutive scrapes. Default: `30s`'
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   scrapeTimeout:
                     description: Number of seconds to wait for target to respond before
                       erroring.
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   secrets:
                     description: Secrets is a list of Secrets in the same namespace
@@ -18026,7 +18059,7 @@ spec:
                               specified here and the sum of memory limits of all containers
                               in a pod. The default is nil which means that the limit
                               is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
-                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                             x-kubernetes-int-or-string: true
                         type: object
                       ephemeral:
@@ -18167,7 +18200,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Limits describes the maximum
                                           amount of compute resources allowed. More
@@ -18178,7 +18211,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Requests describes the minimum
                                           amount of compute resources required. If
@@ -18398,7 +18431,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: 'Limits describes the maximum amount
                                       of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -18408,7 +18441,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: 'Requests describes the minimum amount
                                       of compute resources required. If Requests is
@@ -18497,7 +18530,7 @@ spec:
                                   anyOf:
                                   - type: integer
                                   - type: string
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 description: The storage resource within AllocatedResources
                                   tracks the capacity allocated to a PVC. It may be
@@ -18518,7 +18551,7 @@ spec:
                                   anyOf:
                                   - type: integer
                                   - type: string
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 description: Represents the actual resources of the
                                   underlying volume.
@@ -18746,7 +18779,7 @@ spec:
                         description: LogFormat for Thanos sidecar to be configured
                           with.
                         enum:
-                        - ""
+                        - ''
                         - logfmt
                         - json
                         type: string
@@ -18754,7 +18787,7 @@ spec:
                         description: LogLevel for Thanos sidecar to be configured
                           with.
                         enum:
-                        - ""
+                        - ''
                         - debug
                         - info
                         - warn
@@ -18795,7 +18828,7 @@ spec:
                       readyTimeout:
                         description: ReadyTimeout is the maximum time Thanos sidecar
                           will wait for Prometheus to start. Eg 10m
-                        pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                        pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                         type: string
                       resources:
                         description: Resources defines the resource requirements for
@@ -18807,7 +18840,7 @@ spec:
                               anyOf:
                               - type: integer
                               - type: string
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                               x-kubernetes-int-or-string: true
                             description: 'Limits describes the maximum amount of compute
                               resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -18817,7 +18850,7 @@ spec:
                               anyOf:
                               - type: integer
                               - type: string
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                               x-kubernetes-int-or-string: true
                             description: 'Requests describes the minimum amount of
                               compute resources required. If Requests is omitted for
@@ -19464,7 +19497,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -19498,7 +19531,7 @@ spec:
                                 specified here and the sum of memory limits of all
                                 containers in a pod. The default is nil which means
                                 that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                               x-kubernetes-int-or-string: true
                           type: object
                         ephemeral:
@@ -19657,7 +19690,7 @@ spec:
                                             anyOf:
                                             - type: integer
                                             - type: string
-                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                             x-kubernetes-int-or-string: true
                                           description: 'Limits describes the maximum
                                             amount of compute resources allowed. More
@@ -19668,7 +19701,7 @@ spec:
                                             anyOf:
                                             - type: integer
                                             - type: string
-                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                             x-kubernetes-int-or-string: true
                                           description: 'Requests describes the minimum
                                             amount of compute resources required.
@@ -20243,7 +20276,7 @@ spec:
                                                   description: Specifies the output
                                                     format of the exposed resources,
                                                     defaults to "1"
-                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                                   x-kubernetes-int-or-string: true
                                                 resource:
                                                   description: 'Required: resource
@@ -20922,8 +20955,8 @@ spec:
           status: {}
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -20931,7 +20964,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: prometheusrules.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -21027,8 +21060,8 @@ spec:
         storage: true
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -21036,7 +21069,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: servicemonitors.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -21192,7 +21225,7 @@ spec:
                           description: Interval at which metrics should be scraped
                             If not specified Prometheus' global scrape interval is
                             used.
-                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                           type: string
                         metricRelabelings:
                           description: MetricRelabelConfigs to apply to samples before
@@ -21244,7 +21277,7 @@ spec:
                                   description: LabelName is a valid Prometheus label
                                     name which may only contain ASCII letters, numbers,
                                     as well as underscores.
-                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                   type: string
                                 type: array
                               targetLabel:
@@ -21414,7 +21447,7 @@ spec:
                                   description: LabelName is a valid Prometheus label
                                     name which may only contain ASCII letters, numbers,
                                     as well as underscores.
-                                  pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$
+                                  pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
                                   type: string
                                 type: array
                               targetLabel:
@@ -21432,7 +21465,7 @@ spec:
                             not specified, the Prometheus global scrape timeout is
                             used unless it is less than `Interval` in which the latter
                             is used.
-                          pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                          pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                           type: string
                         targetPort:
                           anyOf:
@@ -21694,8 +21727,8 @@ spec:
         storage: true
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: apiextensions.k8s.io/v1
@@ -21703,7 +21736,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.8.0
-      creationTimestamp: null
+      creationTimestamp: 
       name: thanosrulers.monitoring.coreos.com
     spec:
       group: monitoring.coreos.com
@@ -21720,10 +21753,10 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The desired replicas number of Thanos Rulers
-          jsonPath: .spec.replicas
+          jsonPath: ".spec.replicas"
           name: Replicas
           type: integer
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: Age
           type: date
         name: v1
@@ -22806,7 +22839,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -23463,7 +23496,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -23473,7 +23506,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -23943,7 +23976,7 @@ spec:
                   evaluationInterval:
                     default: 15s
                     description: Interval between consecutive evaluations.
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   excludedFromEnforcement:
                     description: List of references to PrometheusRule objects to be
@@ -24281,7 +24314,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -24938,7 +24971,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -24948,7 +24981,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -25424,14 +25457,14 @@ spec:
                   logFormat:
                     description: Log format for ThanosRuler to be configured with.
                     enum:
-                    - ""
+                    - ''
                     - logfmt
                     - json
                     type: string
                   logLevel:
                     description: Log level for ThanosRuler to be configured with.
                     enum:
-                    - ""
+                    - ''
                     - debug
                     - info
                     - warn
@@ -25578,7 +25611,7 @@ spec:
                           anyOf:
                           - type: integer
                           - type: string
-                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                           x-kubernetes-int-or-string: true
                         description: 'Limits describes the maximum amount of compute
                           resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -25588,7 +25621,7 @@ spec:
                           anyOf:
                           - type: integer
                           - type: string
-                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                           x-kubernetes-int-or-string: true
                         description: 'Requests describes the minimum amount of compute
                           resources required. If Requests is omitted for a container,
@@ -25601,7 +25634,7 @@ spec:
                     description: Time duration ThanosRuler shall retain data for.
                       Default is '24h', and must match the regular expression `[0-9]+(ms|s|m|h|d|w|y)`
                       (milliseconds seconds minutes hours days weeks years).
-                    pattern: ^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$
+                    pattern: "^(0|(([0-9]+)y)?(([0-9]+)w)?(([0-9]+)d)?(([0-9]+)h)?(([0-9]+)m)?(([0-9]+)s)?(([0-9]+)ms)?)$"
                     type: string
                   routePrefix:
                     description: The route prefix ThanosRuler registers HTTP handlers
@@ -25905,7 +25938,7 @@ spec:
                               specified here and the sum of memory limits of all containers
                               in a pod. The default is nil which means that the limit
                               is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
-                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                             x-kubernetes-int-or-string: true
                         type: object
                       ephemeral:
@@ -26046,7 +26079,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Limits describes the maximum
                                           amount of compute resources allowed. More
@@ -26057,7 +26090,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Requests describes the minimum
                                           amount of compute resources required. If
@@ -26277,7 +26310,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: 'Limits describes the maximum amount
                                       of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -26287,7 +26320,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: 'Requests describes the minimum amount
                                       of compute resources required. If Requests is
@@ -26376,7 +26409,7 @@ spec:
                                   anyOf:
                                   - type: integer
                                   - type: string
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 description: The storage resource within AllocatedResources
                                   tracks the capacity allocated to a PVC. It may be
@@ -26397,7 +26430,7 @@ spec:
                                   anyOf:
                                   - type: integer
                                   - type: string
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 description: Represents the actual resources of the
                                   underlying volume.
@@ -26981,7 +27014,7 @@ spec:
                                         - type: string
                                         description: Specifies the output format of
                                           the exposed resources, defaults to "1"
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       resource:
                                         description: 'Required: resource to select'
@@ -27015,7 +27048,7 @@ spec:
                                 specified here and the sum of memory limits of all
                                 containers in a pod. The default is nil which means
                                 that the limit is undefined. More info: http://kubernetes.io/docs/user-guide/volumes#emptydir'
-                              pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                              pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                               x-kubernetes-int-or-string: true
                           type: object
                         ephemeral:
@@ -27174,7 +27207,7 @@ spec:
                                             anyOf:
                                             - type: integer
                                             - type: string
-                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                             x-kubernetes-int-or-string: true
                                           description: 'Limits describes the maximum
                                             amount of compute resources allowed. More
@@ -27185,7 +27218,7 @@ spec:
                                             anyOf:
                                             - type: integer
                                             - type: string
-                                            pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                            pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                             x-kubernetes-int-or-string: true
                                           description: 'Requests describes the minimum
                                             amount of compute resources required.
@@ -27760,7 +27793,7 @@ spec:
                                                   description: Specifies the output
                                                     format of the exposed resources,
                                                     defaults to "1"
-                                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                                   x-kubernetes-int-or-string: true
                                                 resource:
                                                   description: 'Required: resource
@@ -28204,8 +28237,8 @@ spec:
         subresources: {}
     status:
       acceptedNames:
-        kind: ""
-        plural: ""
+        kind: ''
+        plural: ''
       conditions: []
       storedVersions: []
   - apiVersion: rbac.authorization.k8s.io/v1
@@ -28236,7 +28269,7 @@ spec:
       name: kube-state-metrics
     rules:
     - apiGroups:
-      - ""
+      - ''
       resources:
       - configmaps
       - secrets
@@ -28369,13 +28402,13 @@ spec:
       name: prometheus-k8s
     rules:
     - apiGroups:
-      - ""
+      - ''
       resources:
       - nodes/metrics
       verbs:
       - get
     - nonResourceURLs:
-      - /metrics
+      - "/metrics"
       verbs:
       - get
   - apiVersion: rbac.authorization.k8s.io/v1
@@ -28393,7 +28426,7 @@ spec:
         namespace: default
       rules:
       - apiGroups:
-        - ""
+        - ''
         resources:
         - services
         - endpoints
@@ -28431,7 +28464,7 @@ spec:
         namespace: kube-system
       rules:
       - apiGroups:
-        - ""
+        - ''
         resources:
         - services
         - endpoints
@@ -28468,7 +28501,7 @@ spec:
       name: prometheus-adapter
     rules:
     - apiGroups:
-      - ""
+      - ''
       resources:
       - nodes
       - namespaces
@@ -28486,9 +28519,9 @@ spec:
         app.kubernetes.io/name: prometheus-adapter
         app.kubernetes.io/part-of: kube-prometheus
         app.kubernetes.io/version: 0.9.1
-        rbac.authorization.k8s.io/aggregate-to-admin: "true"
-        rbac.authorization.k8s.io/aggregate-to-edit: "true"
-        rbac.authorization.k8s.io/aggregate-to-view: "true"
+        rbac.authorization.k8s.io/aggregate-to-admin: 'true'
+        rbac.authorization.k8s.io/aggregate-to-edit: 'true'
+        rbac.authorization.k8s.io/aggregate-to-view: 'true'
       name: system:aggregated-metrics-reader
     rules:
     - apiGroups:
@@ -28513,9 +28546,9 @@ spec:
     - apiGroups:
       - metrics.k8s.io
       resources:
-      - '*'
+      - "*"
       verbs:
-      - '*'
+      - "*"
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -28542,29 +28575,29 @@ spec:
       - probes
       - prometheusrules
       verbs:
-      - '*'
+      - "*"
     - apiGroups:
       - apps
       resources:
       - statefulsets
       verbs:
-      - '*'
+      - "*"
     - apiGroups:
-      - ""
+      - ''
       resources:
       - configmaps
       - secrets
       verbs:
-      - '*'
+      - "*"
     - apiGroups:
-      - ""
+      - ''
       resources:
       - pods
       verbs:
       - list
       - delete
     - apiGroups:
-      - ""
+      - ''
       resources:
       - services
       - services/finalizers
@@ -28575,14 +28608,14 @@ spec:
       - update
       - delete
     - apiGroups:
-      - ""
+      - ''
       resources:
       - nodes
       verbs:
       - list
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - namespaces
       verbs:
@@ -28639,8 +28672,8 @@ spec:
           automountServiceAccountToken: true
           containers:
           - args:
-            - --kubelet-service=kube-system/kubelet
-            - --prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.57.0
+            - "--kubelet-service=kube-system/kubelet"
+            - "--prometheus-config-reloader=quay.io/prometheus-operator/prometheus-config-reloader:v0.57.0"
             image: quay.io/prometheus-operator/prometheus-operator:v0.57.0
             name: prometheus-operator
             ports:
@@ -28660,10 +28693,10 @@ spec:
                 - ALL
               readOnlyRootFilesystem: true
           - args:
-            - --logtostderr
-            - --secure-listen-address=:8443
-            - --tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
-            - --upstream=http://127.0.0.1:8080/
+            - "--logtostderr"
+            - "--secure-listen-address=:8443"
+            - "--tls-cipher-suites=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305"
+            - "--upstream=http://127.0.0.1:8080/"
             image: quay.io/brancz/kube-rbac-proxy:v0.12.0
             name: kube-rbac-proxy
             ports:
@@ -28742,8 +28775,11 @@ spec:
               in {{$labels.namespace}} namespace.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatorlisterrors
             summary: Errors while performing list operations in controller.
-          expr: |
-            (sum by (controller,namespace) (rate(prometheus_operator_list_operations_failed_total{job="prometheus-operator",namespace="monitoring"}[10m])) / sum by (controller,namespace) (rate(prometheus_operator_list_operations_total{job="prometheus-operator",namespace="monitoring"}[10m]))) > 0.4
+          expr: '(sum by (controller,namespace) (rate(prometheus_operator_list_operations_failed_total{job="prometheus-operator",namespace="monitoring"}[10m]))
+            / sum by (controller,namespace) (rate(prometheus_operator_list_operations_total{job="prometheus-operator",namespace="monitoring"}[10m])))
+            > 0.4
+
+'
           for: 15m
           labels:
             severity: warning
@@ -28753,8 +28789,11 @@ spec:
               in {{$labels.namespace}} namespace.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatorwatcherrors
             summary: Errors while performing watch operations in controller.
-          expr: |
-            (sum by (controller,namespace) (rate(prometheus_operator_watch_operations_failed_total{job="prometheus-operator",namespace="monitoring"}[5m])) / sum by (controller,namespace) (rate(prometheus_operator_watch_operations_total{job="prometheus-operator",namespace="monitoring"}[5m]))) > 0.4
+          expr: '(sum by (controller,namespace) (rate(prometheus_operator_watch_operations_failed_total{job="prometheus-operator",namespace="monitoring"}[5m]))
+            / sum by (controller,namespace) (rate(prometheus_operator_watch_operations_total{job="prometheus-operator",namespace="monitoring"}[5m])))
+            > 0.4
+
+'
           for: 15m
           labels:
             severity: warning
@@ -28764,20 +28803,25 @@ spec:
               }} namespace fails to reconcile {{ $value }} objects.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatorsyncfailed
             summary: Last controller reconciliation failed
-          expr: |
-            min_over_time(prometheus_operator_syncs{status="failed",job="prometheus-operator",namespace="monitoring"}[5m]) > 0
+          expr: 'min_over_time(prometheus_operator_syncs{status="failed",job="prometheus-operator",namespace="monitoring"}[5m])
+            > 0
+
+'
           for: 10m
           labels:
             severity: warning
         - alert: PrometheusOperatorReconcileErrors
           annotations:
-            description: '{{ $value | humanizePercentage }} of reconciling operations
+            description: "{{ $value | humanizePercentage }} of reconciling operations
               failed for {{ $labels.controller }} controller in {{ $labels.namespace
-              }} namespace.'
+              }} namespace."
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatorreconcileerrors
             summary: Errors while reconciling controller.
-          expr: |
-            (sum by (controller,namespace) (rate(prometheus_operator_reconcile_errors_total{job="prometheus-operator",namespace="monitoring"}[5m]))) / (sum by (controller,namespace) (rate(prometheus_operator_reconcile_operations_total{job="prometheus-operator",namespace="monitoring"}[5m]))) > 0.1
+          expr: '(sum by (controller,namespace) (rate(prometheus_operator_reconcile_errors_total{job="prometheus-operator",namespace="monitoring"}[5m])))
+            / (sum by (controller,namespace) (rate(prometheus_operator_reconcile_operations_total{job="prometheus-operator",namespace="monitoring"}[5m])))
+            > 0.1
+
+'
           for: 10m
           labels:
             severity: warning
@@ -28787,8 +28831,10 @@ spec:
               }} Namespace.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatornodelookuperrors
             summary: Errors while reconciling Prometheus.
-          expr: |
-            rate(prometheus_operator_node_address_lookup_errors_total{job="prometheus-operator",namespace="monitoring"}[5m]) > 0.1
+          expr: 'rate(prometheus_operator_node_address_lookup_errors_total{job="prometheus-operator",namespace="monitoring"}[5m])
+            > 0.1
+
+'
           for: 10m
           labels:
             severity: warning
@@ -28798,8 +28844,10 @@ spec:
               isn't ready to reconcile {{ $labels.controller }} resources.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatornotready
             summary: Prometheus operator not ready
-          expr: |
-            min by (controller,namespace) (max_over_time(prometheus_operator_ready{job="prometheus-operator",namespace="monitoring"}[5m]) == 0)
+          expr: 'min by (controller,namespace) (max_over_time(prometheus_operator_ready{job="prometheus-operator",namespace="monitoring"}[5m])
+            == 0)
+
+'
           for: 5m
           labels:
             severity: warning
@@ -28810,8 +28858,10 @@ spec:
               }} resources.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/prometheusoperatorrejectedresources
             summary: Resources rejected by Prometheus operator
-          expr: |
-            min_over_time(prometheus_operator_managed_resources{state="rejected",job="prometheus-operator",namespace="monitoring"}[5m]) > 0
+          expr: 'min_over_time(prometheus_operator_managed_resources{state="rejected",job="prometheus-operator",namespace="monitoring"}[5m])
+            > 0
+
+'
           for: 5m
           labels:
             severity: warning
@@ -28824,8 +28874,10 @@ spec:
               As a result, configuration for service running in {{$labels.pod}} may be stale and cannot be updated anymore.
             runbook_url: https://runbooks.prometheus-operator.dev/runbooks/prometheus-operator/configreloadersidecarerrors
             summary: config-reloader sidecar has not had a successful reload for 10m
-          expr: |
-            max_over_time(reloader_last_reload_successful{namespace=~".+"}[5m]) == 0
+          expr: 'max_over_time(reloader_last_reload_successful{namespace=~".+"}[5m])
+            == 0
+
+'
           for: 10m
           labels:
             severity: warning
@@ -28872,7 +28924,7 @@ spec:
       namespace: default
     spec:
       endpoints:
-      - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+      - bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
         honorLabels: true
         port: https
         scheme: https
@@ -28884,37 +28936,3 @@ spec:
           app.kubernetes.io/name: prometheus-operator
           app.kubernetes.io/part-of: kube-prometheus
           app.kubernetes.io/version: 0.57.0
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: observabilities.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: observability
-        plural: observabilities
-        singular: observability
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  env:
-                    default: dev
-                    pattern: ^(dev|prod)$
-                    type: string
-                  namespace:
-                    type: string
-                required:
-                - namespace
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/observability-request-pipeline:v0.1.0
-status: {}

@@ -1,16 +1,48 @@
+---
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: elasticcloud
 spec:
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: elasticclouds.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: elasticcloud
+        plural: elasticclouds
+        singular: elasticcloud
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  env:
+                    default: dev
+                    description: |
+                      Deploy Elastic Cloud for Kubernetes to specific environment.
+                      Production includes autoscaling for both Elastic and Kibana.
+                    pattern: "^(dev|prod)$"
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  xaasRequestPipeline:
+  - ghcr.io/syntasso/kratix-marketplace/elasticcloud-request-pipeline:v0.1.0
   workerClusterResources:
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -30,22 +62,22 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: available
           type: integer
         - description: Expected nodes
-          jsonPath: .status.expectedNodes
+          jsonPath: ".status.expectedNodes"
           name: expected
           type: integer
         - description: Agent version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1alpha1
@@ -907,7 +939,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -927,18 +959,18 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: APM version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1
@@ -1596,23 +1628,23 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: .status.selector
-            specReplicasPath: .spec.count
-            statusReplicasPath: .status.count
+            labelSelectorPath: ".status.selector"
+            specReplicasPath: ".spec.count"
+            statusReplicasPath: ".status.count"
           status: {}
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: APM version
-          jsonPath: .spec.version
+          jsonPath: ".spec.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1beta1
@@ -2192,7 +2224,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -2212,26 +2244,26 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: available
           type: integer
         - description: Expected nodes
-          jsonPath: .status.expectedNodes
+          jsonPath: ".status.expectedNodes"
           name: expected
           type: integer
         - description: Beat type
-          jsonPath: .spec.type
+          jsonPath: ".spec.type"
           name: type
           type: string
         - description: Beat version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1beta1
@@ -2649,7 +2681,7 @@ spec:
                       roles created automatically. It also allows for dashboard setup
                       when combined with a `KibanaRef`.
                     maxLength: 20
-                    pattern: '[a-zA-Z0-9-]+'
+                    pattern: "[a-zA-Z0-9-]+"
                     type: string
                   version:
                     description: Version of the Beat.
@@ -2712,7 +2744,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -2732,18 +2764,18 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: ElasticMapsServer version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1alpha1
@@ -3333,16 +3365,16 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: .status.selector
-            specReplicasPath: .spec.count
-            statusReplicasPath: .status.count
+            labelSelectorPath: ".status.selector"
+            specReplicasPath: ".spec.count"
+            statusReplicasPath: ".status.count"
           status: {}
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -3362,16 +3394,16 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .spec.elasticsearchRef.name
+        - jsonPath: ".spec.elasticsearchRef.name"
           name: Target
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Active')].status
+        - jsonPath: ".status.conditions[?(@.type=='Active')].status"
           name: Active
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Healthy')].status
+        - jsonPath: ".status.conditions[?(@.type=='Healthy')].status"
           name: Healthy
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Limited')].status
+        - jsonPath: ".status.conditions[?(@.type=='Limited')].status"
           name: Limited
           type: string
         name: v1alpha1
@@ -3450,7 +3482,7 @@ spec:
                                   - type: string
                                   description: Max represents the upper limit for
                                     the resources managed by the autoscaler.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 min:
                                   anyOf:
@@ -3458,7 +3490,7 @@ spec:
                                   - type: string
                                   description: Min represents the lower limit for
                                     the resources managed by the autoscaler.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 requestsToLimitsRatio:
                                   anyOf:
@@ -3466,7 +3498,7 @@ spec:
                                   - type: string
                                   description: RequestsToLimitsRatio allows to customize
                                     Kubernetes resource Limit based on the Request.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                               required:
                               - max
@@ -3482,7 +3514,7 @@ spec:
                                   - type: string
                                   description: Max represents the upper limit for
                                     the resources managed by the autoscaler.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 min:
                                   anyOf:
@@ -3490,7 +3522,7 @@ spec:
                                   - type: string
                                   description: Min represents the lower limit for
                                     the resources managed by the autoscaler.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 requestsToLimitsRatio:
                                   anyOf:
@@ -3498,7 +3530,7 @@ spec:
                                   - type: string
                                   description: RequestsToLimitsRatio allows to customize
                                     Kubernetes resource Limit based on the Request.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                               required:
                               - max
@@ -3533,7 +3565,7 @@ spec:
                                   - type: string
                                   description: Max represents the upper limit for
                                     the resources managed by the autoscaler.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 min:
                                   anyOf:
@@ -3541,7 +3573,7 @@ spec:
                                   - type: string
                                   description: Min represents the lower limit for
                                     the resources managed by the autoscaler.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                                 requestsToLimitsRatio:
                                   anyOf:
@@ -3549,7 +3581,7 @@ spec:
                                   - type: string
                                   description: RequestsToLimitsRatio allows to customize
                                     Kubernetes resource Limit based on the Request.
-                                  pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                  pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                   x-kubernetes-int-or-string: true
                               required:
                               - max
@@ -3650,7 +3682,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: ResourceList is a set of (resource name,
                                 quantity) pairs.
@@ -3660,7 +3692,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: ResourceList is a set of (resource name,
                                 quantity) pairs.
@@ -3697,7 +3729,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -3717,21 +3749,21 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: Elasticsearch version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .status.phase
+        - jsonPath: ".status.phase"
           name: phase
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1
@@ -4355,7 +4387,7 @@ spec:
                           description: Name of this set of nodes. Becomes a part of
                             the Elasticsearch node.name setting.
                           maxLength: 23
-                          pattern: '[a-zA-Z0-9-]+'
+                          pattern: "[a-zA-Z0-9-]+"
                           type: string
                         podTemplate:
                           description: PodTemplate provides customisation options
@@ -4514,7 +4546,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Limits describes the maximum
                                           amount of compute resources allowed. More
@@ -4525,7 +4557,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Requests describes the minimum
                                           amount of compute resources required. If
@@ -4619,7 +4651,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: allocatedResources is the storage
                                       resource within AllocatedResources tracks the
@@ -4641,7 +4673,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: capacity represents the actual resources
                                       of the underlying volume.
@@ -5586,21 +5618,21 @@ spec:
         subresources:
           status: {}
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: Elasticsearch version
-          jsonPath: .spec.version
+          jsonPath: ".spec.version"
           name: version
           type: string
-        - jsonPath: .status.phase
+        - jsonPath: ".status.phase"
           name: phase
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1beta1
@@ -6089,7 +6121,7 @@ spec:
                           description: Name of this set of nodes. Becomes a part of
                             the Elasticsearch node.name setting.
                           maxLength: 23
-                          pattern: '[a-zA-Z0-9-]+'
+                          pattern: "[a-zA-Z0-9-]+"
                           type: string
                         podTemplate:
                           description: PodTemplate provides customisation options
@@ -6247,7 +6279,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Limits describes the maximum
                                           amount of compute resources allowed. More
@@ -6258,7 +6290,7 @@ spec:
                                           anyOf:
                                           - type: integer
                                           - type: string
-                                          pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                          pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                           x-kubernetes-int-or-string: true
                                         description: 'Requests describes the minimum
                                           amount of compute resources required. If
@@ -6352,7 +6384,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: allocatedResources is the storage
                                       resource within AllocatedResources tracks the
@@ -6374,7 +6406,7 @@ spec:
                                       anyOf:
                                       - type: integer
                                       - type: string
-                                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                      pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                       x-kubernetes-int-or-string: true
                                     description: capacity represents the actual resources
                                       of the underlying volume.
@@ -6652,7 +6684,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -6672,18 +6704,18 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: Enterprise Search version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1
@@ -7273,23 +7305,23 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: .status.selector
-            specReplicasPath: .spec.count
-            statusReplicasPath: .status.count
+            labelSelectorPath: ".status.selector"
+            specReplicasPath: ".spec.count"
+            statusReplicasPath: ".status.count"
           status: {}
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: Enterprise Search version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1beta1
@@ -7870,7 +7902,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.10.0
-      creationTimestamp: null
+      creationTimestamp: 
       labels:
         app.kubernetes.io/instance: elastic-operator
         app.kubernetes.io/name: eck-operator-crds
@@ -7890,18 +7922,18 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: Kibana version
-          jsonPath: .status.version
+          jsonPath: ".status.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1
@@ -8668,23 +8700,23 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: .status.selector
-            specReplicasPath: .spec.count
-            statusReplicasPath: .status.count
+            labelSelectorPath: ".status.selector"
+            specReplicasPath: ".spec.count"
+            statusReplicasPath: ".status.count"
           status: {}
       - additionalPrinterColumns:
-        - jsonPath: .status.health
+        - jsonPath: ".status.health"
           name: health
           type: string
         - description: Available nodes
-          jsonPath: .status.availableNodes
+          jsonPath: ".status.availableNodes"
           name: nodes
           type: integer
         - description: Kibana version
-          jsonPath: .spec.version
+          jsonPath: ".spec.version"
           name: version
           type: string
-        - jsonPath: .metadata.creationTimestamp
+        - jsonPath: ".metadata.creationTimestamp"
           name: age
           type: date
         name: v1beta1
@@ -9329,7 +9361,7 @@ spec:
       - watch
       - update
     - apiGroups:
-      - ""
+      - ''
       resources:
       - endpoints
       verbs:
@@ -9337,7 +9369,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ""
+      - ''
       resources:
       - pods
       - events
@@ -9504,7 +9536,7 @@ spec:
       - patch
       - delete
     - apiGroups:
-      - ""
+      - ''
       resources:
       - nodes
       verbs:
@@ -9517,9 +9549,9 @@ spec:
       labels:
         app.kubernetes.io/version: 2.5.0
         control-plane: elastic-operator
-        rbac.authorization.k8s.io/aggregate-to-admin: "true"
-        rbac.authorization.k8s.io/aggregate-to-edit: "true"
-        rbac.authorization.k8s.io/aggregate-to-view: "true"
+        rbac.authorization.k8s.io/aggregate-to-admin: 'true'
+        rbac.authorization.k8s.io/aggregate-to-edit: 'true'
+        rbac.authorization.k8s.io/aggregate-to-view: 'true'
       name: elastic-operator-view
     rules:
     - apiGroups:
@@ -9592,8 +9624,8 @@ spec:
       labels:
         app.kubernetes.io/version: 2.5.0
         control-plane: elastic-operator
-        rbac.authorization.k8s.io/aggregate-to-admin: "true"
-        rbac.authorization.k8s.io/aggregate-to-edit: "true"
+        rbac.authorization.k8s.io/aggregate-to-admin: 'true'
+        rbac.authorization.k8s.io/aggregate-to-edit: 'true'
       name: elastic-operator-edit
     rules:
     - apiGroups:
@@ -9731,7 +9763,7 @@ spec:
           containers:
           - args:
             - manager
-            - --config=/conf/eck.yaml
+            - "--config=/conf/eck.yaml"
             env:
             - name: OPERATOR_NAMESPACE
               valueFrom:
@@ -9758,10 +9790,10 @@ spec:
                 cpu: 100m
                 memory: 150Mi
             volumeMounts:
-            - mountPath: /conf
+            - mountPath: "/conf"
               name: conf
               readOnly: true
-            - mountPath: /tmp/k8s-webhook-server/serving-certs
+            - mountPath: "/tmp/k8s-webhook-server/serving-certs"
               name: cert
               readOnly: true
           securityContext:
@@ -9791,7 +9823,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-agent-k8s-elastic-co-v1alpha1-agent
+          path: "/validate-agent-k8s-elastic-co-v1alpha1-agent"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-agent-validation-v1alpha1.k8s.elastic.co
@@ -9813,7 +9845,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-apm-k8s-elastic-co-v1-apmserver
+          path: "/validate-apm-k8s-elastic-co-v1-apmserver"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-apm-validation-v1.k8s.elastic.co
@@ -9835,7 +9867,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-apm-k8s-elastic-co-v1beta1-apmserver
+          path: "/validate-apm-k8s-elastic-co-v1beta1-apmserver"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-apm-validation-v1beta1.k8s.elastic.co
@@ -9857,7 +9889,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-beat-k8s-elastic-co-v1beta1-beat
+          path: "/validate-beat-k8s-elastic-co-v1beta1-beat"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-beat-validation-v1beta1.k8s.elastic.co
@@ -9879,7 +9911,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-enterprisesearch-k8s-elastic-co-v1-enterprisesearch
+          path: "/validate-enterprisesearch-k8s-elastic-co-v1-enterprisesearch"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-ent-validation-v1.k8s.elastic.co
@@ -9901,7 +9933,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-enterprisesearch-k8s-elastic-co-v1beta1-enterprisesearch
+          path: "/validate-enterprisesearch-k8s-elastic-co-v1beta1-enterprisesearch"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-ent-validation-v1beta1.k8s.elastic.co
@@ -9923,7 +9955,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-elasticsearch-k8s-elastic-co-v1-elasticsearch
+          path: "/validate-elasticsearch-k8s-elastic-co-v1-elasticsearch"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-es-validation-v1.k8s.elastic.co
@@ -9945,7 +9977,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-elasticsearch-k8s-elastic-co-v1beta1-elasticsearch
+          path: "/validate-elasticsearch-k8s-elastic-co-v1beta1-elasticsearch"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-es-validation-v1beta1.k8s.elastic.co
@@ -9967,7 +9999,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-kibana-k8s-elastic-co-v1-kibana
+          path: "/validate-kibana-k8s-elastic-co-v1-kibana"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-kb-validation-v1.k8s.elastic.co
@@ -9989,7 +10021,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-kibana-k8s-elastic-co-v1beta1-kibana
+          path: "/validate-kibana-k8s-elastic-co-v1beta1-kibana"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-kb-validation-v1beta1.k8s.elastic.co
@@ -10011,7 +10043,7 @@ spec:
         service:
           name: elastic-webhook-server
           namespace: elastic-system
-          path: /validate-autoscaling-k8s-elastic-co-v1alpha1-elasticsearchautoscaler
+          path: "/validate-autoscaling-k8s-elastic-co-v1alpha1-elasticsearchautoscaler"
       failurePolicy: Ignore
       matchPolicy: Exact
       name: elastic-esa-validation-v1alpha1.k8s.elastic.co
@@ -10026,36 +10058,3 @@ spec:
         resources:
         - elasticsearchautoscalers
       sideEffects: None
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: elasticclouds.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: elasticcloud
-        plural: elasticclouds
-        singular: elasticcloud
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  env:
-                    default: dev
-                    description: |
-                      Deploy Elastic Cloud for Kubernetes to specific environment.
-                      Production includes autoscaling for both Elastic and Kibana.
-                    pattern: ^(dev|prod)$
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/elasticcloud-request-pipeline:v0.1.0
-status: {}

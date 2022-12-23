@@ -3,6 +3,7 @@
 set -e
 
 promise_name="$(basename "$(dirname "${PWD}")")"
+scripts_dir="${PWD}/../../scripts"
 
 if ! which worker-resource-builder >/dev/null; then
 	echo "worker-resource-builder not installed"
@@ -17,4 +18,4 @@ promise_contents=$(worker-resource-builder \
   -k8s-resources-directory "${PWD}/resources" \
 	-promise "${PWD}/../promise.yaml")
 
-echo "$promise_contents" > "${PWD}/../promise.yaml"
+echo "$promise_contents" | ${scripts_dir}/format-promise > "${PWD}/../promise.yaml"

@@ -1,9 +1,41 @@
+---
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: knative
 spec:
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: knatives.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: knative
+        plural: knatives
+        singular: knative
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  env:
+                    default: dev
+                    description: |
+                      Configures and deploys this Knative with environment specific configuration.
+                      Prod Knative enables application autoscaling using HPA.
+                    pattern: "^(dev|prod)$"
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  xaasRequestPipeline:
+  - ghcr.io/syntasso/kratix-marketplace/knative-request-pipeline:v0.1.0
   workerClusterResources:
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
@@ -12,7 +44,7 @@ spec:
         app.kubernetes.io/component: networking
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: certificates.networking.internal.knative.dev
     spec:
       group: networking.internal.knative.dev
@@ -172,8 +204,8 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        duck.knative.dev/podspecable: "true"
-        knative.dev/crd-install: "true"
+        duck.knative.dev/podspecable: 'true'
+        knative.dev/crd-install: 'true'
       name: configurations.serving.knative.dev
     spec:
       group: serving.knative.dev
@@ -191,16 +223,16 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.latestCreatedRevisionName
+        - jsonPath: ".status.latestCreatedRevisionName"
           name: LatestCreated
           type: string
-        - jsonPath: .status.latestReadyRevisionName
+        - jsonPath: ".status.latestReadyRevisionName"
           name: LatestReady
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1
@@ -754,7 +786,7 @@ spec:
                                         anyOf:
                                         - type: integer
                                         - type: string
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       description: 'Limits describes the maximum amount
                                         of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -764,7 +796,7 @@ spec:
                                         anyOf:
                                         - type: integer
                                         - type: string
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       description: 'Requests describes the minimum
                                         amount of compute resources required. If Requests
@@ -1514,7 +1546,7 @@ spec:
         app.kubernetes.io/component: networking
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: clusterdomainclaims.networking.internal.knative.dev
     spec:
       group: networking.internal.knative.dev
@@ -1570,7 +1602,7 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: domainmappings.serving.knative.dev
     spec:
       group: serving.knative.dev
@@ -1587,13 +1619,13 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.url
+        - jsonPath: ".status.url"
           name: URL
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1beta1
@@ -1737,13 +1769,13 @@ spec:
         subresources:
           status: {}
       - additionalPrinterColumns:
-        - jsonPath: .status.url
+        - jsonPath: ".status.url"
           name: URL
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1alpha1
@@ -1893,7 +1925,7 @@ spec:
         app.kubernetes.io/component: networking
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: ingresses.networking.internal.knative.dev
     spec:
       group: networking.internal.knative.dev
@@ -1910,10 +1942,10 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1alpha1
@@ -2258,7 +2290,7 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: metrics.autoscaling.internal.knative.dev
     spec:
       group: autoscaling.internal.knative.dev
@@ -2272,10 +2304,10 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1alpha1
@@ -2386,7 +2418,7 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: podautoscalers.autoscaling.internal.knative.dev
     spec:
       group: autoscaling.internal.knative.dev
@@ -2403,16 +2435,16 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.desiredScale
+        - jsonPath: ".status.desiredScale"
           name: DesiredScale
           type: integer
-        - jsonPath: .status.actualScale
+        - jsonPath: ".status.actualScale"
           name: ActualScale
           type: integer
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1alpha1
@@ -2561,7 +2593,7 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: revisions.serving.knative.dev
     spec:
       group: serving.knative.dev
@@ -2578,25 +2610,25 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .metadata.labels['serving\.knative\.dev/configuration']
+        - jsonPath: ".metadata.labels['serving\\.knative\\.dev/configuration']"
           name: Config Name
           type: string
-        - jsonPath: .status.serviceName
+        - jsonPath: ".status.serviceName"
           name: K8s Service Name
           type: string
-        - jsonPath: .metadata.labels['serving\.knative\.dev/configurationGeneration']
+        - jsonPath: ".metadata.labels['serving\\.knative\\.dev/configurationGeneration']"
           name: Generation
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
-        - jsonPath: .status.actualReplicas
+        - jsonPath: ".status.actualReplicas"
           name: Actual Replicas
           type: integer
-        - jsonPath: .status.desiredReplicas
+        - jsonPath: ".status.desiredReplicas"
           name: Desired Replicas
           type: integer
         name: v1
@@ -3095,7 +3127,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Limits describes the maximum amount of
                                 compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -3105,7 +3137,7 @@ spec:
                                 anyOf:
                                 - type: integer
                                 - type: string
-                                pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                 x-kubernetes-int-or-string: true
                               description: 'Requests describes the minimum amount
                                 of compute resources required. If Requests is omitted
@@ -3819,8 +3851,8 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        duck.knative.dev/addressable: "true"
-        knative.dev/crd-install: "true"
+        duck.knative.dev/addressable: 'true'
+        knative.dev/crd-install: 'true'
       name: routes.serving.knative.dev
     spec:
       group: serving.knative.dev
@@ -3837,13 +3869,13 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.url
+        - jsonPath: ".status.url"
           name: URL
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1
@@ -4057,7 +4089,7 @@ spec:
         app.kubernetes.io/component: networking
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: serverlessservices.networking.internal.knative.dev
     spec:
       group: networking.internal.knative.dev
@@ -4073,22 +4105,22 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .spec.mode
+        - jsonPath: ".spec.mode"
           name: Mode
           type: string
-        - jsonPath: .spec.numActivators
+        - jsonPath: ".spec.numActivators"
           name: Activators
           type: integer
-        - jsonPath: .status.serviceName
+        - jsonPath: ".status.serviceName"
           name: ServiceName
           type: string
-        - jsonPath: .status.privateServiceName
+        - jsonPath: ".status.privateServiceName"
           name: PrivateServiceName
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1alpha1
@@ -4247,9 +4279,9 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        duck.knative.dev/addressable: "true"
-        duck.knative.dev/podspecable: "true"
-        knative.dev/crd-install: "true"
+        duck.knative.dev/addressable: 'true'
+        duck.knative.dev/podspecable: 'true'
+        knative.dev/crd-install: 'true'
       name: services.serving.knative.dev
     spec:
       group: serving.knative.dev
@@ -4267,19 +4299,19 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .status.url
+        - jsonPath: ".status.url"
           name: URL
           type: string
-        - jsonPath: .status.latestCreatedRevisionName
+        - jsonPath: ".status.latestCreatedRevisionName"
           name: LatestCreated
           type: string
-        - jsonPath: .status.latestReadyRevisionName
+        - jsonPath: ".status.latestReadyRevisionName"
           name: LatestReady
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].status
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].status"
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=='Ready')].reason
+        - jsonPath: ".status.conditions[?(@.type=='Ready')].reason"
           name: Reason
           type: string
         name: v1
@@ -4844,7 +4876,7 @@ spec:
                                         anyOf:
                                         - type: integer
                                         - type: string
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       description: 'Limits describes the maximum amount
                                         of compute resources allowed. More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/'
@@ -4854,7 +4886,7 @@ spec:
                                         anyOf:
                                         - type: integer
                                         - type: string
-                                        pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                                        pattern: "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$"
                                         x-kubernetes-int-or-string: true
                                       description: 'Requests describes the minimum
                                         amount of compute resources required. If Requests
@@ -5720,7 +5752,7 @@ spec:
       labels:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
+        knative.dev/crd-install: 'true'
       name: images.caching.internal.knative.dev
     spec:
       group: caching.internal.knative.dev
@@ -5734,7 +5766,7 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: .spec.image
+        - jsonPath: ".spec.image"
           name: Image
           type: string
         name: v1alpha1
@@ -5848,36 +5880,3 @@ spec:
         storage: true
         subresources:
           status: {}
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: knatives.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: knative
-        plural: knatives
-        singular: knative
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  env:
-                    default: dev
-                    description: |
-                      Configures and deploys this Knative with environment specific configuration.
-                      Prod Knative enables application autoscaling using HPA.
-                    pattern: ^(dev|prod)$
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/knative-request-pipeline:v0.1.0
-status: {}
