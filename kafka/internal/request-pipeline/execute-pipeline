@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+
+set -x
+
+# Read current values from the provided resource request
+export name="$(yq eval '.metadata.name' /input/object.yaml)"
+export size="$(yq eval '.spec.size' /input/object.yaml)"
+
+export replicas=1
+
+if [ $size = large ]; then
+  replicas=3
+fi
+
+# Replace defaults with user provided values
+cat /tmp/transfer/kafka-instance.yaml |  \
+  yq eval '.spec.kafka.replicas = env(replicas)' | \
+  yq eval '.metadata.name = env(name)' - \
+  > /output/kafka-instance.yaml

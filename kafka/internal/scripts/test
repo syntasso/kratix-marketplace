@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crd kafkas.kafka.strimzi.io 
+  kubectl -n kafka wait --for=condition=Available --timeout=5s deployment/strimzi-cluster-operator
+}
+
+test_resource_request() {
+  kubectl -n kafka wait kafka/example  --for=condition=Ready --timeout=5s
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

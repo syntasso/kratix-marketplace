@@ -118,3 +118,4 @@ workflows:
                 - postgresql
                 - redis
                 - vault
+                - kafka
