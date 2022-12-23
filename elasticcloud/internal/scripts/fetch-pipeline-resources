@@ -4,15 +4,8 @@ PWD="$( cd $(dirname $0)/.. && pwd)"
 
 mkdir -p $PWD/request-pipeline/resources
 
-# urls=(
-#     # TODO: set URLs to download resources. Ideally use pinned version URLs.
-# )
-
-# for url in "${instance_urls[@]}"; do
-#     curl -sL -o $PWD/request-pipeline/resources/$(basename $url) $url
-# done
-
-cat > $PWD/request-pipeline/resources/elasticsearch.yaml <<EOF
+cat > $PWD/request-pipeline/resources/baseline-resources.yaml <<EOF
+---
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
@@ -25,9 +18,7 @@ spec:
     count: 1
     config:
       node.store.allow_mmap: false
-EOF
-
-cat > $PWD/request-pipeline/resources/kibana.yaml <<EOF
+---
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
@@ -37,5 +28,53 @@ spec:
   version: 8.5.3
   count: 1
   elasticsearchRef:
-    name: quickstart
+    name: TBDNAME
+EOF
+
+cat > $PWD/request-pipeline/resources/autoscaling.yaml <<EOF
+---
+apiVersion: autoscaling.k8s.elastic.co/v1alpha1
+kind: ElasticsearchAutoscaler
+metadata:
+  name: TBDNAME
+  namespace: default
+spec:
+  elasticsearchRef:
+    name: TBDNAME
+  policies:
+    - name: data-ingest
+      roles: ["data", "ingest" , "transform"]
+      resources:
+        nodeCount: {min: 1, max: 3}
+        cpu: {min: 1, max: 2}
+        memory: {min: 2G, max: 3Gi}
+        storage: {min: 1Gi, max: 5Gi}
+    - name: ml
+      roles:
+        - ml
+      resources:
+        nodeCount: {min: 1, max: 3}
+        cpu: {min: 1, max: 2}
+        memory: {min: 2G, max: 3Gi}
+        storage: {min: 1Gi, max: 5Gi}
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: TBDNAME
+  namespace: default
+spec:
+  scaleTargetRef:
+    apiVersion: kibana.k8s.elastic.co/v1
+    kind: Kibana
+    name: TBDNAME
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50
 EOF

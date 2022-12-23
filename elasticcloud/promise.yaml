@@ -10046,6 +10046,11 @@ spec:
               spec:
                 properties:
                   env:
+                    default: dev
+                    description: |
+                      Deploy Elastic Cloud for Kubernetes to specific environment.
+                      Production includes autoscaling for both Elastic and Kibana.
+                    pattern: ^(dev|prod)$
                     type: string
                 type: object
             type: object

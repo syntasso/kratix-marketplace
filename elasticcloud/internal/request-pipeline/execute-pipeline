@@ -3,6 +3,9 @@
 set -ex
 
 name="$(yq eval '.metadata.name' /input/object.yaml)"
+env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
 
-sed "s/TBDNAME/${name}/g" /tmp/transfer/elasticsearch.yaml > /output/elasticsearch.yaml
-sed "s/TBDNAME/${name}/g" /tmp/transfer/kibana.yaml > /output/kibana.yaml
+sed "s/TBDNAME/${name}/g" /tmp/transfer/baseline-resources.yaml > /output/baseline-resources.yaml
+if [ $env_type = "prod" ]; then
+    sed "s/TBDNAME/${name}/g" /tmp/transfer/autoscaling.yaml > /output/autoscaling.yaml
+fi
