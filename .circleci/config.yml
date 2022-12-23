@@ -82,7 +82,7 @@ jobs:
           retry-count: 45
       - when:
           condition:
-            equal: [ main, << pipeline.git.branch >> ]
+            equal: [main, << pipeline.git.branch >>]
           steps:
             - run:
                 name: GHCR Push
