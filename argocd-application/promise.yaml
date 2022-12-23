@@ -1,59 +1,9 @@
----
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: argocd-application
 spec:
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: argocd-applications.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: argocd-application
-        plural: argocd-applications
-        singular: argocd-application
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  source:
-                    description: Source is a reference to the location of the application's
-                      manifests or chart
-                    properties:
-                      path:
-                        default: "."
-                        description: Path is a directory path within the Git repository,
-                          and is only valid for applications sourced from Git. The
-                          default path is the root directory.
-                        type: string
-                      repoURL:
-                        description: RepoURL is the URL to the repository (Git or
-                          Helm) that contains the application manifests. This URL
-                          must be public.
-                        type: string
-                      targetRevision:
-                        description: TargetRevision defines the revision of the source
-                          to sync the application to. In case of Git, this can be
-                          commit, tag, or branch. If omitted, will equal to HEAD.
-                        type: string
-                    required:
-                    - repoURL
-                    type: object
-                required:
-                - source
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/argocd-application-request-pipeline:v0.1.0
   workerClusterResources:
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
@@ -75,13 +25,13 @@ spec:
       scope: Namespaced
       versions:
       - additionalPrinterColumns:
-        - jsonPath: ".status.sync.status"
+        - jsonPath: .status.sync.status
           name: Sync Status
           type: string
-        - jsonPath: ".status.health.status"
+        - jsonPath: .status.health.status
           name: Health Status
           type: string
-        - jsonPath: ".status.sync.revision"
+        - jsonPath: .status.sync.revision
           name: Revision
           priority: 10
           type: string
@@ -9443,7 +9393,7 @@ spec:
       namespace: argocd
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       - configmaps
@@ -9465,7 +9415,7 @@ spec:
       - patch
       - delete
     - apiGroups:
-      - ''
+      - ""
       resources:
       - events
       verbs:
@@ -9510,7 +9460,7 @@ spec:
       - patch
       - update
     - apiGroups:
-      - ''
+      - ""
       resources:
       - events
       verbs:
@@ -9520,7 +9470,7 @@ spec:
       - patch
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       - configmaps
@@ -9548,7 +9498,7 @@ spec:
       namespace: argocd
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       - configmaps
@@ -9574,7 +9524,7 @@ spec:
       - update
       - patch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - configmaps
       - secrets
@@ -9582,7 +9532,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resourceNames:
       - argocd-notifications-cm
       resources:
@@ -9590,7 +9540,7 @@ spec:
       verbs:
       - get
     - apiGroups:
-      - ''
+      - ""
       resourceNames:
       - argocd-notifications-secret
       resources:
@@ -9608,7 +9558,7 @@ spec:
       namespace: argocd
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       - configmaps
@@ -9635,7 +9585,7 @@ spec:
       - delete
       - patch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - events
       verbs:
@@ -9651,15 +9601,15 @@ spec:
       name: argocd-application-controller
     rules:
     - apiGroups:
-      - "*"
+      - '*'
       resources:
-      - "*"
+      - '*'
       verbs:
-      - "*"
+      - '*'
     - nonResourceURLs:
-      - "*"
+      - '*'
       verbs:
-      - "*"
+      - '*'
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -9670,21 +9620,21 @@ spec:
       name: argocd-server
     rules:
     - apiGroups:
-      - "*"
+      - '*'
       resources:
-      - "*"
+      - '*'
       verbs:
       - delete
       - get
       - patch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - events
       verbs:
       - list
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods
       - pods/log
@@ -10105,15 +10055,15 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/app/config/ssh"
+            - mountPath: /app/config/ssh
               name: ssh-known-hosts
-            - mountPath: "/app/config/tls"
+            - mountPath: /app/config/tls
               name: tls-certs
-            - mountPath: "/app/config/gpg/source"
+            - mountPath: /app/config/gpg/source
               name: gpg-keys
-            - mountPath: "/app/config/gpg/keys"
+            - mountPath: /app/config/gpg/keys
               name: gpg-keyring
-            - mountPath: "/tmp"
+            - mountPath: /tmp
               name: tmp
           serviceAccountName: argocd-applicationset-controller
           volumes:
@@ -10159,7 +10109,7 @@ spec:
                 weight: 5
           containers:
           - command:
-            - "/shared/argocd-dex"
+            - /shared/argocd-dex
             - rundex
             env:
             - name: ARGOCD_DEX_SERVER_DISABLE_TLS
@@ -10185,18 +10135,18 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/shared"
+            - mountPath: /shared
               name: static-files
-            - mountPath: "/tmp"
+            - mountPath: /tmp
               name: dexconfig
-            - mountPath: "/tls"
+            - mountPath: /tls
               name: argocd-dex-server-tls
           initContainers:
           - command:
             - cp
-            - "-n"
-            - "/usr/local/bin/argocd"
-            - "/shared/argocd-dex"
+            - -n
+            - /usr/local/bin/argocd
+            - /shared/argocd-dex
             image: quay.io/argoproj/argocd:v2.5.5
             imagePullPolicy: Always
             name: copyutil
@@ -10210,9 +10160,9 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/shared"
+            - mountPath: /shared
               name: static-files
-            - mountPath: "/tmp"
+            - mountPath: /tmp
               name: dexconfig
           serviceAccountName: argocd-dex-server
           volumes:
@@ -10263,11 +10213,11 @@ spec:
                 - ALL
               readOnlyRootFilesystem: true
             volumeMounts:
-            - mountPath: "/app/config/tls"
+            - mountPath: /app/config/tls
               name: tls-certs
-            - mountPath: "/app/config/reposerver/tls"
+            - mountPath: /app/config/reposerver/tls
               name: argocd-repo-server-tls
-            workingDir: "/app"
+            workingDir: /app
           securityContext:
             runAsNonRoot: true
             seccompProfile:
@@ -10323,10 +10273,10 @@ spec:
                 weight: 5
           containers:
           - args:
-            - "--save"
-            - ''
-            - "--appendonly"
-            - 'no'
+            - --save
+            - ""
+            - --appendonly
+            - "no"
             image: redis:7.0.5-alpine
             imagePullPolicy: Always
             name: redis
@@ -10380,7 +10330,7 @@ spec:
           containers:
           - command:
             - sh
-            - "-c"
+            - -c
             - entrypoint.sh argocd-repo-server --redis argocd-redis:6379
             env:
             - name: ARGOCD_RECONCILIATION_TIMEOUT
@@ -10498,17 +10448,17 @@ spec:
                   name: argocd-cmd-params-cm
                   optional: true
             - name: HELM_CACHE_HOME
-              value: "/helm-working-dir"
+              value: /helm-working-dir
             - name: HELM_CONFIG_HOME
-              value: "/helm-working-dir"
+              value: /helm-working-dir
             - name: HELM_DATA_HOME
-              value: "/helm-working-dir"
+              value: /helm-working-dir
             image: quay.io/argoproj/argocd:v2.5.5
             imagePullPolicy: Always
             livenessProbe:
               failureThreshold: 3
               httpGet:
-                path: "/healthz?full=true"
+                path: /healthz?full=true
                 port: 8084
               initialDelaySeconds: 30
               periodSeconds: 5
@@ -10518,7 +10468,7 @@ spec:
             - containerPort: 8084
             readinessProbe:
               httpGet:
-                path: "/healthz"
+                path: /healthz
                 port: 8084
               initialDelaySeconds: 5
               periodSeconds: 10
@@ -10532,28 +10482,28 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/app/config/ssh"
+            - mountPath: /app/config/ssh
               name: ssh-known-hosts
-            - mountPath: "/app/config/tls"
+            - mountPath: /app/config/tls
               name: tls-certs
-            - mountPath: "/app/config/gpg/source"
+            - mountPath: /app/config/gpg/source
               name: gpg-keys
-            - mountPath: "/app/config/gpg/keys"
+            - mountPath: /app/config/gpg/keys
               name: gpg-keyring
-            - mountPath: "/app/config/reposerver/tls"
+            - mountPath: /app/config/reposerver/tls
               name: argocd-repo-server-tls
-            - mountPath: "/tmp"
+            - mountPath: /tmp
               name: tmp
-            - mountPath: "/helm-working-dir"
+            - mountPath: /helm-working-dir
               name: helm-working-dir
-            - mountPath: "/home/argocd/cmp-server/plugins"
+            - mountPath: /home/argocd/cmp-server/plugins
               name: plugins
           initContainers:
           - command:
             - cp
-            - "-n"
-            - "/usr/local/bin/argocd"
-            - "/var/run/argocd/argocd-cmp-server"
+            - -n
+            - /usr/local/bin/argocd
+            - /var/run/argocd/argocd-cmp-server
             image: quay.io/argoproj/argocd:v2.5.5
             name: copyutil
             securityContext:
@@ -10566,7 +10516,7 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/var/run/argocd"
+            - mountPath: /var/run/argocd
               name: var-files
           serviceAccountName: argocd-repo-server
           volumes:
@@ -10827,7 +10777,7 @@ spec:
             imagePullPolicy: Always
             livenessProbe:
               httpGet:
-                path: "/healthz?full=true"
+                path: /healthz?full=true
                 port: 8080
               initialDelaySeconds: 3
               periodSeconds: 30
@@ -10837,7 +10787,7 @@ spec:
             - containerPort: 8083
             readinessProbe:
               httpGet:
-                path: "/healthz"
+                path: /healthz
                 port: 8080
               initialDelaySeconds: 3
               periodSeconds: 30
@@ -10851,17 +10801,17 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/app/config/ssh"
+            - mountPath: /app/config/ssh
               name: ssh-known-hosts
-            - mountPath: "/app/config/tls"
+            - mountPath: /app/config/tls
               name: tls-certs
-            - mountPath: "/app/config/server/tls"
+            - mountPath: /app/config/server/tls
               name: argocd-repo-server-tls
-            - mountPath: "/app/config/dex/tls"
+            - mountPath: /app/config/dex/tls
               name: argocd-dex-server-tls
-            - mountPath: "/home/argocd"
+            - mountPath: /home/argocd
               name: plugins-home
-            - mountPath: "/tmp"
+            - mountPath: /tmp
               name: tmp
           serviceAccountName: argocd-server
           volumes:
@@ -10935,7 +10885,7 @@ spec:
             - argocd-application-controller
             env:
             - name: ARGOCD_CONTROLLER_REPLICAS
-              value: '1'
+              value: "1"
             - name: ARGOCD_RECONCILIATION_TIMEOUT
               valueFrom:
                 configMapKeyRef:
@@ -11063,7 +11013,7 @@ spec:
             - containerPort: 8082
             readinessProbe:
               httpGet:
-                path: "/healthz"
+                path: /healthz
                 port: 8082
               initialDelaySeconds: 5
               periodSeconds: 10
@@ -11077,11 +11027,11 @@ spec:
               seccompProfile:
                 type: RuntimeDefault
             volumeMounts:
-            - mountPath: "/app/config/controller/tls"
+            - mountPath: /app/config/controller/tls
               name: argocd-repo-server-tls
-            - mountPath: "/home/argocd"
+            - mountPath: /home/argocd
               name: argocd-home
-            workingDir: "/home/argocd"
+            workingDir: /home/argocd
           serviceAccountName: argocd-application-controller
           volumes:
           - emptyDir: {}
@@ -11253,3 +11203,54 @@ spec:
     kind: Namespace
     metadata:
       name: argocd
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: argocd-applications.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: argocd-application
+        plural: argocd-applications
+        singular: argocd-application
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  source:
+                    description: Source is a reference to the location of the application's
+                      manifests or chart
+                    properties:
+                      path:
+                        default: .
+                        description: Path is a directory path within the Git repository,
+                          and is only valid for applications sourced from Git. The
+                          default path is the root directory.
+                        type: string
+                      repoURL:
+                        description: RepoURL is the URL to the repository (Git or
+                          Helm) that contains the application manifests. This URL
+                          must be public.
+                        type: string
+                      targetRevision:
+                        description: TargetRevision defines the revision of the source
+                          to sync the application to. In case of Git, this can be
+                          commit, tag, or branch. If omitted, will equal to HEAD.
+                        type: string
+                    required:
+                    - repoURL
+                    type: object
+                required:
+                - source
+                type: object
+            type: object
+        served: true
+        storage: true
+  xaasRequestPipeline:
+  - ghcr.io/syntasso/kratix-marketplace/argocd-application-request-pipeline:v0.1.0
+status: {}

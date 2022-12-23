@@ -1,42 +1,9 @@
----
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: kafka
 spec:
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: kafka.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: kafka
-        plural: kafka
-        singular: kafka
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  size:
-                    default: small
-                    description: 'Size of this kafka deployment. If small, it deploy
-                      kafka with a single replica; if large, deploy kafka with 3 replicas.
-
-'
-                    pattern: "^(small|large)$"
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/kafka-request-pipeline:v0.1.0
   workerClusterResources:
   - apiVersion: v1
     kind: Namespace
@@ -50,7 +17,7 @@ spec:
       name: strimzi-kafka-broker
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - nodes
       verbs:
@@ -87,7 +54,7 @@ spec:
       - patch
       - update
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods
       - serviceaccounts
@@ -138,7 +105,7 @@ spec:
       - patch
       - update
     - apiGroups:
-      - ''
+      - ""
       - events.k8s.io
       resources:
       - events
@@ -201,7 +168,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkamirrormaker2s.kafka.strimzi.io
     spec:
       conversion:
@@ -220,7 +187,7 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The desired number of Kafka MirrorMaker 2.0 replicas
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Desired replicas
           type: integer
         - description: The state of the custom resource
@@ -244,7 +211,7 @@ spec:
                       properties:
                         alias:
                           description: Alias used to reference the Kafka cluster.
-                          pattern: "^[a-zA-Z0-9\\._\\-]{1,100}$"
+                          pattern: ^[a-zA-Z0-9\._\-]{1,100}$
                           type: string
                         authentication:
                           description: Authentication configuration for connecting
@@ -607,17 +574,17 @@ spec:
                   jvmOptions:
                     description: JVM Options for pods.
                     properties:
-                      "-XX":
+                      -XX:
                         description: A map of -XX options to the JVM.
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
-                      "-Xms":
-                        description: "-Xms option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xms:
+                        description: -Xms option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
-                      "-Xmx":
-                        description: "-Xmx option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xmx:
+                        description: -Xmx option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
                       gcLoggingEnabled:
                         description: Specifies whether the Garbage Collection logging
@@ -682,8 +649,8 @@ spec:
                         - external
                         type: string
                       valueFrom:
-                        description: "`ConfigMap` entry where the logging configuration
-                          is stored. "
+                        description: '`ConfigMap` entry where the logging configuration
+                          is stored. '
                         properties:
                           configMapKeyRef:
                             description: Reference to the key in the ConfigMap containing
@@ -1479,7 +1446,7 @@ spec:
                             description: Defines the total amount (for example `1Gi`)
                               of local storage required for temporary EmptyDir volume
                               (`/tmp`). Default value is `5Mi`.
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           tolerations:
                             description: The pod's tolerations.
@@ -2203,7 +2170,7 @@ spec:
                             description: Defines the total amount (for example `1Gi`)
                               of local storage required for temporary EmptyDir volume
                               (`/tmp`). Default value is `5Mi`.
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           tolerations:
                             description: The pod's tolerations.
@@ -2412,9 +2379,9 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: ".status.labelSelector"
-            specReplicasPath: ".spec.replicas"
-            statusReplicasPath: ".status.replicas"
+            labelSelectorPath: .status.labelSelector
+            specReplicasPath: .spec.replicas
+            statusReplicasPath: .status.replicas
           status: {}
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
@@ -2436,7 +2403,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkaconnectors.kafka.strimzi.io
     spec:
       conversion:
@@ -2456,15 +2423,15 @@ spec:
       - additionalPrinterColumns:
         - description: The name of the Kafka Connect cluster this connector belongs
             to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: The class used by this connector
-          jsonPath: ".spec.class"
+          jsonPath: .spec.class
           name: Connector class
           type: string
         - description: Maximum number of tasks
-          jsonPath: ".spec.tasksMax"
+          jsonPath: .spec.tasksMax
           name: Max Tasks
           type: integer
         - description: The state of the custom resource
@@ -2548,15 +2515,15 @@ spec:
         storage: true
         subresources:
           scale:
-            specReplicasPath: ".spec.tasksMax"
-            statusReplicasPath: ".status.tasksMax"
+            specReplicasPath: .spec.tasksMax
+            statusReplicasPath: .status.tasksMax
           status: {}
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkabridges.kafka.strimzi.io
     spec:
       conversion:
@@ -2575,11 +2542,11 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The desired number of Kafka Bridge replicas
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Desired replicas
           type: integer
         - description: The boostrap servers
-          jsonPath: ".spec.bootstrapServers"
+          jsonPath: .spec.bootstrapServers
           name: Bootstrap Servers
           priority: 1
           type: string
@@ -2833,19 +2800,19 @@ spec:
                     description: The docker image for the pods.
                     type: string
                   jvmOptions:
-                    description: "**Currently not supported** JVM Options for pods."
+                    description: '**Currently not supported** JVM Options for pods.'
                     properties:
-                      "-XX":
+                      -XX:
                         description: A map of -XX options to the JVM.
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
-                      "-Xms":
-                        description: "-Xms option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xms:
+                        description: -Xms option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
-                      "-Xmx":
-                        description: "-Xmx option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xmx:
+                        description: -Xmx option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
                       gcLoggingEnabled:
                         description: Specifies whether the Garbage Collection logging
@@ -2910,8 +2877,8 @@ spec:
                         - external
                         type: string
                       valueFrom:
-                        description: "`ConfigMap` entry where the logging configuration
-                          is stored. "
+                        description: '`ConfigMap` entry where the logging configuration
+                          is stored. '
                         properties:
                           configMapKeyRef:
                             description: Reference to the key in the ConfigMap containing
@@ -3653,7 +3620,7 @@ spec:
                             description: Defines the total amount (for example `1Gi`)
                               of local storage required for temporary EmptyDir volume
                               (`/tmp`). Default value is `5Mi`.
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           tolerations:
                             description: The pod's tolerations.
@@ -3854,16 +3821,16 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: ".status.labelSelector"
-            specReplicasPath: ".spec.replicas"
-            statusReplicasPath: ".status.replicas"
+            labelSelectorPath: .status.labelSelector
+            specReplicasPath: .spec.replicas
+            statusReplicasPath: .status.replicas
           status: {}
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkamirrormakers.kafka.strimzi.io
     spec:
       conversion:
@@ -3882,16 +3849,16 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The desired number of Kafka MirrorMaker replicas
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Desired replicas
           type: integer
         - description: The boostrap servers for the consumer
-          jsonPath: ".spec.consumer.bootstrapServers"
+          jsonPath: .spec.consumer.bootstrapServers
           name: Consumer Bootstrap Servers
           priority: 1
           type: string
         - description: The boostrap servers for the producer
-          jsonPath: ".spec.producer.bootstrapServers"
+          jsonPath: .spec.producer.bootstrapServers
           name: Producer Bootstrap Servers
           priority: 1
           type: string
@@ -4167,17 +4134,17 @@ spec:
                   jvmOptions:
                     description: JVM Options for pods.
                     properties:
-                      "-XX":
+                      -XX:
                         description: A map of -XX options to the JVM.
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
-                      "-Xms":
-                        description: "-Xms option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xms:
+                        description: -Xms option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
-                      "-Xmx":
-                        description: "-Xmx option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xmx:
+                        description: -Xmx option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
                       gcLoggingEnabled:
                         description: Specifies whether the Garbage Collection logging
@@ -4242,8 +4209,8 @@ spec:
                         - external
                         type: string
                       valueFrom:
-                        description: "`ConfigMap` entry where the logging configuration
-                          is stored. "
+                        description: '`ConfigMap` entry where the logging configuration
+                          is stored. '
                         properties:
                           configMapKeyRef:
                             description: Reference to the key in the ConfigMap containing
@@ -5094,7 +5061,7 @@ spec:
                             description: Defines the total amount (for example `1Gi`)
                               of local storage required for temporary EmptyDir volume
                               (`/tmp`). Default value is `5Mi`.
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           tolerations:
                             description: The pod's tolerations.
@@ -5285,9 +5252,9 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: ".status.labelSelector"
-            specReplicasPath: ".spec.replicas"
-            statusReplicasPath: ".status.replicas"
+            labelSelectorPath: .status.labelSelector
+            specReplicasPath: .spec.replicas
+            statusReplicasPath: .status.replicas
           status: {}
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
@@ -5337,7 +5304,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkatopics.kafka.strimzi.io
     spec:
       conversion:
@@ -5356,15 +5323,15 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this topic belongs to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: The desired number of partitions in the topic
-          jsonPath: ".spec.partitions"
+          jsonPath: .spec.partitions
           name: Partitions
           type: integer
         - description: The desired number of replicas of each partition
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Replication factor
           type: integer
         - description: The state of the custom resource
@@ -5449,15 +5416,15 @@ spec:
           status: {}
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this topic belongs to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: The desired number of partitions in the topic
-          jsonPath: ".spec.partitions"
+          jsonPath: .spec.partitions
           name: Partitions
           type: integer
         - description: The desired number of replicas of each partition
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Replication factor
           type: integer
         - description: The state of the custom resource
@@ -5542,15 +5509,15 @@ spec:
           status: {}
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this topic belongs to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: The desired number of partitions in the topic
-          jsonPath: ".spec.partitions"
+          jsonPath: .spec.partitions
           name: Partitions
           type: integer
         - description: The desired number of replicas of each partition
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Replication factor
           type: integer
         - description: The state of the custom resource
@@ -5638,7 +5605,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkaconnects.kafka.strimzi.io
     spec:
       conversion:
@@ -5657,7 +5624,7 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The desired number of Kafka Connect replicas
-          jsonPath: ".spec.replicas"
+          jsonPath: .spec.replicas
           name: Desired replicas
           type: integer
         - description: The state of the custom resource
@@ -5960,7 +5927,7 @@ spec:
                                       automated build. Required for `jar`, `zip`,
                                       `tgz` and `other` artifacts. Not applicable
                                       to the `maven` artifact type.
-                                    pattern: "^(https?|ftp)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]$"
+                                    pattern: ^(https?|ftp)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]$
                                     type: string
                                   version:
                                     description: Maven version number. Applicable
@@ -5977,7 +5944,7 @@ spec:
                                 within the KafkaConnect resource. The name has to
                                 follow the following pattern: `^[a-z][-_a-z0-9]*[a-z]$`.
                                 Required.'
-                              pattern: "^[a-z0-9][-_a-z0-9]*[a-z0-9]$"
+                              pattern: ^[a-z0-9][-_a-z0-9]*[a-z0-9]$
                               type: string
                           required:
                           - name
@@ -6140,17 +6107,17 @@ spec:
                   jvmOptions:
                     description: JVM Options for pods.
                     properties:
-                      "-XX":
+                      -XX:
                         description: A map of -XX options to the JVM.
                         type: object
                         x-kubernetes-preserve-unknown-fields: true
-                      "-Xms":
-                        description: "-Xms option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xms:
+                        description: -Xms option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
-                      "-Xmx":
-                        description: "-Xmx option to to the JVM."
-                        pattern: "^[0-9]+[mMgG]?$"
+                      -Xmx:
+                        description: -Xmx option to to the JVM.
+                        pattern: ^[0-9]+[mMgG]?$
                         type: string
                       gcLoggingEnabled:
                         description: Specifies whether the Garbage Collection logging
@@ -6215,8 +6182,8 @@ spec:
                         - external
                         type: string
                       valueFrom:
-                        description: "`ConfigMap` entry where the logging configuration
-                          is stored. "
+                        description: '`ConfigMap` entry where the logging configuration
+                          is stored. '
                         properties:
                           configMapKeyRef:
                             description: Reference to the key in the ConfigMap containing
@@ -6903,7 +6870,7 @@ spec:
                             description: Defines the total amount (for example `1Gi`)
                               of local storage required for temporary EmptyDir volume
                               (`/tmp`). Default value is `5Mi`.
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           tolerations:
                             description: The pod's tolerations.
@@ -7627,7 +7594,7 @@ spec:
                             description: Defines the total amount (for example `1Gi`)
                               of local storage required for temporary EmptyDir volume
                               (`/tmp`). Default value is `5Mi`.
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           tolerations:
                             description: The pod's tolerations.
@@ -7849,9 +7816,9 @@ spec:
         storage: true
         subresources:
           scale:
-            labelSelectorPath: ".status.labelSelector"
-            specReplicasPath: ".spec.replicas"
-            statusReplicasPath: ".status.replicas"
+            labelSelectorPath: .status.labelSelector
+            specReplicasPath: .spec.replicas
+            statusReplicasPath: .status.replicas
           status: {}
   - apiVersion: apps/v1
     kind: Deployment
@@ -7876,16 +7843,16 @@ spec:
         spec:
           containers:
           - args:
-            - "/opt/strimzi/bin/cluster_operator_run.sh"
+            - /opt/strimzi/bin/cluster_operator_run.sh
             env:
             - name: STRIMZI_NAMESPACE
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: STRIMZI_FULL_RECONCILIATION_INTERVAL_MS
-              value: '120000'
+              value: "120000"
             - name: STRIMZI_OPERATION_TIMEOUT_MS
-              value: '300000'
+              value: "300000"
             - name: STRIMZI_DEFAULT_TLS_SIDECAR_ENTITY_OPERATOR_IMAGE
               value: quay.io/strimzi/kafka:0.32.0-kafka-3.3.1
             - name: STRIMZI_DEFAULT_KAFKA_EXPORTER_IMAGE
@@ -7935,9 +7902,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: STRIMZI_FEATURE_GATES
-              value: ''
+              value: ""
             - name: STRIMZI_LEADER_ELECTION_ENABLED
-              value: 'true'
+              value: "true"
             - name: STRIMZI_LEADER_ELECTION_LEASE_NAME
               value: strimzi-cluster-operator
             - name: STRIMZI_LEADER_ELECTION_LEASE_NAMESPACE
@@ -7951,7 +7918,7 @@ spec:
             image: quay.io/strimzi/operator:0.32.0
             livenessProbe:
               httpGet:
-                path: "/healthy"
+                path: /healthy
                 port: http
               initialDelaySeconds: 10
               periodSeconds: 30
@@ -7961,7 +7928,7 @@ spec:
               name: http
             readinessProbe:
               httpGet:
-                path: "/ready"
+                path: /ready
                 port: http
               initialDelaySeconds: 10
               periodSeconds: 30
@@ -7973,9 +7940,9 @@ spec:
                 cpu: 200m
                 memory: 384Mi
             volumeMounts:
-            - mountPath: "/tmp"
+            - mountPath: /tmp
               name: strimzi-tmp
-            - mountPath: "/opt/strimzi/custom-config/"
+            - mountPath: /opt/strimzi/custom-config/
               name: co-config-volume
           serviceAccountName: strimzi-cluster-operator
           volumes:
@@ -8012,7 +7979,7 @@ spec:
       verbs:
       - get
     - apiGroups:
-      - ''
+      - ""
       resources:
       - nodes
       verbs:
@@ -8022,7 +7989,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkarebalances.kafka.strimzi.io
     spec:
       conversion:
@@ -8041,7 +8008,7 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this resource rebalances
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: A proposal has been requested from Cruise Control
@@ -8248,7 +8215,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkausers.kafka.strimzi.io
     spec:
       conversion:
@@ -8267,15 +8234,15 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this user belongs to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: How the user is authenticated
-          jsonPath: ".spec.authentication.type"
+          jsonPath: .spec.authentication.type
           name: Authentication
           type: string
         - description: How the user is authorised
-          jsonPath: ".spec.authorization.type"
+          jsonPath: .spec.authorization.type
           name: Authorization
           type: string
         - description: The state of the custom resource
@@ -8549,15 +8516,15 @@ spec:
           status: {}
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this user belongs to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: How the user is authenticated
-          jsonPath: ".spec.authentication.type"
+          jsonPath: .spec.authentication.type
           name: Authentication
           type: string
         - description: How the user is authorised
-          jsonPath: ".spec.authorization.type"
+          jsonPath: .spec.authorization.type
           name: Authorization
           type: string
         - description: The state of the custom resource
@@ -8831,15 +8798,15 @@ spec:
           status: {}
       - additionalPrinterColumns:
         - description: The name of the Kafka cluster this user belongs to
-          jsonPath: ".metadata.labels.strimzi\\.io/cluster"
+          jsonPath: .metadata.labels.strimzi\.io/cluster
           name: Cluster
           type: string
         - description: How the user is authenticated
-          jsonPath: ".spec.authentication.type"
+          jsonPath: .spec.authentication.type
           name: Authentication
           type: string
         - description: How the user is authorised
-          jsonPath: ".spec.authorization.type"
+          jsonPath: .spec.authorization.type
           name: Authorization
           type: string
         - description: The state of the custom resource
@@ -9119,7 +9086,7 @@ spec:
       name: strimzi-cluster-operator-watched
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods
       verbs:
@@ -9171,7 +9138,7 @@ spec:
       name: strimzi-kafka-client
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - nodes
       verbs:
@@ -9231,13 +9198,13 @@ spec:
       - update
       - delete
     - apiGroups:
-      - ''
+      - ""
       resources:
       - events
       verbs:
       - create
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       verbs:
@@ -9290,7 +9257,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: strimzipodsets.core.strimzi.io
     spec:
       conversion:
@@ -9309,19 +9276,19 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: Number of pods managed by the StrimziPodSet
-          jsonPath: ".status.pods"
+          jsonPath: .status.pods
           name: Pods
           type: integer
         - description: Number of ready pods managed by the StrimziPodSet
-          jsonPath: ".status.readyPods"
+          jsonPath: .status.readyPods
           name: Ready Pods
           type: integer
         - description: Number of up-to-date pods managed by the StrimziPodSet
-          jsonPath: ".status.currentPods"
+          jsonPath: .status.currentPods
           name: Current Pods
           type: integer
         - description: Age of the StrimziPodSet
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1beta2
@@ -9419,7 +9386,7 @@ spec:
     metadata:
       labels:
         app: strimzi
-        strimzi.io/crd-install: 'true'
+        strimzi.io/crd-install: "true"
       name: kafkas.kafka.strimzi.io
     spec:
       conversion:
@@ -9438,11 +9405,11 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The desired number of Kafka replicas in the cluster
-          jsonPath: ".spec.kafka.replicas"
+          jsonPath: .spec.kafka.replicas
           name: Desired Kafka replicas
           type: integer
         - description: The desired number of ZooKeeper replicas in the cluster
-          jsonPath: ".spec.zookeeper.replicas"
+          jsonPath: .spec.zookeeper.replicas
           name: Desired ZK replicas
           type: integer
         - description: The state of the custom resource
@@ -9558,7 +9525,7 @@ spec:
                             description: Broker capacity for CPU resource in cores
                               or millicores. For example, 1, 1.500, 1500m. For more
                               information on valid CPU resource units see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu.
-                            pattern: "^[0-9]+([.][0-9]{0,3}|[m]?)$"
+                            pattern: ^[0-9]+([.][0-9]{0,3}|[m]?)$
                             type: string
                           cpuUtilization:
                             description: Broker capacity for CPU resource utilization
@@ -9573,7 +9540,7 @@ spec:
                               (Ki, Mi, Gi, or Ti), or a byte value with or without
                               E notation. For example, 100000M, 100000Mi, 104857600000,
                               or 1e+11.
-                            pattern: "^[0-9]+([.][0-9]*)?([KMGTPE]i?|e[0-9]+)?$"
+                            pattern: ^[0-9]+([.][0-9]*)?([KMGTPE]i?|e[0-9]+)?$
                             type: string
                           inboundNetwork:
                             description: Broker capacity for inbound network throughput
@@ -9581,7 +9548,7 @@ spec:
                               Kubernetes byte units (K, M, G) or their bibyte (power
                               of two) equivalents (Ki, Mi, Gi) per second. For example,
                               10000KiB/s.
-                            pattern: "^[0-9]+([KMG]i?)?B/s$"
+                            pattern: ^[0-9]+([KMG]i?)?B/s$
                             type: string
                           outboundNetwork:
                             description: Broker capacity for outbound network throughput
@@ -9589,7 +9556,7 @@ spec:
                               Kubernetes byte units (K, M, G) or their bibyte (power
                               of two) equivalents (Ki, Mi, Gi) per second. For example,
                               10000KiB/s.
-                            pattern: "^[0-9]+([KMG]i?)?B/s$"
+                            pattern: ^[0-9]+([KMG]i?)?B/s$
                             type: string
                           overrides:
                             description: Overrides for individual brokers. The `overrides`
@@ -9607,7 +9574,7 @@ spec:
                                     cores or millicores. For example, 1, 1.500, 1500m.
                                     For more information on valid CPU resource units
                                     see https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-cpu.
-                                  pattern: "^[0-9]+([.][0-9]{0,3}|[m]?)$"
+                                  pattern: ^[0-9]+([.][0-9]{0,3}|[m]?)$
                                   type: string
                                 inboundNetwork:
                                   description: Broker capacity for inbound network
@@ -9615,7 +9582,7 @@ spec:
                                     value with standard Kubernetes byte units (K,
                                     M, G) or their bibyte (power of two) equivalents
                                     (Ki, Mi, Gi) per second. For example, 10000KiB/s.
-                                  pattern: "^[0-9]+([KMG]i?)?B/s$"
+                                  pattern: ^[0-9]+([KMG]i?)?B/s$
                                   type: string
                                 outboundNetwork:
                                   description: Broker capacity for outbound network
@@ -9623,7 +9590,7 @@ spec:
                                     value with standard Kubernetes byte units (K,
                                     M, G) or their bibyte (power of two) equivalents
                                     (Ki, Mi, Gi) per second. For example, 10000KiB/s.
-                                  pattern: "^[0-9]+([KMG]i?)?B/s$"
+                                  pattern: ^[0-9]+([KMG]i?)?B/s$
                                   type: string
                               required:
                               - brokers
@@ -9651,17 +9618,17 @@ spec:
                       jvmOptions:
                         description: JVM Options for the Cruise Control container.
                         properties:
-                          "-XX":
+                          -XX:
                             description: A map of -XX options to the JVM.
                             type: object
                             x-kubernetes-preserve-unknown-fields: true
-                          "-Xms":
-                            description: "-Xms option to to the JVM."
-                            pattern: "^[0-9]+[mMgG]?$"
+                          -Xms:
+                            description: -Xms option to to the JVM.
+                            pattern: ^[0-9]+[mMgG]?$
                             type: string
-                          "-Xmx":
-                            description: "-Xmx option to to the JVM."
-                            pattern: "^[0-9]+[mMgG]?$"
+                          -Xmx:
+                            description: -Xmx option to to the JVM.
+                            pattern: ^[0-9]+[mMgG]?$
                             type: string
                           gcLoggingEnabled:
                             description: Specifies whether the Garbage Collection
@@ -9729,8 +9696,8 @@ spec:
                             - external
                             type: string
                           valueFrom:
-                            description: "`ConfigMap` entry where the logging configuration
-                              is stored. "
+                            description: '`ConfigMap` entry where the logging configuration
+                              is stored. '
                             properties:
                               configMapKeyRef:
                                 description: Reference to the key in the ConfigMap
@@ -10397,7 +10364,7 @@ spec:
                                 description: Defines the total amount (for example
                                   `1Gi`) of local storage required for temporary EmptyDir
                                   volume (`/tmp`). Default value is `5Mi`.
-                                pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                 type: string
                               tolerations:
                                 description: The pod's tolerations.
@@ -11139,7 +11106,7 @@ spec:
                                 description: Defines the total amount (for example
                                   `1Gi`) of local storage required for temporary EmptyDir
                                   volume (`/tmp`). Default value is `5Mi`.
-                                pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                 type: string
                               tolerations:
                                 description: The pod's tolerations.
@@ -11553,17 +11520,17 @@ spec:
                           jvmOptions:
                             description: JVM Options for pods.
                             properties:
-                              "-XX":
+                              -XX:
                                 description: A map of -XX options to the JVM.
                                 type: object
                                 x-kubernetes-preserve-unknown-fields: true
-                              "-Xms":
-                                description: "-Xms option to to the JVM."
-                                pattern: "^[0-9]+[mMgG]?$"
+                              -Xms:
+                                description: -Xms option to to the JVM.
+                                pattern: ^[0-9]+[mMgG]?$
                                 type: string
-                              "-Xmx":
-                                description: "-Xmx option to to the JVM."
-                                pattern: "^[0-9]+[mMgG]?$"
+                              -Xmx:
+                                description: -Xmx option to to the JVM.
+                                pattern: ^[0-9]+[mMgG]?$
                                 type: string
                               gcLoggingEnabled:
                                 description: Specifies whether the Garbage Collection
@@ -11632,8 +11599,8 @@ spec:
                                 - external
                                 type: string
                               valueFrom:
-                                description: "`ConfigMap` entry where the logging
-                                  configuration is stored. "
+                                description: '`ConfigMap` entry where the logging
+                                  configuration is stored. '
                                 properties:
                                   configMapKeyRef:
                                     description: Reference to the key in the ConfigMap
@@ -11751,17 +11718,17 @@ spec:
                           jvmOptions:
                             description: JVM Options for pods.
                             properties:
-                              "-XX":
+                              -XX:
                                 description: A map of -XX options to the JVM.
                                 type: object
                                 x-kubernetes-preserve-unknown-fields: true
-                              "-Xms":
-                                description: "-Xms option to to the JVM."
-                                pattern: "^[0-9]+[mMgG]?$"
+                              -Xms:
+                                description: -Xms option to to the JVM.
+                                pattern: ^[0-9]+[mMgG]?$
                                 type: string
-                              "-Xmx":
-                                description: "-Xmx option to to the JVM."
-                                pattern: "^[0-9]+[mMgG]?$"
+                              -Xmx:
+                                description: -Xmx option to to the JVM.
+                                pattern: ^[0-9]+[mMgG]?$
                                 type: string
                               gcLoggingEnabled:
                                 description: Specifies whether the Garbage Collection
@@ -11830,8 +11797,8 @@ spec:
                                 - external
                                 type: string
                               valueFrom:
-                                description: "`ConfigMap` entry where the logging
-                                  configuration is stored. "
+                                description: '`ConfigMap` entry where the logging
+                                  configuration is stored. '
                                 properties:
                                   configMapKeyRef:
                                     description: Reference to the key in the ConfigMap
@@ -12533,7 +12500,7 @@ spec:
                                 description: Defines the total amount (for example
                                   `1Gi`) of local storage required for temporary EmptyDir
                                   volume (`/tmp`). Default value is `5Mi`.
-                                pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                 type: string
                               tolerations:
                                 description: The pod's tolerations.
@@ -12796,17 +12763,17 @@ spec:
                       jvmOptions:
                         description: JVM Options for pods.
                         properties:
-                          "-XX":
+                          -XX:
                             description: A map of -XX options to the JVM.
                             type: object
                             x-kubernetes-preserve-unknown-fields: true
-                          "-Xms":
-                            description: "-Xms option to to the JVM."
-                            pattern: "^[0-9]+[mMgG]?$"
+                          -Xms:
+                            description: -Xms option to to the JVM.
+                            pattern: ^[0-9]+[mMgG]?$
                             type: string
-                          "-Xmx":
-                            description: "-Xmx option to to the JVM."
-                            pattern: "^[0-9]+[mMgG]?$"
+                          -Xmx:
+                            description: -Xmx option to to the JVM.
+                            pattern: ^[0-9]+[mMgG]?$
                             type: string
                           gcLoggingEnabled:
                             description: Specifies whether the Garbage Collection
@@ -13381,7 +13348,7 @@ spec:
                                 objects. The name has to be unique within given a
                                 Kafka cluster. The name can consist of lowercase characters
                                 and numbers and be up to 11 characters long.
-                              pattern: "^[a-z0-9]{1,11}$"
+                              pattern: ^[a-z0-9]{1,11}$
                               type: string
                             networkPolicyPeers:
                               description: List of peers which should be able to connect
@@ -13532,8 +13499,8 @@ spec:
                             - external
                             type: string
                           valueFrom:
-                            description: "`ConfigMap` entry where the logging configuration
-                              is stored. "
+                            description: '`ConfigMap` entry where the logging configuration
+                              is stored. '
                             properties:
                               configMapKeyRef:
                                 description: Reference to the key in the ConfigMap
@@ -13687,7 +13654,7 @@ spec:
                             description: When type=ephemeral, defines the total amount
                               of local storage required for this EmptyDir volume (for
                               example 1Gi).
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           type:
                             description: Storage type, must be either 'ephemeral',
@@ -13747,7 +13714,7 @@ spec:
                                   description: When type=ephemeral, defines the total
                                     amount of local storage required for this EmptyDir
                                     volume (for example 1Gi).
-                                  pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                  pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                   type: string
                                 type:
                                   description: Storage type, must be either 'ephemeral'
@@ -14659,7 +14626,7 @@ spec:
                                 description: Defines the total amount (for example
                                   `1Gi`) of local storage required for temporary EmptyDir
                                   volume (`/tmp`). Default value is `5Mi`.
-                                pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                 type: string
                               tolerations:
                                 description: The pod's tolerations.
@@ -15453,7 +15420,7 @@ spec:
                                 description: Defines the total amount (for example
                                   `1Gi`) of local storage required for temporary EmptyDir
                                   volume (`/tmp`). Default value is `5Mi`.
-                                pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                 type: string
                               tolerations:
                                 description: The pod's tolerations.
@@ -15606,17 +15573,17 @@ spec:
                       jvmOptions:
                         description: JVM Options for pods.
                         properties:
-                          "-XX":
+                          -XX:
                             description: A map of -XX options to the JVM.
                             type: object
                             x-kubernetes-preserve-unknown-fields: true
-                          "-Xms":
-                            description: "-Xms option to to the JVM."
-                            pattern: "^[0-9]+[mMgG]?$"
+                          -Xms:
+                            description: -Xms option to to the JVM.
+                            pattern: ^[0-9]+[mMgG]?$
                             type: string
-                          "-Xmx":
-                            description: "-Xmx option to to the JVM."
-                            pattern: "^[0-9]+[mMgG]?$"
+                          -Xmx:
+                            description: -Xmx option to to the JVM.
+                            pattern: ^[0-9]+[mMgG]?$
                             type: string
                           gcLoggingEnabled:
                             description: Specifies whether the Garbage Collection
@@ -15683,8 +15650,8 @@ spec:
                             - external
                             type: string
                           valueFrom:
-                            description: "`ConfigMap` entry where the logging configuration
-                              is stored. "
+                            description: '`ConfigMap` entry where the logging configuration
+                              is stored. '
                             properties:
                               configMapKeyRef:
                                 description: Reference to the key in the ConfigMap
@@ -15824,7 +15791,7 @@ spec:
                             description: When type=ephemeral, defines the total amount
                               of local storage required for this EmptyDir volume (for
                               example 1Gi).
-                            pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                            pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                             type: string
                           type:
                             description: Storage type, must be either 'ephemeral'
@@ -16410,7 +16377,7 @@ spec:
                                 description: Defines the total amount (for example
                                   `1Gi`) of local storage required for temporary EmptyDir
                                   volume (`/tmp`). Default value is `5Mi`.
-                                pattern: "^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+                                pattern: ^([0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$
                                 type: string
                               tolerations:
                                 description: The pod's tolerations.
@@ -16724,9 +16691,9 @@ spec:
                           description: The name of the listener.
                           type: string
                         type:
-                          description: "*The `type` property has been deprecated,
+                          description: '*The `type` property has been deprecated,
                             and should now be configured using `name`.* The name of
-                            the listener."
+                            the listener.'
                           type: string
                       type: object
                     type: array
@@ -16740,3 +16707,35 @@ spec:
         storage: true
         subresources:
           status: {}
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: kafka.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: kafka
+        plural: kafka
+        singular: kafka
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  size:
+                    default: small
+                    description: |
+                      Size of this kafka deployment. If small, it deploy kafka with a single replica; if large, deploy kafka with 3 replicas.
+                    pattern: ^(small|large)$
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  xaasRequestPipeline:
+  - ghcr.io/syntasso/kratix-marketplace/kafka-request-pipeline:v0.1.0
+status: {}

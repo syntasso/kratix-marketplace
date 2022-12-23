@@ -1,35 +1,9 @@
----
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: istio
 spec:
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: istio.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: istio
-        plural: istio
-        singular: istio
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  size:
-                    default: small
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
   workerClusterResources:
   - apiVersion: v1
     kind: ServiceAccount
@@ -76,7 +50,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha1
@@ -213,7 +187,7 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The name of a service from the service registry
-          jsonPath: ".spec.host"
+          jsonPath: .spec.host
           name: Host
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -221,7 +195,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha3
@@ -1637,7 +1611,7 @@ spec:
           status: {}
       - additionalPrinterColumns:
         - description: The name of a service from the service registry
-          jsonPath: ".spec.host"
+          jsonPath: .spec.host
           name: Host
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -1645,7 +1619,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1beta1
@@ -3649,16 +3623,16 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: The hosts associated with the ServiceEntry
-          jsonPath: ".spec.hosts"
+          jsonPath: .spec.hosts
           name: Hosts
           type: string
         - description: Whether the service is external to the mesh or part of the
             mesh (MESH_EXTERNAL or MESH_INTERNAL)
-          jsonPath: ".spec.location"
+          jsonPath: .spec.location
           name: Location
           type: string
         - description: Service discovery mode for the hosts (NONE, STATIC, or DNS)
-          jsonPath: ".spec.resolution"
+          jsonPath: .spec.resolution
           name: Resolution
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -3666,7 +3640,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha3
@@ -3774,16 +3748,16 @@ spec:
           status: {}
       - additionalPrinterColumns:
         - description: The hosts associated with the ServiceEntry
-          jsonPath: ".spec.hosts"
+          jsonPath: .spec.hosts
           name: Hosts
           type: string
         - description: Whether the service is external to the mesh or part of the
             mesh (MESH_EXTERNAL or MESH_INTERNAL)
-          jsonPath: ".spec.location"
+          jsonPath: .spec.location
           name: Location
           type: string
         - description: Service discovery mode for the hosts (NONE, STATIC, or DNS)
-          jsonPath: ".spec.resolution"
+          jsonPath: .spec.resolution
           name: Resolution
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -3791,7 +3765,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1beta1
@@ -4294,11 +4268,11 @@ spec:
       - additionalPrinterColumns:
         - description: The names of gateways and sidecars that should apply these
             routes
-          jsonPath: ".spec.gateways"
+          jsonPath: .spec.gateways
           name: Gateways
           type: string
         - description: The destination hosts to which traffic is being sent
-          jsonPath: ".spec.hosts"
+          jsonPath: .spec.hosts
           name: Hosts
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -4306,7 +4280,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha3
@@ -5084,11 +5058,11 @@ spec:
       - additionalPrinterColumns:
         - description: The names of gateways and sidecars that should apply these
             routes
-          jsonPath: ".spec.gateways"
+          jsonPath: .spec.gateways
           name: Gateways
           type: string
         - description: The destination hosts to which traffic is being sent
-          jsonPath: ".spec.hosts"
+          jsonPath: .spec.hosts
           name: Hosts
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -5096,7 +5070,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1beta1
@@ -5902,11 +5876,11 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         - description: Address associated with the network endpoint.
-          jsonPath: ".spec.address"
+          jsonPath: .spec.address
           name: Address
           type: string
         name: v1alpha3
@@ -5954,11 +5928,11 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         - description: Address associated with the network endpoint.
-          jsonPath: ".spec.address"
+          jsonPath: .spec.address
           name: Address
           type: string
         name: v1beta1
@@ -6029,7 +6003,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha3
@@ -6054,8 +6028,8 @@ spec:
                         type: object
                     type: object
                   probe:
-                    description: "`ReadinessProbe` describes the configuration the
-                      user must provide for healthchecking on their workload."
+                    description: '`ReadinessProbe` describes the configuration the
+                      user must provide for healthchecking on their workload.'
                     oneOf:
                     - not:
                         anyOf:
@@ -6185,7 +6159,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1beta1
@@ -6208,8 +6182,8 @@ spec:
                         type: object
                     type: object
                   probe:
-                    description: "`ReadinessProbe` describes the configuration the
-                      user must provide for healthchecking on their workload."
+                    description: '`ReadinessProbe` describes the configuration the
+                      user must provide for healthchecking on their workload.'
                     oneOf:
                     - not:
                         anyOf:
@@ -6568,7 +6542,7 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: Defines the mTLS mode used for peer authentication.
-          jsonPath: ".spec.mtls.mode"
+          jsonPath: .spec.mtls.mode
           name: Mode
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -6576,7 +6550,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1beta1
@@ -6762,7 +6736,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha1
@@ -7020,11 +6994,11 @@ spec:
       versions:
       - additionalPrinterColumns:
         - description: Istio control plane revision
-          jsonPath: ".spec.revision"
+          jsonPath: .spec.revision
           name: Revision
           type: string
         - description: IOP current state
-          jsonPath: ".status.status"
+          jsonPath: .status.status
           name: Status
           type: string
         - description: 'CreationTimestamp is a timestamp representing the server time
@@ -7032,7 +7006,7 @@ spec:
             order across separate operations. Clients may not set this value. It is
             represented in RFC3339 form and is in UTC. Populated by the system. Read-only.
             Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata'
-          jsonPath: ".metadata.creationTimestamp"
+          jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
         name: v1alpha1
@@ -7079,7 +7053,7 @@ spec:
       - rbac.istio.io
       - telemetry.istio.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - watch
@@ -7117,7 +7091,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods
       - nodes
@@ -7150,9 +7124,9 @@ spec:
       resources:
       - ingresses/status
       verbs:
-      - "*"
+      - '*'
     - apiGroups:
-      - ''
+      - ""
       resources:
       - configmaps
       verbs:
@@ -7197,7 +7171,7 @@ spec:
       - networking.x-k8s.io
       - gateway.networking.k8s.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - watch
@@ -7206,7 +7180,7 @@ spec:
       - networking.x-k8s.io
       - gateway.networking.k8s.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - update
     - apiGroups:
@@ -7219,7 +7193,7 @@ spec:
       - patch
       - delete
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       verbs:
@@ -7259,13 +7233,13 @@ spec:
       - authentication.istio.io
       - rbac.istio.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - endpoints
       - pods
@@ -7384,7 +7358,7 @@ spec:
       verbs:
       - create
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       verbs:
@@ -7427,7 +7401,7 @@ spec:
         service:
           name: istiod
           namespace: istio-system
-          path: "/validate"
+          path: /validate
       failurePolicy: Ignore
       name: validation.istio.io
       rules:
@@ -7437,12 +7411,12 @@ spec:
         - telemetry.istio.io
         - extensions.istio.io
         apiVersions:
-        - "*"
+        - '*'
         operations:
         - CREATE
         - UPDATE
         resources:
-        - "*"
+        - '*'
       sideEffects: None
   - apiVersion: policy/v1
     kind: PodDisruptionBudget
@@ -8789,7 +8763,7 @@ spec:
       - telemetry.istio.io
       - extensions.istio.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - watch
@@ -8827,7 +8801,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods
       - nodes
@@ -8860,9 +8834,9 @@ spec:
       resources:
       - ingresses/status
       verbs:
-      - "*"
+      - '*'
     - apiGroups:
-      - ''
+      - ""
       resources:
       - configmaps
       verbs:
@@ -8907,7 +8881,7 @@ spec:
       - networking.x-k8s.io
       - gateway.networking.k8s.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - watch
@@ -8916,7 +8890,7 @@ spec:
       - networking.x-k8s.io
       - gateway.networking.k8s.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - update
       - patch
@@ -8930,7 +8904,7 @@ spec:
       - patch
       - delete
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       verbs:
@@ -8976,7 +8950,7 @@ spec:
       - create
       - delete
     - apiGroups:
-      - ''
+      - ""
       resources:
       - services
       verbs:
@@ -9002,13 +8976,13 @@ spec:
       - authentication.istio.io
       - rbac.istio.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - endpoints
       - pods
@@ -9144,7 +9118,7 @@ spec:
       verbs:
       - create
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       verbs:
@@ -9155,7 +9129,7 @@ spec:
       - update
       - delete
     - apiGroups:
-      - ''
+      - ""
       resources:
       - configmaps
       verbs:
@@ -9229,25 +9203,25 @@ spec:
       template:
         metadata:
           annotations:
-            prometheus.io/port: '15014'
-            prometheus.io/scrape: 'true'
-            sidecar.istio.io/inject: 'false'
+            prometheus.io/port: "15014"
+            prometheus.io/scrape: "true"
+            sidecar.istio.io/inject: "false"
           labels:
             app: istiod
             install.operator.istio.io/owning-resource: unknown
             istio: pilot
             istio.io/rev: default
             operator.istio.io/component: Pilot
-            sidecar.istio.io/inject: 'false'
+            sidecar.istio.io/inject: "false"
         spec:
           containers:
           - args:
             - discovery
-            - "--monitoringAddr=:15014"
-            - "--log_output_level=default:info"
-            - "--domain"
+            - --monitoringAddr=:15014
+            - --log_output_level=default:info
+            - --domain
             - cluster.local
-            - "--keepaliveMaxServerConnectionAge"
+            - --keepaliveMaxServerConnectionAge
             - 30m
             env:
             - name: REVISION
@@ -9272,17 +9246,17 @@ spec:
                   apiVersion: v1
                   fieldPath: spec.serviceAccountName
             - name: KUBECONFIG
-              value: "/var/run/secrets/remote/config"
+              value: /var/run/secrets/remote/config
             - name: PILOT_TRACE_SAMPLING
-              value: '1'
+              value: "1"
             - name: PILOT_ENABLE_PROTOCOL_SNIFFING_FOR_OUTBOUND
-              value: 'true'
+              value: "true"
             - name: PILOT_ENABLE_PROTOCOL_SNIFFING_FOR_INBOUND
-              value: 'true'
+              value: "true"
             - name: ISTIOD_ADDR
               value: istiod.istio-system.svc:15012
             - name: PILOT_ENABLE_ANALYSIS
-              value: 'false'
+              value: "false"
             - name: CLUSTER_ID
               value: Kubernetes
             image: docker.io/istio/pilot:1.16.1
@@ -9296,7 +9270,7 @@ spec:
               protocol: TCP
             readinessProbe:
               httpGet:
-                path: "/ready"
+                path: /ready
                 port: 8080
               initialDelaySeconds: 1
               periodSeconds: 3
@@ -9315,21 +9289,21 @@ spec:
               runAsNonRoot: true
               runAsUser: 1337
             volumeMounts:
-            - mountPath: "/var/run/secrets/tokens"
+            - mountPath: /var/run/secrets/tokens
               name: istio-token
               readOnly: true
-            - mountPath: "/var/run/secrets/istio-dns"
+            - mountPath: /var/run/secrets/istio-dns
               name: local-certs
-            - mountPath: "/etc/cacerts"
+            - mountPath: /etc/cacerts
               name: cacerts
               readOnly: true
-            - mountPath: "/var/run/secrets/remote"
+            - mountPath: /var/run/secrets/remote
               name: istio-kubeconfig
               readOnly: true
-            - mountPath: "/var/run/secrets/istiod/tls"
+            - mountPath: /var/run/secrets/istiod/tls
               name: istio-csr-dns-cert
               readOnly: true
-            - mountPath: "/var/run/secrets/istiod/ca"
+            - mountPath: /var/run/secrets/istiod/ca
               name: istio-csr-ca-configmap
               readOnly: true
           securityContext:
@@ -9407,18 +9381,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.13.*"
+            proxyVersion: ^1\.13.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9441,18 +9415,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.13.*"
+            proxyVersion: ^1\.13.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9476,18 +9450,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.13.*"
+            proxyVersion: ^1\.13.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9519,18 +9493,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.13.*"
+            proxyVersion: ^1\.13.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9551,18 +9525,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.13.*"
+            proxyVersion: ^1\.13.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9583,18 +9557,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.13.*"
+            proxyVersion: ^1\.13.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9627,18 +9601,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.14.*"
+            proxyVersion: ^1\.14.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9661,18 +9635,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.14.*"
+            proxyVersion: ^1\.14.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9696,18 +9670,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.14.*"
+            proxyVersion: ^1\.14.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9739,18 +9713,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.14.*"
+            proxyVersion: ^1\.14.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9771,18 +9745,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.14.*"
+            proxyVersion: ^1\.14.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9803,18 +9777,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.14.*"
+            proxyVersion: ^1\.14.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9847,18 +9821,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.15.*"
+            proxyVersion: ^1\.15.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9881,18 +9855,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.15.*"
+            proxyVersion: ^1\.15.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9916,18 +9890,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.15.*"
+            proxyVersion: ^1\.15.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9959,18 +9933,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.15.*"
+            proxyVersion: ^1\.15.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -9991,18 +9965,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.15.*"
+            proxyVersion: ^1\.15.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10023,18 +9997,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.15.*"
+            proxyVersion: ^1\.15.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10067,18 +10041,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.16.*"
+            proxyVersion: ^1\.16.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10101,18 +10075,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.16.*"
+            proxyVersion: ^1\.16.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10136,18 +10110,18 @@ spec:
                 subFilter:
                   name: envoy.filters.http.router
           proxy:
-            proxyVersion: "^1\\.16.*"
+            proxyVersion: ^1\.16.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.http.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10179,18 +10153,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.16.*"
+            proxyVersion: ^1\.16.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10211,18 +10185,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.16.*"
+            proxyVersion: ^1\.16.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10243,18 +10217,18 @@ spec:
               filter:
                 name: envoy.filters.network.tcp_proxy
           proxy:
-            proxyVersion: "^1\\.16.*"
+            proxyVersion: ^1\.16.*
         patch:
           operation: INSERT_BEFORE
           value:
             name: istio.stats
             typed_config:
-              "@type": type.googleapis.com/udpa.type.v1.TypedStruct
+              '@type': type.googleapis.com/udpa.type.v1.TypedStruct
               type_url: type.googleapis.com/envoy.extensions.filters.network.wasm.v3.Wasm
               value:
                 config:
                   configuration:
-                    "@type": type.googleapis.com/google.protobuf.StringValue
+                    '@type': type.googleapis.com/google.protobuf.StringValue
                     value: |
                       {
                         "debug": "false",
@@ -10286,7 +10260,7 @@ spec:
         service:
           name: istiod
           namespace: istio-system
-          path: "/inject"
+          path: /inject
           port: 443
       failurePolicy: Fail
       name: rev.namespace.sidecar-injector.istio.io
@@ -10303,10 +10277,10 @@ spec:
         - key: sidecar.istio.io/inject
           operator: NotIn
           values:
-          - 'false'
+          - "false"
       rules:
       - apiGroups:
-        - ''
+        - ""
         apiVersions:
         - v1
         operations:
@@ -10321,7 +10295,7 @@ spec:
         service:
           name: istiod
           namespace: istio-system
-          path: "/inject"
+          path: /inject
           port: 443
       failurePolicy: Fail
       name: rev.object.sidecar-injector.istio.io
@@ -10336,14 +10310,14 @@ spec:
         - key: sidecar.istio.io/inject
           operator: NotIn
           values:
-          - 'false'
+          - "false"
         - key: istio.io/rev
           operator: In
           values:
           - default
       rules:
       - apiGroups:
-        - ''
+        - ""
         apiVersions:
         - v1
         operations:
@@ -10358,7 +10332,7 @@ spec:
         service:
           name: istiod
           namespace: istio-system
-          path: "/inject"
+          path: /inject
           port: 443
       failurePolicy: Fail
       name: namespace.sidecar-injector.istio.io
@@ -10373,10 +10347,10 @@ spec:
         - key: sidecar.istio.io/inject
           operator: NotIn
           values:
-          - 'false'
+          - "false"
       rules:
       - apiGroups:
-        - ''
+        - ""
         apiVersions:
         - v1
         operations:
@@ -10391,7 +10365,7 @@ spec:
         service:
           name: istiod
           namespace: istio-system
-          path: "/inject"
+          path: /inject
           port: 443
       failurePolicy: Fail
       name: object.sidecar-injector.istio.io
@@ -10406,12 +10380,12 @@ spec:
         - key: sidecar.istio.io/inject
           operator: In
           values:
-          - 'true'
+          - "true"
         - key: istio.io/rev
           operator: DoesNotExist
       rules:
       - apiGroups:
-        - ''
+        - ""
         apiVersions:
         - v1
         operations:
@@ -10433,43 +10407,43 @@ spec:
       template:
         metadata:
           annotations:
-            prometheus.io/port: '14269'
-            prometheus.io/scrape: 'true'
+            prometheus.io/port: "14269"
+            prometheus.io/scrape: "true"
           labels:
             app: jaeger
-            sidecar.istio.io/inject: 'false'
+            sidecar.istio.io/inject: "false"
         spec:
           containers:
           - env:
             - name: BADGER_EPHEMERAL
-              value: 'false'
+              value: "false"
             - name: SPAN_STORAGE_TYPE
               value: badger
             - name: BADGER_DIRECTORY_VALUE
-              value: "/badger/data"
+              value: /badger/data
             - name: BADGER_DIRECTORY_KEY
-              value: "/badger/key"
+              value: /badger/key
             - name: COLLECTOR_ZIPKIN_HOST_PORT
               value: :9411
             - name: MEMORY_MAX_TRACES
-              value: '50000'
+              value: "50000"
             - name: QUERY_BASE_PATH
-              value: "/jaeger"
+              value: /jaeger
             image: docker.io/jaegertracing/all-in-one:1.35
             livenessProbe:
               httpGet:
-                path: "/"
+                path: /
                 port: 14269
             name: jaeger
             readinessProbe:
               httpGet:
-                path: "/"
+                path: /
                 port: 14269
             resources:
               requests:
                 cpu: 10m
             volumeMounts:
-            - mountPath: "/badger"
+            - mountPath: /badger
               name: data
           volumes:
           - emptyDir: {}
@@ -10660,7 +10634,7 @@ spec:
       name: kiali-viewer
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - configmaps
       - endpoints
@@ -10670,7 +10644,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - namespaces
       - pods
@@ -10681,7 +10655,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods/portforward
       verbs:
@@ -10715,7 +10689,7 @@ spec:
       - telemetry.istio.io
       - gateway.networking.k8s.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - list
@@ -10761,7 +10735,7 @@ spec:
       name: kiali
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - configmaps
       - endpoints
@@ -10771,7 +10745,7 @@ spec:
       - list
       - watch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - namespaces
       - pods
@@ -10783,7 +10757,7 @@ spec:
       - watch
       - patch
     - apiGroups:
-      - ''
+      - ""
       resources:
       - pods/portforward
       verbs:
@@ -10819,7 +10793,7 @@ spec:
       - telemetry.istio.io
       - gateway.networking.k8s.io
       resources:
-      - "*"
+      - '*'
       verbs:
       - get
       - list
@@ -10891,13 +10865,13 @@ spec:
       namespace: istio-system
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - secrets
       verbs:
       - list
     - apiGroups:
-      - ''
+      - ""
       resourceNames:
       - cacerts
       - istio-ca-secret
@@ -10932,7 +10906,7 @@ spec:
   - apiVersion: v1
     kind: Service
     metadata:
-      annotations: 
+      annotations: null
       labels:
         app: kiali
         app.kubernetes.io/instance: kiali
@@ -10985,8 +10959,8 @@ spec:
           annotations:
             checksum/config: ba7d5f42aefa84b2190d799cce4ce0796a3190e41770608c9bf6b4740cf5b892
             kiali.io/dashboards: go,kiali
-            prometheus.io/port: '9090'
-            prometheus.io/scrape: 'true'
+            prometheus.io/port: "9090"
+            prometheus.io/scrape: "true"
           labels:
             app: kiali
             app.kubernetes.io/instance: kiali
@@ -10995,15 +10969,15 @@ spec:
             app.kubernetes.io/part-of: kiali
             app.kubernetes.io/version: v1.60.0
             helm.sh/chart: kiali-server-1.60.0
-            sidecar.istio.io/inject: 'false'
+            sidecar.istio.io/inject: "false"
             version: v1.60.0
           name: kiali
         spec:
           containers:
           - command:
-            - "/opt/kiali/kiali"
-            - "-config"
-            - "/kiali-configuration/config.yaml"
+            - /opt/kiali/kiali
+            - -config
+            - /kiali-configuration/config.yaml
             env:
             - name: ACTIVE_NAMESPACE
               valueFrom:
@@ -11016,12 +10990,12 @@ spec:
             - name: LOG_TIME_FIELD_FORMAT
               value: 2006-01-02T15:04:05Z07:00
             - name: LOG_SAMPLER_RATE
-              value: '1'
+              value: "1"
             image: quay.io/kiali/kiali:v1.60
             imagePullPolicy: Always
             livenessProbe:
               httpGet:
-                path: "/kiali/healthz"
+                path: /kiali/healthz
                 port: api-port
                 scheme: HTTP
               initialDelaySeconds: 5
@@ -11034,7 +11008,7 @@ spec:
               name: http-metrics
             readinessProbe:
               httpGet:
-                path: "/kiali/healthz"
+                path: /kiali/healthz
                 port: api-port
                 scheme: HTTP
               initialDelaySeconds: 5
@@ -11054,13 +11028,13 @@ spec:
               readOnlyRootFilesystem: true
               runAsNonRoot: true
             volumeMounts:
-            - mountPath: "/kiali-configuration"
+            - mountPath: /kiali-configuration
               name: kiali-configuration
-            - mountPath: "/kiali-cert"
+            - mountPath: /kiali-cert
               name: kiali-cert
-            - mountPath: "/kiali-secret"
+            - mountPath: /kiali-secret
               name: kiali-secret
-            - mountPath: "/kiali-cabundle"
+            - mountPath: /kiali-cabundle
               name: kiali-cabundle
           serviceAccountName: kiali
           volumes:
@@ -11097,8 +11071,10 @@ spec:
       namespace: istio-system
   - apiVersion: v1
     data:
-      alerting_rules.yml: "{}\n"
-      alerts: "{}\n"
+      alerting_rules.yml: |
+        {}
+      alerts: |
+        {}
       prometheus.yml: |
         global:
           evaluation_interval: 1m
@@ -11387,8 +11363,10 @@ spec:
             - __meta_kubernetes_pod_phase
           scrape_interval: 5m
           scrape_timeout: 30s
-      recording_rules.yml: "{}\n"
-      rules: "{}\n"
+      recording_rules.yml: |
+        {}
+      rules: |
+        {}
     kind: ConfigMap
     metadata:
       labels:
@@ -11411,7 +11389,7 @@ spec:
       name: prometheus
     rules:
     - apiGroups:
-      - ''
+      - ""
       resources:
       - nodes
       - nodes/proxy
@@ -11436,7 +11414,7 @@ spec:
       - list
       - watch
     - nonResourceURLs:
-      - "/metrics"
+      - /metrics
       verbs:
       - get
   - apiVersion: rbac.authorization.k8s.io/v1
@@ -11506,33 +11484,33 @@ spec:
             component: server
             heritage: Helm
             release: prometheus
-            sidecar.istio.io/inject: 'false'
+            sidecar.istio.io/inject: "false"
         spec:
           containers:
           - args:
-            - "--volume-dir=/etc/config"
-            - "--webhook-url=http://127.0.0.1:9090/-/reload"
+            - --volume-dir=/etc/config
+            - --webhook-url=http://127.0.0.1:9090/-/reload
             image: jimmidyson/configmap-reload:v0.5.0
             imagePullPolicy: IfNotPresent
             name: prometheus-server-configmap-reload
             resources: {}
             volumeMounts:
-            - mountPath: "/etc/config"
+            - mountPath: /etc/config
               name: config-volume
               readOnly: true
           - args:
-            - "--storage.tsdb.retention.time=15d"
-            - "--config.file=/etc/config/prometheus.yml"
-            - "--storage.tsdb.path=/data"
-            - "--web.console.libraries=/etc/prometheus/console_libraries"
-            - "--web.console.templates=/etc/prometheus/consoles"
-            - "--web.enable-lifecycle"
+            - --storage.tsdb.retention.time=15d
+            - --config.file=/etc/config/prometheus.yml
+            - --storage.tsdb.path=/data
+            - --web.console.libraries=/etc/prometheus/console_libraries
+            - --web.console.templates=/etc/prometheus/consoles
+            - --web.enable-lifecycle
             image: prom/prometheus:v2.34.0
             imagePullPolicy: IfNotPresent
             livenessProbe:
               failureThreshold: 3
               httpGet:
-                path: "/-/healthy"
+                path: /-/healthy
                 port: 9090
                 scheme: HTTP
               initialDelaySeconds: 30
@@ -11545,7 +11523,7 @@ spec:
             readinessProbe:
               failureThreshold: 3
               httpGet:
-                path: "/-/ready"
+                path: /-/ready
                 port: 9090
                 scheme: HTTP
               initialDelaySeconds: 0
@@ -11554,11 +11532,11 @@ spec:
               timeoutSeconds: 4
             resources: {}
             volumeMounts:
-            - mountPath: "/etc/config"
+            - mountPath: /etc/config
               name: config-volume
-            - mountPath: "/data"
+            - mountPath: /data
               name: storage-volume
-              subPath: ''
+              subPath: ""
           dnsPolicy: ClusterFirst
           enableServiceLinks: true
           hostNetwork: false
@@ -11575,3 +11553,30 @@ spec:
             name: config-volume
           - emptyDir: {}
             name: storage-volume
+  xaasCrd:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: istio.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: istio
+        plural: istio
+        singular: istio
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  size:
+                    default: small
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+status: {}
