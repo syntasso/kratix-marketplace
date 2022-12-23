@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+urls=(
+    "https://download.elastic.co/downloads/eck/2.5.0/crds.yaml"
+    "https://download.elastic.co/downloads/eck/2.5.0/operator.yaml"
+)
+
+mkdir -p ${PWD}/resources
+
+for url in "${urls[@]}"; do
+    curl -sL -o $PWD/resources/$(basename $url) $url
+done

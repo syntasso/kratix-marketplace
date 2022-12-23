@@ -1,0 +1,6 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: elasticcloud
+metadata:
+  name: es-2
+spec:
+  env: dev

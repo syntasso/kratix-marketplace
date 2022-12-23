@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+mkdir -p $PWD/request-pipeline/resources
+
+# urls=(
+#     # TODO: set URLs to download resources. Ideally use pinned version URLs.
+# )
+
+# for url in "${instance_urls[@]}"; do
+#     curl -sL -o $PWD/request-pipeline/resources/$(basename $url) $url
+# done
+
+cat > $PWD/request-pipeline/resources/elasticsearch.yaml <<EOF
+apiVersion: elasticsearch.k8s.elastic.co/v1
+kind: Elasticsearch
+metadata:
+  name: TBDNAME
+  namespace: default
+spec:
+  version: 8.5.3
+  nodeSets:
+  - name: default
+    count: 1
+    config:
+      node.store.allow_mmap: false
+EOF
+
+cat > $PWD/request-pipeline/resources/kibana.yaml <<EOF
+apiVersion: kibana.k8s.elastic.co/v1
+kind: Kibana
+metadata:
+  name: TBDNAME
+  namespace: default
+spec:
+  version: 8.5.3
+  count: 1
+  elasticsearchRef:
+    name: quickstart
+EOF
