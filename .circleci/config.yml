@@ -111,6 +111,7 @@ workflows:
             parameters:
               promise:
                 - argocd-application
+                - elasticcloud
                 - jenkins
                 - knative
                 - observability
