@@ -2,17 +2,22 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-urls=(
-    "https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml"
-)
-
-for url in "${urls[@]}"; do
-    curl -sL -o $PWD/resources/$(basename $url) $url
-done
-
 echo """---
 apiVersion: v1
 kind: Namespace
 metadata:
   name: argocd
 """ > $PWD/resources/namespace.yaml
+
+DIR=$(mktemp -d)
+echo """---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+resources:
+  - 'https://github.com/argoproj/argo-cd.git/manifests/cluster-install?ref=v2.5.5'
+""" > $DIR/kustomization.yaml
+
+kubectl kustomize $DIR --output $PWD/resources/cluster-install-with-namespace.yaml
