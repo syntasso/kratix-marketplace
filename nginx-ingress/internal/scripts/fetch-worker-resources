@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+mkdir -p ${PWD}/resources
+
+kubectl kustomize \
+    'https://github.com/nginxinc/nginx-ingress-helm-operator/config/default?ref=v1.2.1' \
+    --output ${PWD}/resources/nginx-controller-operator.yaml

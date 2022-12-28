@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "no image to build, load or push"
+exit 0
