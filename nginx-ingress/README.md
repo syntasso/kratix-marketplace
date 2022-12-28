@@ -1,6 +1,6 @@
-# Nginx Ingress
+# NGINX Ingress
 
-This Promise installs the Nginx Ingress controller onto a requested cluster. Given the controller is available cluster wide, there is no additional requirement to make a resource request with this promise.
+This Promise installs the NGINX Ingress controller onto a requested cluster. Given the controller is available cluster wide, there is no additional requirement to make a resource request with this promise.
 
 To install:
 ```
