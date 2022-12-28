@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+helm repo add istio https://istio-release.storage.googleapis.com/charts
+
+# TODO values file
+echo """---
+base:
+  enableCRDTemplates: true
+""" > /tmp/values.yaml
+
+helm template istio-base istio/base \
+    -n istio-system --values /tmp/values.yaml > $PWD/resources/istio-base.yaml
+
+rm /tmp/values.yaml
+
+helm template istiod istio/istiod \
+    -n istio-system > $PWD/resources/istiod.yaml
+
+
+echo """---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+""" > $PWD/resources/namespace.yaml
+
+urls=(
+    "https://raw.githubusercontent.com/istio/istio/f0b008a933d4596afc38c57d7c41fee699387bd2/samples/addons/jaeger.yaml"
+    "https://raw.githubusercontent.com/istio/istio/18e50cf93b654c62fdc100df52858859815881b6/samples/addons/kiali.yaml"
+    "https://raw.githubusercontent.com/istio/istio/f0b008a933d4596afc38c57d7c41fee699387bd2/samples/addons/prometheus.yaml"
+)
+
+for url in "${urls[@]}"; do
+    curl -sL -o $PWD/resources/$(basename $url) $url
+done
