@@ -5,6 +5,7 @@ metadata:
   name: nginx-ingress
 spec:
   workerClusterResources:
+  - null
   - apiVersion: v1
     kind: Namespace
     metadata:

@@ -120,6 +120,7 @@ workflows:
                 - kafka
                 - knative
                 - namespace
+                - nginx-ingress
                 - observability
                 - postgresql
                 - redis
