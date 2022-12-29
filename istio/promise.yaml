@@ -10409,9 +10409,9 @@ spec:
           annotations:
             prometheus.io/port: "14269"
             prometheus.io/scrape: "true"
+            sidecar.istio.io/inject: "false"
           labels:
             app: jaeger
-            sidecar.istio.io/inject: "false"
         spec:
           containers:
           - env:
