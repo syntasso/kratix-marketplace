@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+# at time of writing only the master version of the helmcharts supports templating the namespace key in
+# see https://github.com/crossplane/crossplane/pull/3437
+helm repo add crossplane-master https://charts.crossplane.io/master/
+helm repo update
+
+helm template crossplane --devel --namespace crossplane-system \
+    crossplane-master/crossplane > $PWD/resources/crossplane.yaml
+
+echo """---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: crossplane-system
+""" > $PWD/resources/namespace.yaml

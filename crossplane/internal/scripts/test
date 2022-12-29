@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crd compositions.apiextensions.crossplane.io 
+  kubectl -n crossplane-system wait --for=condition=Available --timeout=5s deployment/crossplane
+  kubectl -n crossplane-system wait --for=condition=Available --timeout=5s deployment/crossplane-rbac-manager
+}
+
+test_resource_request() {
+  # no RR exists
+  exit 0
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
