@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crd rabbitmqclusters.rabbitmq.com
+  kubectl wait --for=condition=Available --timeout=5s deployment/rabbitmq-cluster-operator
+}
+
+test_resource_request() {
+  kubectl wait --for=condition=ready --timeout=5s pod/example-server-0
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

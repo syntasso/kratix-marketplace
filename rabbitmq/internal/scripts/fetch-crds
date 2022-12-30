@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+urls=(
+    "https://github.com/rabbitmq/cluster-operator/releases/download/v2.0.0/cluster-operator.yml"
+)
+
+mkdir -p $PWD/resources
+rm -rf $PWD/resources/*
+
+for url in "${urls[@]}"; do
+    curl -sL $url | sed 's/rabbitmq-system/default/g' > $PWD/resources/$(basename $url)
+done

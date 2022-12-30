@@ -116,14 +116,15 @@ workflows:
               promise:
                 - argocd-application
                 - elasticcloud
+                - istio
                 - jenkins
+                - kafka
                 - kafka
                 - knative
                 - namespace
                 - nginx-ingress
                 - observability
                 - postgresql
+                - rabbitmq
                 - redis
                 - vault
-                - kafka
-                - istio
