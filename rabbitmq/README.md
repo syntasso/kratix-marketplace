@@ -13,7 +13,7 @@ To install, run the following command while targeting your Platform cluster:
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/rabbitmq/promise.yaml
 ```
 
-This will install the RabbitMQ Operator on all the available worker clusters. To verify
+This will install the RabbitMQ Operator on all the Worker cluster. To verify
 that the operator is installed, run the following command while targeting the Worker
 cluster:
 
