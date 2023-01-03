@@ -8,11 +8,15 @@ To install:
 kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/observability/promise.yaml
 ```
 
+This will install the Prometheus Operator and related components into the clusters. To get an
+instance of Promethues and Grafana you need to make a resource request.
+
 To make a resource request (dev by default):
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/observability/resource-request.yaml
 ```
 
+This will create an instance of Promethues and Grafana on the targeted cluster.
 
 ## Accessing UI
 
