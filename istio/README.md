@@ -1,16 +1,26 @@
-# istio
+# Istio
 
-This Promise install Istio on your clusters.
+This Promise install [Istio](https://istio.io/) on your clusters.
 
-To install:
+To install, run the following command while targeting your Platform cluster:
 ```
 kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/istio/promise.yaml
 ```
 
-Installing the promise will install Istio into your clusters. There is no Resource
-Request to be made with this promise.
+This will install Istio into your worker clusters. To verify Istio is installed,
+run the following command while targeting a worker cluster:
+```
+kubectl -n istio-system get deployments
+NAME         READY   UP-TO-DATE   AVAILABLE   AGE
+istiod       1/1     1            1           3m18s
+jaeger       1/1     1            1           3m18s
+kiali        1/1     1            1           3m18s
+prometheus   1/1     1            1           3m18s
 
-To enable Istio sidecar inject in pods in your namespace:
+```
+
+To enable Istio sidecar inject in pods in your namespace, run the following
+command while targeting the worker cluster:
 ```
 kubectl label namespace <namespace> istio-injection=enabled
 ```
@@ -20,7 +30,7 @@ To access the Kiali dashboard open a port-forward
 kubectl port-forward svc/kiali -n istio-system 20001:20001
 ```
 
-access in your browser at localhost:20001
+Access in your browser at localhost:20001
 
 ## Development
 
