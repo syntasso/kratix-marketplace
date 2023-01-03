@@ -8,10 +8,15 @@ To install:
 kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kafka/promise.yaml
 ```
 
-This will install the Kafka Operator into your clusters. To get a Kafka instance make a
-resource request.
+This will install the Kafka Operator into your clusters. To verify the Kafka Operator is
+installed correctly on your cluster run:
+```
+kubctl --namespace kafka get deployments
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+strimzi-cluster-operator   1/1     1            1           89s
+```
 
-To make a resource request (small by default):
+To get a Kafka instance make a resource request (small by default):
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kafka/resource-request.yaml
 ```
