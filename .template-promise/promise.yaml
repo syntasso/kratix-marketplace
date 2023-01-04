@@ -2,6 +2,7 @@ apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
   name: # TODO
+  namespace: default
 spec:
   xaasCrd:
     apiVersion: apiextensions.k8s.io/v1
@@ -28,4 +29,4 @@ spec:
           served: true
           storage: true
   xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-request-pipeline:v0.1.0
+    - ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-request-pipeline:v0.1.0
