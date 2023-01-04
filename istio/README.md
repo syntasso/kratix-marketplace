@@ -1,6 +1,6 @@
 # Istio
 
-This Promise install [Istio](https://istio.io/) on your clusters.
+This Promise installs [Istio](https://istio.io/) on your clusters.
 
 To install, run the following command while targeting your Platform cluster:
 ```
