@@ -1,7 +1,0 @@
-apiVersion: marketplace.kratix.io/v1alpha1
-kind: elasticcloud
-metadata:
-  name: example
-  namespace: default
-spec:
-  env: dev
