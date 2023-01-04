@@ -126,7 +126,6 @@ workflows:
                 - namespace
                 - nginx-ingress
                 - postgresql
-                - rabbitmq
                 - redis
                 - vault
                 - crossplane
