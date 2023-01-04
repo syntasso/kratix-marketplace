@@ -121,7 +121,6 @@ workflows:
                 - istio
                 - jenkins
                 - kafka
-                - kafka
                 - knative
                 - namespace
                 - nginx-ingress
@@ -129,3 +128,4 @@ workflows:
                 - rabbitmq
                 - redis
                 - vault
+                - crossplane
