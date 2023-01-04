@@ -1,12 +1,11 @@
+<p align="center">
+  <img
+    src="./kratix_marketplace.png"
+    alt="Kratix logo"
+  />
+</p>
+
 # Kratix Marketplace
-
-<img
-align="left"
-src="./kratix_marketplace.png"
-alt="Kratix logo"
-/>
-
-κρατήστε μια υπόσχεση | _kratíste mia ypóschesi_ | **Keep a promise**
 
 [![syntasso](https://circleci.com/gh/syntasso/kratix-marketplace.svg?style=shield)](https://app.circleci.com/pipelines/github/syntasso/kratix-marketplace?branch=main)
 
