@@ -2,5 +2,6 @@ apiVersion: marketplace.kratix.io/v1alpha1
 kind: namespace
 metadata:
   name: example
+  namespace: default
 spec:
   namespaceName: promised-namespace

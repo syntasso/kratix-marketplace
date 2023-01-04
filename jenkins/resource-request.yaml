@@ -2,6 +2,7 @@ apiVersion: marketplace.kratix.io/v1alpha1
 kind: jenkins
 metadata:
   name: example
+  namespace: default
 spec:
   env: dev
   plugins:

@@ -2,6 +2,7 @@ apiVersion: marketplace.kratix.io/v1alpha1
 kind: argocd-application
 metadata:
   name: my-webapp
+  namespace: default
 spec:
   source:
     repoURL: https://github.com/argoproj/argocd-example-apps.git
