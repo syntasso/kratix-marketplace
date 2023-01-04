@@ -125,7 +125,6 @@ workflows:
                 - knative
                 - namespace
                 - nginx-ingress
-                - observability
                 - postgresql
                 - rabbitmq
                 - redis
