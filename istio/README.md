@@ -1,6 +1,6 @@
 # Istio
 
-This Promise install [Istio](https://istio.io/) on your clusters.
+This Promise installs [Istio](https://istio.io/) on your clusters.
 
 To install, run the following command while targeting your Platform cluster:
 ```
@@ -18,6 +18,8 @@ kiali        1/1     1            1           3m18s
 prometheus   1/1     1            1           3m18s
 
 ```
+
+Istio is not being provided as-a-Service with this Promise. Therefore, there's no Resource Request: installing the Promise suffice to get Istio installed.
 
 To enable Istio sidecar inject in pods in your namespace, run the following
 command while targeting the worker cluster:

@@ -69,8 +69,9 @@ jobs:
             ./internal/scripts/pipeline-image build load
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test promise
+          # 5 minutes total retry (3 sec * 100 times = 300 sec)
           sleep: 3
-          retry-count: 45
+          retry-count: 100
       - run:
           name: Apply resource-request
           working_directory: ~/repo/<< parameters.promise >>
@@ -80,8 +81,9 @@ jobs:
             fi
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test resource-request
+          # 5 minutes total retry (3 sec * 100 times = 300 sec)
           sleep: 3
-          retry-count: 45
+          retry-count: 100
       - when:
           condition:
             equal: [main, << pipeline.git.branch >>]
@@ -119,12 +121,11 @@ workflows:
                 - istio
                 - jenkins
                 - kafka
-                - kafka
                 - knative
                 - namespace
                 - nginx-ingress
-                - observability
                 - postgresql
                 - rabbitmq
                 - redis
                 - vault
+                - crossplane

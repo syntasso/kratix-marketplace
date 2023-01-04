@@ -3,9 +3,25 @@
 PWD="$( cd $(dirname $0)/.. && pwd)"
 mkdir -p ${PWD}/resources
 
-output_file=${PWD}/resources/nginx-controller-operator.yaml
-touch ${output_file}
+DIR=$(mktemp -d)
+echo """---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 
-kubectl kustomize \
-    'https://github.com/nginxinc/nginx-ingress-helm-operator/config/default?ref=v1.2.1' \
-    --output ${output_file}
+resources:
+  - 'https://github.com/nginxinc/nginx-ingress-helm-operator/config/default?ref=v1.2.1'
+  - 'https://github.com/nginxinc/nginx-ingress-helm-operator/config/samples?ref=v1.2.1'
+
+patches:
+  - target:
+      group: charts.nginx.org
+      version: v1alpha1
+      kind: NginxIngress
+      name: nginxingress-sample
+    patch: |-
+      - op: replace
+        path: /metadata/namespace
+        value: default
+""" > $DIR/kustomization.yaml
+
+kubectl kustomize $DIR --output $PWD/resources/operator-and-basic-install.yaml

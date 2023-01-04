@@ -3,6 +3,7 @@ kind: Promise
 metadata:
   creationTimestamp: null
   name: namespace
+  namespace: default
 spec:
   workerClusterResources: []
   xaasCrd:
@@ -18,22 +19,22 @@ spec:
         singular: namespace
       scope: Namespaced
       versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                required:
-                - namespaceName
-                properties:
-                  namespaceName:
-                    type: string
-                    description: |
-                      The name of the namespace to be created
-                type: object
-            type: object
-        served: true
-        storage: true
+        - name: v1alpha1
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  required:
+                    - namespaceName
+                  properties:
+                    namespaceName:
+                      type: string
+                      description: |
+                        The name of the namespace to be created
+                  type: object
+              type: object
+          served: true
+          storage: true
   xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/namespace-request-pipeline:v0.1.0
+    - ghcr.io/syntasso/kratix-marketplace/namespace-request-pipeline:v0.1.0
 status: {}

@@ -1,1 +1,7 @@
 # TODO: Provide an example resource request
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: <TODO: xaasCrd Name>
+metadata:
+  name: example
+  namespace: default
+spec:

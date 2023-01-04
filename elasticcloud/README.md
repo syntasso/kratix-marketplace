@@ -61,7 +61,7 @@ kubectl port-forward service/example-kb-http 5601
 Open https://localhost:5601 in your browser. Login as the `elastic` user. The password can be obtained with the following command:
 
 ```
-kubectl get secret quickstart-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode
+kubectl get secret example-es-elastic-user -o=jsonpath='{.data.elastic}' | base64 --decode
 ```
 
 ## Development

@@ -3,6 +3,7 @@ kind: Promise
 metadata:
   creationTimestamp: null
   name: redis
+  namespace: default
 spec:
   workerClusterResources:
   - apiVersion: apps/v1

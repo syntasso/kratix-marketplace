@@ -3,6 +3,7 @@ kind: Promise
 metadata:
   creationTimestamp: null
   name: rabbitmq
+  namespace: default
 spec:
   workerClusterResources:
   - apiVersion: v1

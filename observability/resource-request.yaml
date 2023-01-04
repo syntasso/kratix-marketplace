@@ -1,7 +1,0 @@
-apiVersion: marketplace.kratix.io/v1alpha1
-kind: observability
-metadata:
-  name: example
-spec:
-  env: dev
-  namespace: monitoring

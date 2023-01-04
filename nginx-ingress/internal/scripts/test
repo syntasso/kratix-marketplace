@@ -3,6 +3,7 @@ set -e
 
 test_promise() {
   kubectl wait --for=condition=Available --timeout=5s --namespace nginx-ingress-operator-system deployment/nginx-ingress-operator-controller-manager
+  kubectl wait --for=condition=Initialized --timeout=5s --namespace default nginxingresses.charts.nginx.org/nginxingress-sample
 }
 
 test_resource_request() {

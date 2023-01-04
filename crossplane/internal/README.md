@@ -8,23 +8,6 @@ the `workerClusterResources`. To build run:
 ./scripts/inject-wcr
 ```
 
-## Pipeline image
-To build the image:
-```
-./scripts/pipeline-image build
-```
-
-To load the image to the local kind platform cluster:
-```
-./scripts/pipeline-image load
-```
-
-To push the image to ghcr.io:
-```
-./scripts/pipeline-image push
-```
-
-
 ## Testing
 To test the promise install kratix, and then:
 ```
@@ -33,9 +16,3 @@ kubectl apply -f promise.yaml
 ```
 
 This asserts the Promise is installed correctly.
-
-To test the resource request:
-```
-kubectl apply -f resource-request.yaml
-./scripts/test resource-request
-```
