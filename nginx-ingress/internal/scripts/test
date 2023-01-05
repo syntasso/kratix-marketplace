@@ -2,12 +2,11 @@
 set -e
 
 test_promise() {
-  kubectl wait --for=condition=Available --timeout=5s --namespace nginx-ingress-operator-system deployment/nginx-ingress-operator-controller-manager
-  kubectl wait --for=condition=Initialized --timeout=5s --namespace default nginxingresses.charts.nginx.org/nginxingress-sample
+  kubectl wait --for=condition=Available --timeout=5s --namespace default deployment/nginx-nginx-ingress
 }
 
 test_resource_request() {
-  echo "no resource requests to test"
+  echo "no resource request to test"
 }
 
 if [ "$1" = "promise" ]; then

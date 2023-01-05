@@ -1,8 +1,11 @@
 # NGINX Ingress
 
-This Promise provides access to the [NGINX Ingress controller](https://docs.nginx.com/nginx-ingress-controller/) for a given cluster by deploying the [NGINX Ingress Operator](https://github.com/nginxinc/nginx-ingress-helm-operator) and configuring a Cluster-wide Ingress Controller.
+This Promise provides access to the [NGINX Ingress Controller (NIC)](https://docs.nginx.com/nginx-ingress-controller/) in the global deployment configuration. Since this configuration only deploys a single instance per cluster, there is no need to request individual resources once the Promise is installed. For more details about the difference, see the NGINX documents [here](https://docs.nginx.com/nginx-ingress-controller/installation/running-multiple-ingress-controllers/).
 
-Given the controller is available cluster wide, there is no additional requirement to make a resource request with this promise.
+Once the Promise is installed, you can see the ingress controller running on any applicable worker clusters with the following command:
+```
+kubectl get --namespace default deployment/nginx-nginx-ingress
+```
 
 To install:
 ```
