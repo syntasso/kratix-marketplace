@@ -9,7 +9,7 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 
 To provide credentials to slack create a secret in `default` namespace called
 `slack-channel-hook` with a `.data.url` field. You can create it using
-the following command (ensure you have SLACK_HOOK_URL env var exported):
+the following command (ensure you have `SLACK_HOOK_URL` env var exported):
 ```
 kubectl --namespace default create secret generic \
   slack-channel-hook --from-literal=url=${SLACK_HOOK_URL}
