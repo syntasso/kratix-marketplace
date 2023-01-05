@@ -29,7 +29,7 @@ slack       1m
 
 To create a slack message, run the following command while targeting the Platform cluster:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/namespace/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/slack/resource-request.yaml
 ```
 
 You should see a slack message appear shortly afterwards.
