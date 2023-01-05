@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+
+set -x
+
+export name="$(yq eval '.metadata.name' /input/object.yaml)"
+export userGroup="$(yq eval '.spec.userGroup' /input/object.yaml)"
+export clusterRole="$(yq eval '.spec.clusterRole // "view"' /input/object.yaml)"
+
+if [[ "${userGroup}" != "null" ]]; then
+    export subject="""- kind: Group
+  name: ${userGroup}
+  apiGroup: rbac.authorization.k8s.io"""
+    yq eval '.subjects = env(subject) |
+        .roleRef.name = env(clusterRole) |
+        .metadata.name += env(clusterRole) + "-" + env(name)' /tmp/transfer/crb.yaml > /output/crb.yaml
+fi

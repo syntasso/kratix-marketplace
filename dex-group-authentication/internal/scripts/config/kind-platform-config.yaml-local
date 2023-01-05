@@ -1,0 +1,32 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # These allow localhost ports to be open for the specfied NodePort service
+      # on every cluster creation. While these services are not always running,
+      # they are commonly used and accessed.
+      - containerPort: 31337
+        hostPort: 31337 # MinIO
+      - containerPort: 32000
+        hostPort: 32000 # Dex
+    extraMounts:
+      # The ca.pem file is required to run Kuberentes auth via Dex
+      - hostPath: /Users/abbybangser/dev/syntasso/kratix-marketplace/dex-group-authentication/internal/scripts/config/ssl
+        containerPath: /etc/ca-certificates
+        readOnly: true
+kubeadmConfigPatches:
+  # This is the configuration required for Kuberentes to use OIDC (in our case Dex)
+  # for cluster authorization.
+  #
+  # To use this, install the Dex marketplace promise:
+  #   https://github.com/syntasso/kratix-marketplace/tree/main/dex
+  - |
+    kind: ClusterConfiguration
+    apiServer:
+      extraArgs:
+        oidc-client-id: kube
+        oidc-issuer-url: https://localhost:32000
+        oidc-username-claim: email
+        oidc-groups-claim: groups
+        oidc-ca-file: /etc/ca-certificates/ca.pem

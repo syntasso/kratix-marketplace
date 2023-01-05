@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl wait --for=condition=Available -n dex --timeout=5s deployment/dex
+}
+
+test_resource_request() {
+  kubectl get clusterrolebindings | grep "custom-"
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

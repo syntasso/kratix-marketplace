@@ -118,7 +118,8 @@ workflows:
           matrix:
             parameters:
               promise:
-                - argocd-application
+                - argocd-application]
+                - dex-group-authentication
                 - istio
                 - jenkins
                 - kafka
