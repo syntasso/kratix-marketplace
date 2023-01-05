@@ -92,7 +92,7 @@ jobs:
                 name: GHCR Push
                 working_directory: ~/repo/<< parameters.promise >>
                 command: |
-                  echo "$GITHUB_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
+                  echo "$GITHUB_PACKAGES_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
                   ./internal/scripts/pipeline-image push
             - run:
                 name: Verify package is public
@@ -101,7 +101,7 @@ jobs:
                   if test -f "internal/request-pipeline/Dockerfile"; then
                     visibility=$(curl -sL \
                       -H "Accept: application/vnd.github+json"\
-                      -H "Authorization: Bearer $GITHUB_TOKEN" \
+                      -H "Authorization: Bearer $GITHUB_PACKAGES_TOKEN" \
                       -H "X-GitHub-Api-Version: 2022-11-28" \
                       "https://api.github.com/orgs/syntasso/packages?package_type=container" |
                     jq -r '.[] | select(.name | contains ("<< parameters.promise >>")) | .visibility')
@@ -113,11 +113,12 @@ workflows:
   promises:
     jobs:
       - test-and-push:
+          context:
+            - github-credentials
           matrix:
             parameters:
               promise:
                 - argocd-application
-                - elasticcloud
                 - istio
                 - jenkins
                 - kafka
@@ -125,7 +126,6 @@ workflows:
                 - namespace
                 - nginx-ingress
                 - postgresql
-                - rabbitmq
                 - redis
                 - vault
                 - crossplane
