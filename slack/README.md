@@ -7,8 +7,8 @@ To install, run the following commands while targeting your Platform cluster:
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/slack/promise.yaml
 ```
 
-This promisees uses a [Slack hook](https://slack.com/intl/en-gb/help/articles/115005265063-Incoming-webhooks-for-Slack)
-to send the slack messages. To provide access to this hook create secret in `default` namespace called
+This promise uses a [Slack hook](https://slack.com/intl/en-gb/help/articles/115005265063-Incoming-webhooks-for-Slack)
+to send messages to a channel. To provide access to this hook create secret in `default` namespace called
 `slack-channel-hook` with a `.data.url` field containing the hook. You can create it using
 the following command (ensure you have `SLACK_HOOK_URL` env var exported):
 ```
