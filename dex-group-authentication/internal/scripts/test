@@ -2,7 +2,7 @@
 set -e
 
 test_promise() {
-  kubectl wait --for=condition=Available -n dex --timeout=5s deployment/dex
+  kubectl wait --for=condition=Progressing -n dex --timeout=5s deployment/dex
 }
 
 test_resource_request() {
