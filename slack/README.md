@@ -16,11 +16,6 @@ kubectl --namespace default create secret generic \
   slack-channel-hook --from-literal=url=${SLACK_HOOK_URL}
 ```
 
-Then apply the required RBAC to ensure Kratix can access the secret:
-```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/slack/rbac.yaml
-```
-
 To verify that the Promise is installed, run the following on your Platform cluster:
 ```
 $ kubectl get promises.platform.kratix.io
