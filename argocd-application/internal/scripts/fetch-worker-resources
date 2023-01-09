@@ -18,7 +18,7 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-  - 'https://github.com/argoproj/argo-cd.git/manifests/cluster-install?ref=v2.5.5'
+  - 'https://github.com/syntasso/kratix-marketplace/tree/main/argocd-application'
 """ > $DIR/kustomization.yaml
 
 kubectl kustomize $DIR --output $PWD/resources/cluster-install-with-namespace.yaml
