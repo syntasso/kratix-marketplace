@@ -30,6 +30,13 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 
 You should see a slack message appear shortly afterwards.
 
+### Deletion
+As we've created the `slack-channel-hook` `secret` outside of the usual Promise workflow, when deleteing the resource request we will need to delete this secret manaually:
+```
+kubectl delete secret slack-channel-hook
+```
+
+
 ## Development
 
 For development see [README.md](./internal/README.md)
