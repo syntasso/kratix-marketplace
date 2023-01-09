@@ -50,12 +50,12 @@ Below is an example workflow for a user through KubeLogin:
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dex/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dex-group-authentication/promise.yaml
 ```
 
 To make a resource request (small by default):
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dex/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dex-group-authentication/resource-request.yaml
 ```
 
 ## Development
