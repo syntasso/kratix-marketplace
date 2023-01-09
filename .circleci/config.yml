@@ -119,6 +119,7 @@ workflows:
             parameters:
               promise:
                 - argocd-application
+                - dex-group-authentication
                 - istio
                 - jenkins
                 - kafka
@@ -129,3 +130,4 @@ workflows:
                 - redis
                 - vault
                 - crossplane
+                - slack

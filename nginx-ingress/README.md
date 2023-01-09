@@ -1,18 +1,24 @@
 # NGINX Ingress
 
-This Promise provides access to the [NGINX Ingress controller](https://docs.nginx.com/nginx-ingress-controller/) for a given cluster by deploying the [NGINX Ingress Operator](https://github.com/nginxinc/nginx-ingress-helm-operator) and configuring a Cluster-wide Ingress Controller.
+This Promise provides access to the [NGINX Ingress Controller (NIC)](https://docs.nginx.com/nginx-ingress-controller/)
+in the global deployment configuration. Since this configuration only deploys a
+single instance per cluster, there is no need to request individual resources once
+the Promise is installed. For more details about the difference, see the NGINX
+documents [here](https://docs.nginx.com/nginx-ingress-controller/installation/running-multiple-ingress-controllers/).
 
-Given the controller is available cluster wide, there is no additional requirement to make a resource request with this promise.
-
-To install:
+To install, run the following command while targeting your Platform cluster:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/nginx-ingress/promise.yaml
 ```
 
-To make a resource request (small by default):
+To verify the Promise is installed, you can run the following command while
+targeting a worker cluster:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/nginx-ingress/resource-request.yaml
+kubectl get --namespace default deployment/nginx-nginx-ingress
 ```
+
+NGINX is not being provided as-a-Service with this Promise. Therefore, there's no
+Resource Request: installing the Promise will install NGINX.
 
 ## Development
 

@@ -2,11 +2,11 @@
 set -e
 
 test_promise() {
-  kubectl wait --for=condition=Available --timeout=5s --namespace default deployment/nginx-nginx-ingress
+  kubectl get crds slacks.marketplace.kratix.io
 }
 
 test_resource_request() {
-  echo "no resource request to test"
+  exit 0
 }
 
 if [ "$1" = "promise" ]; then

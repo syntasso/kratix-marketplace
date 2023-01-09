@@ -2,11 +2,11 @@
 set -e
 
 test_promise() {
-  kubectl wait --for=condition=Available --timeout=5s --namespace default deployment/nginx-nginx-ingress
+  kubectl wait --for=condition=Progressing -n dex --timeout=5s deployment/dex
 }
 
 test_resource_request() {
-  echo "no resource request to test"
+  kubectl get clusterrolebindings | grep "custom-"
 }
 
 if [ "$1" = "promise" ]; then
