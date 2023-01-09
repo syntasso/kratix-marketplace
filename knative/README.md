@@ -5,30 +5,46 @@ which can be `dev` or `prod`:
   * `dev` [Knative Autoscaling-HPA](https://knative.dev/docs/serving/autoscaling/autoscaler-types/#horizontal-pod-autoscaler-hpa) is switched off.
   * `prod` [Knative Autoscaling-HPA](https://knative.dev/docs/serving/autoscaling/autoscaler-types/#horizontal-pod-autoscaler-hpa) is switched on.
 
-Once the Promise is installed, you can see Knative prerequisite CRDs in a worker cluster with the following command:
-```
-kubectl get crds | grep knative.dev
-```
 
-Once a Resource Request is made, you can see the controller running in the worker cluster with the following command:
-```
-kubectl get --namespace knative-serving deployment/controller
-```
-
-And you can apply Knative resources to deploy application, for example:
-```
-kubectl apply --filename https://raw.githubusercontent.com/syntasso/sample-golang-app/main/k8s/serving.yaml
-```
-
-To install:
+To install, run the following command while targeting your Platform cluster:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/knative/promise.yaml
 ```
 
-To make a resource request (small by default):
+To verify Knatives prerequisite CRDs are installed, run the following command while targeting a worker cluster:
+```
+kubectl get crds | grep knative.dev
+```
+
+To make a resource request, run the following command while targeting your Platform cluster:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/knative/resource-request.yaml
 ```
+
+Once a Resource Request is made, you can see the controller is running by running the
+following command while targeting a worker cluster:
+```
+kubectl get --namespace knative-serving deployment/controller
+```
+
+You can now provision Knative servings on your worker cluster, for example apply
+the following yaml while targeting a worker cluster:
+```yaml
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: helloworld-go
+  namespace: default
+spec:
+  template:
+    spec:
+      containers:
+        - image: gcr.io/knative-samples/helloworld-go
+          env:
+            - name: TARGET
+              value: "Go Sample v1"
+```
+
 
 ## Development
 
