@@ -1,6 +1,34 @@
 #!/usr/bin/env bash
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
+ssl_dir=${PWD}/scripts/config/ssl
+
+echo "generating certs in ${ssl_dir}"
+mkdir -p ${ssl_dir}
+
+cat << EOF > ${ssl_dir}/req.cnf
+[req]
+req_extensions = v3_req
+distinguished_name = req_distinguished_name
+
+[req_distinguished_name]
+
+[ v3_req ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = localhost
+EOF
+
+openssl genrsa -out ${ssl_dir}/ca-key.pem 2048
+openssl req -sha256 -x509 -new -nodes -key ${ssl_dir}/ca-key.pem -days 10 -out ${ssl_dir}/ca.pem -subj "/CN=kube-ca"
+
+openssl genrsa -out ${ssl_dir}/key.pem 2048
+openssl req -sha256 -new -key ${ssl_dir}/key.pem -out ${ssl_dir}/csr.pem -subj "/CN=kube-ca" -config ${ssl_dir}/req.cnf
+openssl x509 -sha256 -req -in ${ssl_dir}/csr.pem -CA ${ssl_dir}/ca.pem -CAkey ${ssl_dir}/ca-key.pem -CAcreateserial -out ${ssl_dir}/cert.pem -days 10 -extensions v3_req -extfile ${ssl_dir}/req.cnf
+
 
 kind delete cluster --name platform
 
