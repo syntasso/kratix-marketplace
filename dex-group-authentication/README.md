@@ -16,7 +16,7 @@ This Promise can be used to authenticate users to Kubernetes clusters. To do thi
 1. A cluster started with OIDC configurations set including a valid Certificate Authority using. Use the script `./internal/scripts/setup` to get setup locally
 1. A valid [GitHub OAuth application](https://github.com/settings/applications/new)
 (for testing locally you can use `http://127.0.0.1:5555` as Homepage URL and `https://localhost:32000/callback` as the callback)
-1. A secret which references the created GitHub OAuth application:
+1. A secret which references the created GitHub OAuth application, run the following while targeting the worker cluster:
     ```
     kubectl -n dex create secret \
         generic github-client \
