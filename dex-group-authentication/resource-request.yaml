@@ -1,5 +1,5 @@
 apiVersion: marketplace.kratix.io/v1alpha1
-kind: dex-group-auth
+kind: dex-group-authentication
 metadata:
   name: example
 spec:

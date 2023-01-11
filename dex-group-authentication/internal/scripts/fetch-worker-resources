@@ -41,6 +41,10 @@ kind: Kustomization
 resources:
   - 'https://raw.githubusercontent.com/dexidp/dex/v2.35.3/examples/k8s/dex.yaml'
 
+replicas:
+- name: dex
+  count: 2
+
 configMapGenerator:
 - name: dex
   namespace: dex

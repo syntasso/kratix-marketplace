@@ -30,7 +30,7 @@ Users within these groups can then use [KubeLogin plugin](https://github.com/int
 Once you've setup the prerequisites above you can install the Promise by applying the following while targeting
 the Platform cluster:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dex-group-authentication/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dex-group-auth/promise.yaml
 ```
 
 To verify its correctly installed, run the following while targeting the worker cluster:
@@ -54,7 +54,7 @@ kubectl apply -f resource-request.yaml
 
 You've now setup permissions for a userGroup specified in the `resource-request.yaml` to have access to login to the worker
 cluster via OIDC. Use [KubeLogin](https://github.com/int128/kubelogin#setup) to verify this works (ensure `DEX_PATH` env var
-is exported, for example `export DEX_PATH=~/workspace/kratix-marketplace/dex-group-authentication`:
+is exported, for example `export DEX_PATH=~/workspace/kratix-marketplace/dex-group-auth`:
 
 1. Set up KubeLogin
     ```

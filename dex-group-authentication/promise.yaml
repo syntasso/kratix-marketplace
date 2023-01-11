@@ -2,7 +2,7 @@ apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
   creationTimestamp: null
-  name: dex-group-auth
+  name: dex-group-authentication
 spec:
   workerClusterResources:
   - apiVersion: v1
@@ -100,7 +100,7 @@ spec:
       name: dex
       namespace: dex
     spec:
-      replicas: 3
+      replicas: 2
       selector:
         matchLabels:
           app: dex
@@ -167,13 +167,13 @@ spec:
     apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
-      name: dex-group-auths.marketplace.kratix.io
+      name: dex-group-authentications.marketplace.kratix.io
     spec:
       group: marketplace.kratix.io
       names:
-        kind: dex-group-auth
-        plural: dex-group-auths
-        singular: dex-group-auth
+        kind: dex-group-authentication
+        plural: dex-group-authentications
+        singular: dex-group-authentication
       scope: Namespaced
       versions:
       - name: v1alpha1
