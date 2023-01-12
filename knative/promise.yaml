@@ -5,7 +5,456 @@ metadata:
   name: knative
   namespace: default
 spec:
+  clusterSelector:
+    environment: dev
   workerClusterResources:
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: knative-serving
+  - aggregationRule:
+      clusterRoleSelectors:
+      - matchLabels:
+          duck.knative.dev/addressable: "true"
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: knative-serving-aggregated-addressable-resolver
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        duck.knative.dev/addressable: "true"
+      name: knative-serving-addressable-resolver
+    rules:
+    - apiGroups:
+      - serving.knative.dev
+      resources:
+      - routes
+      - routes/status
+      - services
+      - services/status
+      verbs:
+      - get
+      - list
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        rbac.authorization.k8s.io/aggregate-to-admin: "true"
+      name: knative-serving-namespaced-admin
+    rules:
+    - apiGroups:
+      - serving.knative.dev
+      resources:
+      - '*'
+      verbs:
+      - '*'
+    - apiGroups:
+      - networking.internal.knative.dev
+      - autoscaling.internal.knative.dev
+      - caching.internal.knative.dev
+      resources:
+      - '*'
+      verbs:
+      - get
+      - list
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        rbac.authorization.k8s.io/aggregate-to-edit: "true"
+      name: knative-serving-namespaced-edit
+    rules:
+    - apiGroups:
+      - serving.knative.dev
+      resources:
+      - '*'
+      verbs:
+      - create
+      - update
+      - patch
+      - delete
+    - apiGroups:
+      - networking.internal.knative.dev
+      - autoscaling.internal.knative.dev
+      - caching.internal.knative.dev
+      resources:
+      - '*'
+      verbs:
+      - get
+      - list
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        rbac.authorization.k8s.io/aggregate-to-view: "true"
+      name: knative-serving-namespaced-view
+    rules:
+    - apiGroups:
+      - serving.knative.dev
+      - networking.internal.knative.dev
+      - autoscaling.internal.knative.dev
+      - caching.internal.knative.dev
+      resources:
+      - '*'
+      verbs:
+      - get
+      - list
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        serving.knative.dev/controller: "true"
+      name: knative-serving-core
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      - namespaces
+      - secrets
+      - configmaps
+      - endpoints
+      - services
+      - events
+      - serviceaccounts
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+    - apiGroups:
+      - ""
+      resources:
+      - endpoints/restricted
+      verbs:
+      - create
+    - apiGroups:
+      - ""
+      resources:
+      - namespaces/finalizers
+      verbs:
+      - update
+    - apiGroups:
+      - apps
+      resources:
+      - deployments
+      - deployments/finalizers
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+    - apiGroups:
+      - admissionregistration.k8s.io
+      resources:
+      - mutatingwebhookconfigurations
+      - validatingwebhookconfigurations
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+    - apiGroups:
+      - apiextensions.k8s.io
+      resources:
+      - customresourcedefinitions
+      - customresourcedefinitions/status
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+    - apiGroups:
+      - autoscaling
+      resources:
+      - horizontalpodautoscalers
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+    - apiGroups:
+      - coordination.k8s.io
+      resources:
+      - leases
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+    - apiGroups:
+      - serving.knative.dev
+      - autoscaling.internal.knative.dev
+      - networking.internal.knative.dev
+      resources:
+      - '*'
+      - '*/status'
+      - '*/finalizers'
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - deletecollection
+      - patch
+      - watch
+    - apiGroups:
+      - caching.internal.knative.dev
+      resources:
+      - images
+      verbs:
+      - get
+      - list
+      - create
+      - update
+      - delete
+      - patch
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        duck.knative.dev/podspecable: "true"
+      name: knative-serving-podspecable-binding
+    rules:
+    - apiGroups:
+      - serving.knative.dev
+      resources:
+      - configurations
+      - services
+      verbs:
+      - list
+      - watch
+      - patch
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: controller
+      namespace: knative-serving
+  - aggregationRule:
+      clusterRoleSelectors:
+      - matchLabels:
+          serving.knative.dev/controller: "true"
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: knative-serving-admin
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: knative-serving-controller-admin
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: knative-serving-admin
+    subjects:
+    - kind: ServiceAccount
+      name: controller
+      namespace: knative-serving
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: knative-serving-controller-addressable-resolver
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: knative-serving-aggregated-addressable-resolver
+    subjects:
+    - kind: ServiceAccount
+      name: controller
+      namespace: knative-serving
+  - apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      labels:
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        knative.dev/crd-install: "true"
+      name: images.caching.internal.knative.dev
+    spec:
+      group: caching.internal.knative.dev
+      names:
+        categories:
+        - knative-internal
+        - caching
+        kind: Image
+        plural: images
+        singular: image
+      scope: Namespaced
+      versions:
+      - additionalPrinterColumns:
+        - jsonPath: .spec.image
+          name: Image
+          type: string
+        name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            description: Image is a Knative abstraction that encapsulates the interface
+              by which Knative components express a desire to have a particular image
+              cached.
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation
+                  of an object. Servers should convert recognized schemas to the latest
+                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              kind:
+                description: 'Kind is a string value representing the REST resource
+                  this object represents. Servers may infer this from the endpoint
+                  the client submits requests to. Cannot be updated. In CamelCase.
+                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              spec:
+                description: Spec holds the desired state of the Image (from the client).
+                properties:
+                  image:
+                    description: Image is the name of the container image url to cache
+                      across the cluster.
+                    type: string
+                  imagePullSecrets:
+                    description: ImagePullSecrets contains the names of the Kubernetes
+                      Secrets containing login information used by the Pods which
+                      will run this container.
+                    items:
+                      description: LocalObjectReference contains enough information
+                        to let you locate the referenced object inside the same namespace.
+                      properties:
+                        name:
+                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+                            TODO: Add other useful fields. apiVersion, kind, uid?'
+                          type: string
+                      type: object
+                      x-kubernetes-map-type: atomic
+                    type: array
+                  serviceAccountName:
+                    description: 'ServiceAccountName is the name of the Kubernetes
+                      ServiceAccount as which the Pods will run this container.  This
+                      is potentially used to authenticate the image pull if the service
+                      account has attached pull secrets.  For more information: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-imagepullsecrets-to-a-service-account'
+                    type: string
+                required:
+                - image
+                type: object
+              status:
+                description: Status communicates the observed state of the Image (from
+                  the controller).
+                properties:
+                  annotations:
+                    additionalProperties:
+                      type: string
+                    description: Annotations is additional Status fields for the Resource
+                      to save some additional State as well as convey more information
+                      to the user. This is roughly akin to Annotations on any k8s
+                      resource, just the reconciler conveying richer information outwards.
+                    type: object
+                  conditions:
+                    description: Conditions the latest available observations of a
+                      resource's current state.
+                    items:
+                      description: 'Condition defines a readiness condition for a
+                        Knative resource. See: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties'
+                      properties:
+                        lastTransitionTime:
+                          description: LastTransitionTime is the last time the condition
+                            transitioned from one status to another. We use VolatileTime
+                            in place of metav1.Time to exclude this from creating
+                            equality.Semantic differences (all other things held constant).
+                          type: string
+                        message:
+                          description: A human readable message indicating details
+                            about the transition.
+                          type: string
+                        reason:
+                          description: The reason for the condition's last transition.
+                          type: string
+                        severity:
+                          description: Severity with which to treat failures of this
+                            type of condition. When this is not specified, it defaults
+                            to Error.
+                          type: string
+                        status:
+                          description: Status of the condition, one of True, False,
+                            Unknown.
+                          type: string
+                        type:
+                          description: Type of condition.
+                          type: string
+                      required:
+                      - status
+                      - type
+                      type: object
+                    type: array
+                  observedGeneration:
+                    description: ObservedGeneration is the 'Generation' of the Service
+                      that was last processed by the controller.
+                    format: int64
+                    type: integer
+                type: object
+            type: object
+        served: true
+        storage: true
+        subresources:
+          status: {}
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
@@ -5715,140 +6164,1083 @@ spec:
         storage: true
         subresources:
           status: {}
-  - apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      name: serving-certs-ctrl-ca
+      namespace: knative-serving
+  - apiVersion: v1
+    kind: Secret
     metadata:
       labels:
+        networking.internal.knative.dev/certificate-uid: serving-certs
+        serving-certs-ctrl: data-plane
+      name: knative-serving-certs
+      namespace: knative-serving
+  - apiVersion: caching.internal.knative.dev/v1alpha1
+    kind: Image
+    metadata:
+      labels:
+        app.kubernetes.io/component: queue-proxy
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
-        knative.dev/crd-install: "true"
-      name: images.caching.internal.knative.dev
+      name: queue-proxy
+      namespace: knative-serving
     spec:
-      group: caching.internal.knative.dev
-      names:
-        categories:
-        - knative-internal
-        - caching
-        kind: Image
-        plural: images
-        singular: image
-      scope: Namespaced
-      versions:
-      - additionalPrinterColumns:
-        - jsonPath: .spec.image
-          name: Image
-          type: string
-        name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            description: Image is a Knative abstraction that encapsulates the interface
-              by which Knative components express a desire to have a particular image
-              cached.
-            properties:
-              apiVersion:
-                description: 'APIVersion defines the versioned schema of this representation
-                  of an object. Servers should convert recognized schemas to the latest
-                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-                type: string
-              kind:
-                description: 'Kind is a string value representing the REST resource
-                  this object represents. Servers may infer this from the endpoint
-                  the client submits requests to. Cannot be updated. In CamelCase.
-                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                type: string
-              metadata:
-                type: object
-              spec:
-                description: Spec holds the desired state of the Image (from the client).
-                properties:
-                  image:
-                    description: Image is the name of the container image url to cache
-                      across the cluster.
-                    type: string
-                  imagePullSecrets:
-                    description: ImagePullSecrets contains the names of the Kubernetes
-                      Secrets containing login information used by the Pods which
-                      will run this container.
-                    items:
-                      description: LocalObjectReference contains enough information
-                        to let you locate the referenced object inside the same namespace.
-                      properties:
-                        name:
-                          description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
-                            TODO: Add other useful fields. apiVersion, kind, uid?'
-                          type: string
-                      type: object
-                      x-kubernetes-map-type: atomic
-                    type: array
-                  serviceAccountName:
-                    description: 'ServiceAccountName is the name of the Kubernetes
-                      ServiceAccount as which the Pods will run this container.  This
-                      is potentially used to authenticate the image pull if the service
-                      account has attached pull secrets.  For more information: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#add-imagepullsecrets-to-a-service-account'
-                    type: string
-                required:
-                - image
-                type: object
-              status:
-                description: Status communicates the observed state of the Image (from
-                  the controller).
-                properties:
-                  annotations:
-                    additionalProperties:
-                      type: string
-                    description: Annotations is additional Status fields for the Resource
-                      to save some additional State as well as convey more information
-                      to the user. This is roughly akin to Annotations on any k8s
-                      resource, just the reconciler conveying richer information outwards.
-                    type: object
-                  conditions:
-                    description: Conditions the latest available observations of a
-                      resource's current state.
-                    items:
-                      description: 'Condition defines a readiness condition for a
-                        Knative resource. See: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#typical-status-properties'
-                      properties:
-                        lastTransitionTime:
-                          description: LastTransitionTime is the last time the condition
-                            transitioned from one status to another. We use VolatileTime
-                            in place of metav1.Time to exclude this from creating
-                            equality.Semantic differences (all other things held constant).
-                          type: string
-                        message:
-                          description: A human readable message indicating details
-                            about the transition.
-                          type: string
-                        reason:
-                          description: The reason for the condition's last transition.
-                          type: string
-                        severity:
-                          description: Severity with which to treat failures of this
-                            type of condition. When this is not specified, it defaults
-                            to Error.
-                          type: string
-                        status:
-                          description: Status of the condition, one of True, False,
-                            Unknown.
-                          type: string
-                        type:
-                          description: Type of condition.
-                          type: string
-                      required:
-                      - status
-                      - type
-                      type: object
-                    type: array
-                  observedGeneration:
-                    description: ObservedGeneration is the 'Generation' of the Service
-                      that was last processed by the controller.
-                    format: int64
-                    type: integer
-                type: object
-            type: object
-        served: true
-        storage: true
-        subresources:
-          status: {}
+      image: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:f78383554ed81895ff230217f3e0ce9bf9ff2048d4303cc9fb36342ac3f470b3
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: 47c2487f
+      labels:
+        app.kubernetes.io/component: autoscaler
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-autoscaler
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: e7973912
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-defaults
+      namespace: knative-serving
+  - apiVersion: v1
+    data:
+      queue-sidecar-image: gcr.io/knative-releases/knative.dev/serving/cmd/queue@sha256:f78383554ed81895ff230217f3e0ce9bf9ff2048d4303cc9fb36342ac3f470b3
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: dd7ee769
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-deployment
+      namespace: knative-serving
+  - apiVersion: v1
+    data:
+      local.gd: ""
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: 26c09de5
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-domain
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: 691a192e
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-features
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: aa3813a8
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-gc
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: f4b71f57
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-leader-election
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: b0f3c6f2
+      labels:
+        app.kubernetes.io/component: logging
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-logging
+      namespace: knative-serving
+  - apiVersion: v1
+    data:
+      ingress-class: kourier.ingress.networking.knative.dev
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: 73d96d1b
+      labels:
+        app.kubernetes.io/component: networking
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-network
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: fed4756e
+      labels:
+        app.kubernetes.io/component: observability
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-observability
+      namespace: knative-serving
+  - apiVersion: v1
+    data: {}
+    kind: ConfigMap
+    metadata:
+      annotations:
+        knative.dev/example-checksum: "26614636"
+      labels:
+        app.kubernetes.io/component: tracing
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config-tracing
+      namespace: knative-serving
+  - apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app.kubernetes.io/component: activator
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: activator
+      namespace: knative-serving
+    spec:
+      maxReplicas: 20
+      metrics:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 100
+            type: Utilization
+        type: Resource
+      minReplicas: 1
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: activator
+  - apiVersion: policy/v1
+    kind: PodDisruptionBudget
+    metadata:
+      labels:
+        app.kubernetes.io/component: activator
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: activator-pdb
+      namespace: knative-serving
+    spec:
+      minAvailable: 80%
+      selector:
+        matchLabels:
+          app: activator
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: activator
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: activator
+      namespace: knative-serving
+    spec:
+      selector:
+        matchLabels:
+          app: activator
+          role: activator
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: activator
+            app.kubernetes.io/component: activator
+            app.kubernetes.io/name: knative-serving
+            app.kubernetes.io/version: 1.8.3
+            role: activator
+        spec:
+          containers:
+          - env:
+            - name: GOGC
+              value: "500"
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: METRICS_DOMAIN
+              value: knative.dev/internal/serving
+            image: gcr.io/knative-releases/knative.dev/serving/cmd/activator@sha256:24c6c8de9a6872ca796a13d1e8324a4dd250aacc5094975b60ce235122abb97f
+            livenessProbe:
+              failureThreshold: 12
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: activator
+                port: 8012
+              initialDelaySeconds: 15
+              periodSeconds: 10
+            name: activator
+            ports:
+            - containerPort: 9090
+              name: metrics
+            - containerPort: 8008
+              name: profiling
+            - containerPort: 8012
+              name: http1
+            - containerPort: 8013
+              name: h2c
+            readinessProbe:
+              failureThreshold: 5
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: activator
+                port: 8012
+              periodSeconds: 5
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 600Mi
+              requests:
+                cpu: 300m
+                memory: 60Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          serviceAccountName: controller
+          terminationGracePeriodSeconds: 600
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: activator
+        app.kubernetes.io/component: activator
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: activator-service
+      namespace: knative-serving
+    spec:
+      ports:
+      - name: http-metrics
+        port: 9090
+        targetPort: 9090
+      - name: http-profiling
+        port: 8008
+        targetPort: 8008
+      - name: http
+        port: 80
+        targetPort: 8012
+      - name: http2
+        port: 81
+        targetPort: 8013
+      - name: https
+        port: 443
+        targetPort: 8112
+      selector:
+        app: activator
+      type: ClusterIP
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: autoscaler
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: autoscaler
+      namespace: knative-serving
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: autoscaler
+      strategy:
+        rollingUpdate:
+          maxUnavailable: 0
+        type: RollingUpdate
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: autoscaler
+            app.kubernetes.io/component: autoscaler
+            app.kubernetes.io/name: knative-serving
+            app.kubernetes.io/version: 1.8.3
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app: autoscaler
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+          containers:
+          - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: METRICS_DOMAIN
+              value: knative.dev/serving
+            image: gcr.io/knative-releases/knative.dev/serving/cmd/autoscaler@sha256:f26a8b516112413cbba4244b36202354d1c98ed209301b255c55958213708a78
+            livenessProbe:
+              failureThreshold: 6
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: autoscaler
+                port: 8080
+            name: autoscaler
+            ports:
+            - containerPort: 9090
+              name: metrics
+            - containerPort: 8008
+              name: profiling
+            - containerPort: 8080
+              name: websocket
+            readinessProbe:
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: autoscaler
+                port: 8080
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1000Mi
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          serviceAccountName: controller
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: autoscaler
+        app.kubernetes.io/component: autoscaler
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: autoscaler
+      namespace: knative-serving
+    spec:
+      ports:
+      - name: http-metrics
+        port: 9090
+        targetPort: 9090
+      - name: http-profiling
+        port: 8008
+        targetPort: 8008
+      - name: http
+        port: 8080
+        targetPort: 8080
+      selector:
+        app: autoscaler
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: controller
+      namespace: knative-serving
+    spec:
+      selector:
+        matchLabels:
+          app: controller
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+          labels:
+            app: controller
+            app.kubernetes.io/component: controller
+            app.kubernetes.io/name: knative-serving
+            app.kubernetes.io/version: 1.8.3
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app: controller
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+          containers:
+          - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: METRICS_DOMAIN
+              value: knative.dev/internal/serving
+            image: gcr.io/knative-releases/knative.dev/serving/cmd/controller@sha256:ea48ea2f2433cc7e5c25940e79465ca7226750260faaa1724b95dd8cfac92034
+            name: controller
+            ports:
+            - containerPort: 9090
+              name: metrics
+            - containerPort: 8008
+              name: profiling
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 1000Mi
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          serviceAccountName: controller
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: controller
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: controller
+      namespace: knative-serving
+    spec:
+      ports:
+      - name: http-metrics
+        port: 9090
+        targetPort: 9090
+      - name: http-profiling
+        port: 8008
+        targetPort: 8008
+      selector:
+        app: controller
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: domain-mapping
+      namespace: knative-serving
+    spec:
+      selector:
+        matchLabels:
+          app: domain-mapping
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+          labels:
+            app: domain-mapping
+            app.kubernetes.io/component: domain-mapping
+            app.kubernetes.io/name: knative-serving
+            app.kubernetes.io/version: 1.8.3
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app: domain-mapping
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+          containers:
+          - env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: METRICS_DOMAIN
+              value: knative.dev/serving
+            image: gcr.io/knative-releases/knative.dev/serving/cmd/domain-mapping@sha256:9197c51406208c8f3cc98c2b1f69ed2ba8b88e11cf765616700abecc5dd18350
+            name: domain-mapping
+            ports:
+            - containerPort: 9090
+              name: metrics
+            - containerPort: 8008
+              name: profiling
+            resources:
+              limits:
+                cpu: 300m
+                memory: 400Mi
+              requests:
+                cpu: 30m
+                memory: 40Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          serviceAccountName: controller
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: domainmapping-webhook
+      namespace: knative-serving
+    spec:
+      selector:
+        matchLabels:
+          app: domainmapping-webhook
+          role: domainmapping-webhook
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: domainmapping-webhook
+            app.kubernetes.io/component: domain-mapping
+            app.kubernetes.io/name: knative-serving
+            app.kubernetes.io/version: 1.8.3
+            role: domainmapping-webhook
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app: domainmapping-webhook
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+          containers:
+          - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: WEBHOOK_PORT
+              value: "8443"
+            - name: METRICS_DOMAIN
+              value: knative.dev/serving
+            image: gcr.io/knative-releases/knative.dev/serving/cmd/domain-mapping-webhook@sha256:1b6e7f382c878f8ac168ce36a92f1af4dbdac0f61aae9e73fe899486786a4bbf
+            livenessProbe:
+              failureThreshold: 6
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: webhook
+                port: 8443
+                scheme: HTTPS
+              initialDelaySeconds: 20
+              periodSeconds: 1
+            name: domainmapping-webhook
+            ports:
+            - containerPort: 9090
+              name: metrics
+            - containerPort: 8008
+              name: profiling
+            - containerPort: 8443
+              name: https-webhook
+            readinessProbe:
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: webhook
+                port: 8443
+                scheme: HTTPS
+              periodSeconds: 1
+            resources:
+              limits:
+                cpu: 500m
+                memory: 500Mi
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          serviceAccountName: controller
+          terminationGracePeriodSeconds: 300
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        role: domainmapping-webhook
+      name: domainmapping-webhook
+      namespace: knative-serving
+    spec:
+      ports:
+      - name: http-metrics
+        port: 9090
+        targetPort: 9090
+      - name: http-profiling
+        port: 8008
+        targetPort: 8008
+      - name: https-webhook
+        port: 443
+        targetPort: 8443
+      selector:
+        role: domainmapping-webhook
+  - apiVersion: autoscaling/v2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: webhook
+      namespace: knative-serving
+    spec:
+      maxReplicas: 5
+      metrics:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 100
+            type: Utilization
+        type: Resource
+      minReplicas: 1
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: webhook
+  - apiVersion: policy/v1
+    kind: PodDisruptionBudget
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: webhook-pdb
+      namespace: knative-serving
+    spec:
+      minAvailable: 80%
+      selector:
+        matchLabels:
+          app: webhook
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: webhook
+      namespace: knative-serving
+    spec:
+      selector:
+        matchLabels:
+          app: webhook
+          role: webhook
+      template:
+        metadata:
+          annotations:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          labels:
+            app: webhook
+            app.kubernetes.io/name: knative-serving
+            app.kubernetes.io/version: 1.8.3
+            role: webhook
+        spec:
+          affinity:
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app: webhook
+                  topologyKey: kubernetes.io/hostname
+                weight: 100
+          containers:
+          - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: WEBHOOK_NAME
+              value: webhook
+            - name: WEBHOOK_PORT
+              value: "8443"
+            - name: METRICS_DOMAIN
+              value: knative.dev/internal/serving
+            image: gcr.io/knative-releases/knative.dev/serving/cmd/webhook@sha256:e271d46b5168e25e9742f6f33a461cfcdc17b2460d4355fff7fe0c71fc1e4378
+            livenessProbe:
+              failureThreshold: 6
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: webhook
+                port: 8443
+                scheme: HTTPS
+              initialDelaySeconds: 20
+              periodSeconds: 1
+            name: webhook
+            ports:
+            - containerPort: 9090
+              name: metrics
+            - containerPort: 8008
+              name: profiling
+            - containerPort: 8443
+              name: https-webhook
+            readinessProbe:
+              httpGet:
+                httpHeaders:
+                - name: k-kubelet-probe
+                  value: webhook
+                port: 8443
+                scheme: HTTPS
+              periodSeconds: 1
+            resources:
+              limits:
+                cpu: 500m
+                memory: 500Mi
+              requests:
+                cpu: 100m
+                memory: 100Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile:
+                type: RuntimeDefault
+          serviceAccountName: controller
+          terminationGracePeriodSeconds: 300
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+        role: webhook
+      name: webhook
+      namespace: knative-serving
+    spec:
+      ports:
+      - name: http-metrics
+        port: 9090
+        targetPort: 9090
+      - name: http-profiling
+        port: 8008
+        targetPort: 8008
+      - name: https-webhook
+        port: 443
+        targetPort: 8443
+      selector:
+        role: webhook
+  - apiVersion: admissionregistration.k8s.io/v1
+    kind: ValidatingWebhookConfiguration
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: config.webhook.serving.knative.dev
+    webhooks:
+    - admissionReviewVersions:
+      - v1
+      - v1beta1
+      clientConfig:
+        service:
+          name: webhook
+          namespace: knative-serving
+      failurePolicy: Fail
+      name: config.webhook.serving.knative.dev
+      objectSelector:
+        matchExpressions:
+        - key: app.kubernetes.io/name
+          operator: In
+          values:
+          - knative-serving
+        - key: app.kubernetes.io/component
+          operator: In
+          values:
+          - autoscaler
+          - controller
+          - logging
+          - networking
+          - observability
+          - tracing
+      sideEffects: None
+      timeoutSeconds: 10
+  - apiVersion: admissionregistration.k8s.io/v1
+    kind: MutatingWebhookConfiguration
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: webhook.serving.knative.dev
+    webhooks:
+    - admissionReviewVersions:
+      - v1
+      - v1beta1
+      clientConfig:
+        service:
+          name: webhook
+          namespace: knative-serving
+      failurePolicy: Fail
+      name: webhook.serving.knative.dev
+      rules:
+      - apiGroups:
+        - autoscaling.internal.knative.dev
+        - networking.internal.knative.dev
+        - serving.knative.dev
+        apiVersions:
+        - '*'
+        operations:
+        - CREATE
+        - UPDATE
+        resources:
+        - metrics
+        - podautoscalers
+        - certificates
+        - ingresses
+        - serverlessservices
+        - configurations
+        - revisions
+        - routes
+        - services
+        scope: '*'
+      sideEffects: None
+      timeoutSeconds: 10
+  - apiVersion: admissionregistration.k8s.io/v1
+    kind: MutatingWebhookConfiguration
+    metadata:
+      labels:
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: webhook.domainmapping.serving.knative.dev
+    webhooks:
+    - admissionReviewVersions:
+      - v1
+      - v1beta1
+      clientConfig:
+        service:
+          name: domainmapping-webhook
+          namespace: knative-serving
+      failurePolicy: Fail
+      name: webhook.domainmapping.serving.knative.dev
+      rules:
+      - apiGroups:
+        - serving.knative.dev
+        apiVersions:
+        - '*'
+        operations:
+        - CREATE
+        - UPDATE
+        resources:
+        - domainmappings
+        - domainmappings/status
+        scope: '*'
+      sideEffects: None
+      timeoutSeconds: 10
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: domainmapping-webhook-certs
+      namespace: knative-serving
+  - apiVersion: admissionregistration.k8s.io/v1
+    kind: ValidatingWebhookConfiguration
+    metadata:
+      labels:
+        app.kubernetes.io/component: domain-mapping
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: validation.webhook.domainmapping.serving.knative.dev
+    webhooks:
+    - admissionReviewVersions:
+      - v1
+      - v1beta1
+      clientConfig:
+        service:
+          name: domainmapping-webhook
+          namespace: knative-serving
+      failurePolicy: Fail
+      name: validation.webhook.domainmapping.serving.knative.dev
+      rules:
+      - apiGroups:
+        - serving.knative.dev
+        apiVersions:
+        - '*'
+        operations:
+        - CREATE
+        - UPDATE
+        - DELETE
+        resources:
+        - domainmappings
+        - domainmappings/status
+        scope: '*'
+      sideEffects: None
+      timeoutSeconds: 10
+  - apiVersion: admissionregistration.k8s.io/v1
+    kind: ValidatingWebhookConfiguration
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: validation.webhook.serving.knative.dev
+    webhooks:
+    - admissionReviewVersions:
+      - v1
+      - v1beta1
+      clientConfig:
+        service:
+          name: webhook
+          namespace: knative-serving
+      failurePolicy: Fail
+      name: validation.webhook.serving.knative.dev
+      rules:
+      - apiGroups:
+        - autoscaling.internal.knative.dev
+        - networking.internal.knative.dev
+        - serving.knative.dev
+        apiVersions:
+        - '*'
+        operations:
+        - CREATE
+        - UPDATE
+        - DELETE
+        resources:
+        - metrics
+        - podautoscalers
+        - certificates
+        - ingresses
+        - serverlessservices
+        - configurations
+        - revisions
+        - routes
+        - services
+        scope: '*'
+      sideEffects: None
+      timeoutSeconds: 10
+  - apiVersion: v1
+    kind: Secret
+    metadata:
+      labels:
+        app.kubernetes.io/component: webhook
+        app.kubernetes.io/name: knative-serving
+        app.kubernetes.io/version: 1.8.3
+      name: webhook-certs
+      namespace: knative-serving
   xaasCrd:
     apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition

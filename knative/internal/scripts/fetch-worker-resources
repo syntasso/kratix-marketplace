@@ -3,9 +3,15 @@
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
 urls=(
-    "https://github.com/knative/serving/releases/download/knative-v1.8.3/serving-crds.yaml"
+    "https://github.com/knative/serving/releases/download/knative-v1.8.3/serving-core.yaml"
 )
 
+rm -rf $PWD/resources/*
+
 for url in "${urls[@]}"; do
-    curl -sL -o $PWD/resources/$(basename $url) $url
+    curl -sL $url \
+        | yq '(select(.metadata.name == "config-domain") | .data ) = { "local.gd": "" }' \
+        | yq '(select(.metadata.name == "config-network") | .data.ingress-class ) = "kourier.ingress.networking.knative.dev"' \
+        | yq 'del(.data._example)' \
+        > $PWD/resources/$(basename $url)
 done
