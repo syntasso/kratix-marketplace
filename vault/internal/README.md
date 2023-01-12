@@ -68,7 +68,7 @@ Once deployed we need to setup Vault:
       bound_service_account_namespaces=default \
       policies=app \
       ttl=1h
-```
+    ```
 7. `vault secrets enable -path=secret kv`
 8. `vault kv put secret/helloworld username=foobaruser password=foobarbazpass`
 
