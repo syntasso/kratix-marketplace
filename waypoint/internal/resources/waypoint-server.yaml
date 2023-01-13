@@ -419,7 +419,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: waypoint-bootstrap-0.10.5-1bg620
+  name: waypoint-bootstrap-0.10.5-8jlvhj
   namespace: waypoint
   labels:
     app.kubernetes.io/name: waypoint
