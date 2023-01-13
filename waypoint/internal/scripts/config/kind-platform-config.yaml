@@ -1,0 +1,14 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+  - role: control-plane
+    extraPortMappings:
+      # These allow localhost ports to be open for the specfied NodePort service
+      # on every cluster creation. While these services are not always running,
+      # they are commonly used and accessed.
+      - containerPort: 30001
+        hostPort: 30001
+      - containerPort: 30002
+        hostPort: 30002
+      - containerPort: 30003
+        hostPort: 30003

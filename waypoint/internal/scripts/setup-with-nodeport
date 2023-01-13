@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+yq eval -i "select(.kind == \"Service\" and .metadata.labels[\"component\"] == \"ui\").spec.type |= \"NodePort\" |
+            select(.kind == \"Service\" and .metadata.labels[\"component\"] == \"ui\").spec.ports = [
+                    {\"name\": \"http\", \"port\": 80, \"targetPort\": \"http\" },
+                    {\"name\": \"https\", \"port\": 443, \"nodePort\": 30003, \"targetPort\": \"https\"},
+                    {\"name\": \"grpc\", \"port\": 9701, \"nodePort\": 30001, \"targetPort\": \"grpc\"},
+                    {\"name\": \"https-2\", \"port\": 9702, \"nodePort\": 30002, \"targetPort\": \"https\"}
+                  ]" ${PWD}/resources/waypoint-server.yaml
+
+sh ${PWD}/scripts/inject-wcr
+
+kind delete cluster --name platform
+kind create cluster --name platform --config ${PWD}/scripts/config/kind-platform-config.yaml
+
+images=(
+    minio/minio:RELEASE.2022-06-30T20-58-09Z
+    gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+    $(curl https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml | grep "image: syntasso/kratix-platform:" | awk '{print $2}')
+)
+
+for image in "${images[@]}"; do
+    docker pull $image
+    kind load docker-image --name platform $image
+done
+
+kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml
+kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
+
+while ! kubectl get namespace kratix-worker-system --context kind-platform >/dev/null 2>&1; do
+    echo -n "."
+    sleep 2
+done
+
+echo "Kratix is installed"

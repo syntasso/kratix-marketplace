@@ -14,7 +14,14 @@ To build run:
 
 ### Switch to NodePort
 
-To use the NodePort comment in the lines at the bottom of the ./scripts/fetch-worker-resources and then follow the above build instructions to regenerate the Promise `workerClusterResources`.
+To use the NodePort to run `./scripts/setup-with-nodeport` which will provide:
+
+* A local KinD cluster that:
+    * Has ports 30001, 30002, 30003 exposed
+    * Is running Kratix
+* Updates to the Promise resources that support NodePort
+
+You are now ready to apply the Promise and make Resource Requests per the top level README.
 
 ## Pipeline image
 
