@@ -12,12 +12,19 @@ kind: Job
 metadata:
   name: TBDNAME-token-generator
   namespace: waypoint
+  labels:
+    app.kubernetes.io/name: waypoint
+    app.kubernetes.io/instance: waypoint
 spec:
   backoffLimit: 1
   activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 86400 # 24 hours
   template:
     metadata:
       name: TBDNAME-token-generator
+      labels:
+        app.kubernetes.io/name: waypoint
+        app.kubernetes.io/instance: waypoint
     spec:
       serviceAccountName: waypoint-token-generator
       restartPolicy: OnFailure

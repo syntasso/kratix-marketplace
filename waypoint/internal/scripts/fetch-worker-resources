@@ -110,6 +110,7 @@ metadata:
 spec:
   backoffLimit: 1
   activeDeadlineSeconds: 60
+  ttlSecondsAfterFinished: 86400 # 24 hours
   template:
     metadata:
       name: waypoint-init-secret

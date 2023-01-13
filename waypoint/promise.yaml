@@ -89,6 +89,7 @@ spec:
             name: runner-token
           restartPolicy: Never
           serviceAccountName: waypoint-token-generator
+      ttlSecondsAfterFinished: 86400
   - apiVersion: batch/v1
     kind: Job
     metadata:
@@ -522,7 +523,7 @@ spec:
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: waypoint
         helm.sh/chart: waypoint-0.1.17
-      name: waypoint-bootstrap-0.10.5-8jlvhj
+      name: waypoint-bootstrap-0.10.5-qk5f11
       namespace: waypoint
     spec:
       activeDeadlineSeconds: 600
