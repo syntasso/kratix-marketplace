@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl wait --for=condition=ready --timeout=5s --namespace waypoint pod/waypoint-server-0
+  kubectl wait --for=condition=ready --timeout=5s --namespace waypoint pod/waypoint-runner-0
+}
+
+test_resource_request() {
+  kubectl get secrets --namespace waypoint annedeveloper-token-generator
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

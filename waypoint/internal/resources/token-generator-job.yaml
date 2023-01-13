@@ -1,0 +1,25 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: waypoint-token-generator
+  namespace: waypoint
+  labels:
+    app.kubernetes.io/name: waypoint
+spec:
+  backoffLimit: 1
+  activeDeadlineSeconds: 600
+  ttlSecondsAfterFinished: 86400 # 24h
+  template:
+    metadata:
+      name: waypoint-token-generator
+      labels:
+        app.kubernetes.io/name: waypoint
+    spec:
+      serviceAccountName: waypoint-token-generator
+      restartPolicy: Never
+      containers:
+        - name: token-generator
+          image: ghcr.io/syntasso/kratix-marketplace/waypoint-token-generator:v1
+          imagePullPolicy: IfNotPresent
+          command: ["generate-token", "--username admin", "--bootstrap"]

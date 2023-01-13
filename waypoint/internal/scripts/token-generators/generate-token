@@ -1,0 +1,114 @@
+#! /bin/sh
+
+set -euo pipefail
+
+WAYPOINT_USERNAME=""
+TOKEN_NAME_TO_GENERATE=""
+TOKEN_NAME_ADMIN="waypoint-token-admin"
+WAYPOINT_UI_ADDR=waypoint-ui.waypoint.svc:9701
+BOOTSTRAP_REQUIRED=false
+
+usage() {
+    echo "Usage: generate-token [--help] [--username ''] [--bootstrap]"
+    echo "\t--help, -h\t Prints this message"
+    echo "\t--username '', -u\t Required: The name of the Waypoint user to create"
+    echo "\t--bootstrap, -b\t Waits for the bootstrap token to be available"
+    exit "${1:-0}"
+}
+
+load_options() {
+    for arg in "$@"; do
+      shift
+      case "$arg" in
+        '--help')      set -- "$@" '-h'   ;;
+        '--username')  set -- "$@" '-u'   ;;
+        '--bootstrap') set -- "$@" '-b'   ;;
+        *)             set -- "$@" "$arg" ;;
+      esac
+    done
+
+    OPTIND=1
+    while getopts "hu:b" opt
+    do
+      case "$opt" in
+        'h') usage ;;
+        'u') WAYPOINT_USERNAME=${OPTARG} ;;
+        'b') BOOTSTRAP_REQUIRED=true ;;
+        *) usage 1 ;;
+      esac
+    done
+    shift $(expr $OPTIND - 1)
+
+    if [ "${WAYPOINT_USERNAME}" == "" ]; then echo "username is required\n"; usage; exit 1; fi
+
+    TOKEN_NAME_TO_GENERATE="waypoint-token-${WAYPOINT_USERNAME}"
+}
+
+wait_for_bootstrap_token_to_be_populated() {
+    local loops=0
+    local bootstrap_token_name=waypoint-server-token
+    echo "bootstrap flag set, requiring bootstrap secret '${bootstrap_token_name}' to be available"
+    while [ -z $(kubectl get secret ${bootstrap_token_name} --output json | jq -r '.data.token') ]; do
+        if [ $loops -ge 120 ]; then
+            echo "Bootstrap token never was populated. Unable to authenticate and create token for '${TOKEN_NAME_TO_GENERATE}'"
+            exit 1
+        fi
+        echo -n '.'
+        sleep 2
+        loops=$(( loops + 1 ))
+    done
+    echo '✅'
+}
+
+waypoint_login_with_bootstrap_token() {
+    echo "authenticating with bootstrap token"
+    waypoint login \
+        -server-addr=${WAYPOINT_UI_ADDR} \
+        -server-tls-skip-verify \
+        -from-kubernetes \
+        -from-kubernetes-namespace=waypoint
+}
+
+create_k8s_secret() {
+    local secret_name=$1
+    local username=$2
+    echo "creating secret '${secret_name}' with Waypoint user invite for '${username}'"
+    kubectl create secret generic \
+        --from-literal=token=$(waypoint user invite --username=${username} | tr -d '\n') \
+        ${secret_name}
+}
+
+patch_k8s_secret() {
+    local secret_name=$1
+    local username=$2
+    echo "patching exiting secret '${secret_name}'"
+    kubectl patch secret \
+        --patch="{\"data\": {\"token\": \"$(waypoint user token --username=${username} | tr -d '\n' | base64 -w0)\"}}" \
+        ${secret_name}
+}
+
+generate_token() {
+    echo "generating a token for '${TOKEN_NAME_TO_GENERATE}'"
+    if ${BOOTSTRAP_REQUIRED}; then wait_for_bootstrap_token_to_be_populated; fi
+
+    if kubectl get secret ${TOKEN_NAME_ADMIN}; then
+        echo "authenticating with existing admin token"
+        waypoint login \
+            -server-addr=${WAYPOINT_UI_ADDR} \
+            -server-tls-skip-verify \
+            -token=$(kubectl get secret ${TOKEN_NAME_ADMIN} --output json | jq -r '.data.token' | base64 -d)
+    else
+        waypoint_login_with_bootstrap_token
+        create_k8s_secret ${TOKEN_NAME_ADMIN} admin
+        exit 0
+    fi
+
+    if kubectl get secret ${TOKEN_NAME_TO_GENERATE}; then
+        patch_k8s_secret ${TOKEN_NAME_TO_GENERATE} ${WAYPOINT_USERNAME}
+    else
+        create_k8s_secret ${TOKEN_NAME_TO_GENERATE} ${WAYPOINT_USERNAME}
+    fi
+}
+
+load_options $@
+generate_token

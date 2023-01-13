@@ -119,6 +119,7 @@ workflows:
             parameters:
               promise:
                 - argocd-application
+                - crossplane
                 - dex-group-authentication
                 - istio
                 - jenkins
@@ -128,6 +129,6 @@ workflows:
                 - nginx-ingress
                 - postgresql
                 - redis
-                - vault
-                - crossplane
                 - slack
+                - vault
+                - waypoint
