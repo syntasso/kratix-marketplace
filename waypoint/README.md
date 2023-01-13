@@ -8,6 +8,16 @@ The Promise has 1 field:
 Check the CRD documentation for more information.
 
 To install:
+
+> **Warning**
+> 
+> **By default Waypoint requires a LoadBalancer Service type**
+> 
+> **If you are running [KinD]() or any other cluster without support by default, please either:**
+> **1. Follow cluster software instructions to install LoadBalancers (e.g. here)**
+> **2. Change this Promise to use NodePort type Services (see: [Developer Readme](./internal/README.md#switch-to-nodeport))**
+
+
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/waypoint/promise.yaml
 ```
