@@ -13,8 +13,8 @@ To install:
 > 
 > **By default Waypoint requires a LoadBalancer Service type**
 > 
-> **If you are running [KinD]() or any other cluster without support by default, please either:**
-> **1. Follow cluster software instructions to install LoadBalancers (e.g. here)**
+> **If you are running [KinD](https://kind.sigs.k8s.io/docs/user/quick-start/) or any other cluster without support by default, please either:**
+> **1. Follow cluster software instructions to install LoadBalancers (e.g. [here](https://kind.sigs.k8s.io/docs/user/loadbalancer/))**
 > **2. Change this Promise to use NodePort type Services (see: [Developer Readme](./internal/README.md#switch-to-nodeport))**
 
 
