@@ -131,4 +131,3 @@ workflows:
                 - redis
                 - slack
                 - vault
-                - waypoint
