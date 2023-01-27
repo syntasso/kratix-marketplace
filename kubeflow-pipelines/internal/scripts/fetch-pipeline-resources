@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -e
+
+ROOT="$( cd $(dirname $0)/.. && pwd)"
+
+resourcesdir=$ROOT/request-pipeline/resources/
+
+mkdir -p $resourcesdir
+rm -rf ${resourcesdir}/*
+
+
+repodir="/tmp/kubeflow-pipelines"
+
+exec 2>&1 1>/dev/null
+
+if [ ! -d ${repodir} ]; then
+    git clone git@github.com:kubeflow/pipelines.git ${repodir}
+else
+    git reset --hard origin/HEAD
+fi
+
+namespace="TBDNAMESPACE"
+
+pushd ${repodir}
+    git checkout v2.0.0.0b2
+
+    pushd manifests/kustomize/
+        pushd base/installs/generic
+            # disable the cache-server
+            yq 'del(.bases[1,2])' kustomization.yaml > kustomization.yaml.tmp
+            mv kustomization.yaml.tmp kustomization.yaml
+        popd
+
+        pushd cluster-scoped-resources
+            kustomize edit set namespace ${namespace}
+        popd
+
+        pushd env/platform-agnostic-pns
+            kustomize edit set namespace ${namespace}
+        popd
+
+        kustomize build env/platform-agnostic-pns > ${resourcesdir}/manifest.yaml
+    popd
+    git reset --hard origin/HEAD
+popd
+
+kubectl create namespace ${namespace} --dry-run=client -o yaml > ${resourcesdir}/namespace.yaml

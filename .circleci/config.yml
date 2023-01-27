@@ -125,6 +125,7 @@ workflows:
                 - jenkins
                 - kafka
                 - knative
+                - kubeflow-pipelines
                 - namespace
                 - nginx-ingress
                 - redis

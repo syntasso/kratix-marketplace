@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+ROOT="$( cd $(dirname $0)/.. && pwd)"
+
+repodir="/tmp/kubeflow-pipelines"
+
+if [ ! -d ${repodir} ]; then
+    git clone git@github.com:kubeflow/pipelines.git ${repodir}
+fi
+
+resourcesdir=${ROOT}/resources
+
+rm -rf ${resourcesdir}/*
+mkdir -p ${resourcesdir}
+
+pushd ${repodir}
+    git checkout v2.0.0.0b2
+
+    kustomize build manifests/kustomize/cluster-scoped-resources/ > ${resourcesdir}/kubeflow.yaml
+
+    git reset --hard origin/HEAD
+popd

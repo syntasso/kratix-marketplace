@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl wait crd/applications.app.k8s.io --for condition=established --timeout=60s
+}
+
+test_resource_request() {
+  kubectl wait pods -l application-crd-id=kubeflow-pipelines -n kf-example --for condition=Ready --timeout=60s
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
