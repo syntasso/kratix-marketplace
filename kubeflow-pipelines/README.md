@@ -1,6 +1,6 @@
 # Kubeflow Pipelines
 
-This Promise provides Kubeflow Pipelines.
+This Promise provides [Kubeflow Pipelines](https://www.kubeflow.org/docs/components/pipelines/v1/introduction/).
 
 To install:
 ```
