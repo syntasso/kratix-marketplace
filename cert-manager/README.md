@@ -1,18 +1,3 @@
-# Kubeflow Pipelines
-
-This Promise provides Kubeflow Pipelines.
-
-To install:
-```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubeflow-pipelines/promise.yaml
-```
-
-To verify the installation:
-
-```shell-session
-kubectl wait crd/applications.app.k8s.io --for condition=established --timeout=60s
-```
-
 # Cert-manager
 
 This Promise provides [cert-manager](https://cert-manager.io/docs/) to a
