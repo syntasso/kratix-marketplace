@@ -1,4 +1,4 @@
-# Cert-manager
+# cert-manager
 
 This Promise provides [cert-manager](https://cert-manager.io/docs/) to a
 Cluster. Installing the Promise will install cert-manager under the
