@@ -10,7 +10,7 @@ kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/
 
 This will install the Kafka Operator into your clusters. To verify the Kafka Operator is
 installed, run the following command while targeting a Worker cluster:
-```
+```shell-session
 $ kubectl --namespace kafka get deployments
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
 strimzi-cluster-operator   1/1     1            1           89s
@@ -18,7 +18,7 @@ strimzi-cluster-operator   1/1     1            1           89s
 
 To get a Kafka instance make a resource request (small by default), run the
 following command while targeting your Platform cluster:
-```
+```shell-session
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kafka/resource-request.yaml
 ```
 
