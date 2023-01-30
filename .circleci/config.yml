@@ -1,138 +1,27 @@
 version: 2.1
 
+# this allows you to use CircleCI's dynamic configuration feature
+setup: true
+
+# the continuation orb is required in order to use dynamic configuration
 orbs:
-  k8s: circleci/kubernetes@1.3.1
-  retry: kimh/run-with-retry@1.0.0
+  continuation: circleci/continuation@0.1.2
 
-executors:
-  machine-medium:
-    machine: true
-    resource_class: medium
-    working_directory: ~/repo
-  machine-large:
-    machine: true
-    resource_class: large
-    working_directory: ~/repo
-
-commands:
-  install_software:
-    steps:
-      - k8s/install
-      - run:
-          name: Install tools and deps
-          command: |
-            if [ ! -f ~/bin/kind ]; then
-              curl -L https://github.com/kubernetes-sigs/kind/releases/download/v0.14.0/kind-linux-amd64 -o ~/bin/kind
-              chmod +x ~/bin/kind
-            fi
-
-            curl -L https://github.com/syntasso/kratix/releases/download/v0.0.1/worker-resource-builder-v0.0.0-1-linux-amd64 -o ~/bin/worker-resource-builder
-            chmod +x ~/bin/worker-resource-builder
-      - run:
-          name: Install Kratix
-          command: |
-            kind create cluster --name platform
-            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml
-            sleep 5
-            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
-            sleep 5
-      - attach_workspace:
-          at: .
-
+# our defined job, and its steps
 jobs:
-  test-and-push:
-    parameters:
-      promise:
-        type: string
-    executor:
-      name: machine-large
+  setup:
+    executor: continuation/default
     steps:
-      - install_software
-      - checkout
-      - run:
-          working_directory: ~/repo/<< parameters.promise >>
-          name: Validate no pending changes
+      - checkout # checkout code
+      - run: # run a command
+          name: Generate config
           command: |
-            ./internal/scripts/inject-wcr
+            ./.circleci/scripts/generate-config > generated_config.yaml
+      - continuation/continue:
+          configuration_path: generated_config.yml # use newly generated config to continue
 
-            if ! git diff --exit-code .; then
-              echo ""
-              echo "Changes in the WCR were detected"
-              echo "Injection of WCR via CI is not supported. Please commit and push them manually."
-              exit 1
-            fi
-      - run:
-          name: Install Promise
-          working_directory: ~/repo/<< parameters.promise >>
-          command: |
-            kubectl create --filename promise.yaml
-            if test -f ./internal/scripts/pipeline-image; then
-              ./internal/scripts/pipeline-image build load
-            fi
-      - retry/run-with-retry:
-          command: << parameters.promise >>/internal/scripts/test promise
-          # 5 minutes total retry (3 sec * 100 times = 300 sec)
-          sleep: 3
-          retry-count: 100
-      - run:
-          name: Apply resource-request
-          working_directory: ~/repo/<< parameters.promise >>
-          command: |
-            if test -f "resource-request.yaml"; then
-              kubectl apply --filename resource-request.yaml
-            fi
-      - retry/run-with-retry:
-          command: << parameters.promise >>/internal/scripts/test resource-request
-          # 5 minutes total retry (3 sec * 100 times = 300 sec)
-          sleep: 3
-          retry-count: 100
-      - when:
-          condition:
-            equal: [main, << pipeline.git.branch >>]
-          steps:
-            - run:
-                name: GHCR Push
-                working_directory: ~/repo/<< parameters.promise >>
-                command: |
-                  if test -f ./internal/scripts/pipeline-image; then
-                    echo "$GITHUB_PACKAGES_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
-                    ./internal/scripts/pipeline-image push
-                  fi
-            - run:
-                name: Verify package is public
-                working_directory: ~/repo/<< parameters.promise >>
-                command: |
-                  if test -f "internal/request-pipeline/Dockerfile"; then
-                    visibility=$(curl -sL \
-                      -H "Accept: application/vnd.github+json"\
-                      -H "Authorization: Bearer $GITHUB_PACKAGES_TOKEN" \
-                      -H "X-GitHub-Api-Version: 2022-11-28" \
-                      "https://api.github.com/orgs/syntasso/packages?package_type=container" |
-                    jq -r '.[] | select(.name | contains ("<< parameters.promise >>-request-pipeline")) | .visibility')
-
-                    test "${visibility}" = "public"
-                  fi
-
+# our single workflow, that triggers the setup job defined above
 workflows:
-  promises:
+  setup:
     jobs:
-      - test-and-push:
-          context:
-            - github-credentials
-          matrix:
-            parameters:
-              promise:
-                - argocd-application
-                - cert-manager
-                - crossplane
-                - dex-group-authentication
-                - istio
-                - jenkins
-                - kafka
-                - knative
-                - kubeflow-pipelines
-                - namespace
-                - nginx-ingress
-                - redis
-                - slack
-                - vault
+      - setup

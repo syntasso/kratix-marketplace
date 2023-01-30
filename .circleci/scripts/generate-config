@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -u
+exec 3>&1 1>&2
+
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+promises() {
+    local all_dirs=$(find $ROOT -type d -depth 1)
+
+    declare -a arr
+    for dir in $all_dirs; do
+        if [ -f $dir/promise.yaml ]; then
+            arr+=($dir)
+        fi
+    done
+    echo "${arr[@]}"
+}
+
+latest_commit_sha_for() {
+    local dir=$1
+    git log -1 --format=format:%H --full-diff $dir
+}
+
+updated_on_head() {
+    local dir=$1
+    local sha_on_head=$(git rev-parse HEAD)
+    local sha=$(latest_commit_sha_for $dir)
+    [ "$sha" = "$sha_on_head" ]
+}
+
+pushd $ROOT
+trap popd EXIT
+
+template=/tmp/promise_to_test.yaml
+cp ".circleci/scripts/promise_to_test_template.yaml" $template
+
+target_config=.circleci/promises_to_test.yaml
+
+test_all=false
+if updated_on_head .circleci; then
+    test_all=true
+fi
+
+for promise in $(promises); do
+    if  $test_all || updated_on_head $promise ; then
+        name="$(basename $promise)"
+        if [ "${name:0:1}" = "." ]; then
+            continue
+        fi
+        yq ".workflows.promises.jobs[0].test-and-push.matrix.parameters.promise += [\"$name\"]" $template > $template.upd
+        mv $template.upd $template
+    fi
+done
+
+cat ${template} >&3
