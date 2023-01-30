@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -e
+
+ROOT="$( cd $(dirname $0)/.. && pwd)"
+
+urls=(
+    "https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml"
+)
+
+if [ ! -d ${repodir} ]; then
+    git clone git@github.com:kubeflow/pipelines.git ${repodir}
+fi
+
+resourcesdir=${ROOT}/resources
+
+rm -rf ${resourcesdir}/*
+mkdir -p ${resourcesdir}
+
+for url in ${urls[@]}; do
+    filename=$(basename ${url})
+    curl -sL "${url}" -o ${resourcesdir}/${filename}
+done
