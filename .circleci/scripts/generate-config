@@ -8,7 +8,7 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 workflow=$(curl -sL https://circleci.com/api/v2/insights/gh%2Fsyntasso%2Fkratix-marketplace//workflows/promises | jq -r '[.items[] | select(.status == "success")][0] | .id')
 pipeline=$(curl -sL https://circleci.com/api/v2/workflow/$workflow | jq -r '.pipeline_id')
 
-export LAST_GREEN_SHA=$(curl -sL https://circleci.com/api/v2/pipeline/fd05bc39-535c-4c32-b3f3-e9876a458295 | jq -r '.vcs.revision')
+export LAST_GREEN_SHA=$(curl -sL https://circleci.com/api/v2/pipeline/$pipeline | jq -r '.vcs.revision')
 export UNTESTED_SHAS=$(git log --format=format:%H $LAST_GREEN_SHA~0..HEAD --full-diff)
 
 promises() {
