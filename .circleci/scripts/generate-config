@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 
-set -u
+set -eu
 exec 3>&1 1>&2
 
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
+
+workflow=$(curl -sL https://circleci.com/api/v2/insights/gh%2Fsyntasso%2Fkratix-marketplace//workflows/promises | jq -r '[.items[] | select(.status == "success")][0] | .id')
+pipeline=$(curl -sL https://circleci.com/api/v2/workflow/$workflow | jq -r '.pipeline_id')
+
+export LAST_GREEN_SHA=$(curl -sL https://circleci.com/api/v2/pipeline/fd05bc39-535c-4c32-b3f3-e9876a458295 | jq -r '.vcs.revision')
+export UNTESTED_SHAS=$(git log --format=format:%H $LAST_GREEN_SHA~0..HEAD --full-diff)
 
 promises() {
     local all_dirs=$(find $ROOT -maxdepth 1 -type d)
@@ -17,16 +23,10 @@ promises() {
     echo "${arr[@]}"
 }
 
-latest_commit_sha_for() {
+untested_changes() {
     local dir=$1
-    git log -1 --format=format:%H --full-diff $dir
-}
-
-updated_on_head() {
-    local dir=$1
-    local sha_on_head=$(git rev-parse HEAD)
-    local sha=$(latest_commit_sha_for $dir)
-    [ "$sha" = "$sha_on_head" ]
+    last_sha_for_dir=$(git log -1 --format=format:%H --full-diff $dir)
+    [[ "$UNTESTED_SHAS" =~ "$last_sha_for_dir" ]]
 }
 
 pushd $ROOT
@@ -38,12 +38,15 @@ cp ".circleci/scripts/promise_to_test_template.yaml" $template
 target_config=.circleci/promises_to_test.yaml
 
 test_all=false
-if updated_on_head .circleci; then
-    test_all=true
-fi
+
+for dir in ".circleci scripts"; do
+    if untested_changes $dir; then
+        test_all=true
+    fi
+done
 
 for promise in $(promises); do
-    if  $test_all || updated_on_head $promise ; then
+    if  $test_all || untested_changes $promise ; then
         name="$(basename $promise)"
         if [ "${name:0:1}" = "." ]; then
             continue
