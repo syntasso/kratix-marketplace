@@ -1,29 +1,29 @@
 # Knative
 
 This Promise provides [Knative](https://knative.dev/docs/)-as-a-Service. The Promise has 1 field `.spec.env`
-which can be `dev` or `prod`: 
+which can be `dev` or `prod`:
   * `dev` [Knative Autoscaling-HPA](https://knative.dev/docs/serving/autoscaling/autoscaler-types/#horizontal-pod-autoscaler-hpa) is switched off.
   * `prod` [Knative Autoscaling-HPA](https://knative.dev/docs/serving/autoscaling/autoscaler-types/#horizontal-pod-autoscaler-hpa) is switched on.
 
 
 To install, run the following command while targeting your Platform cluster:
-```
+```shell-session
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/knative/promise.yaml
 ```
 
 To verify Knatives prerequisite CRDs are installed, run the following command while targeting a worker cluster:
-```
+```shell-session
 kubectl get crds | grep knative.dev
 ```
 
 To make a resource request, run the following command while targeting your Platform cluster:
-```
+```shell-session
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/knative/resource-request.yaml
 ```
 
 Once a Resource Request is made, you can see the controller is running by running the
 following command while targeting a worker cluster:
-```
+```shell-session
 kubectl get --namespace knative-serving deployment/controller
 ```
 
