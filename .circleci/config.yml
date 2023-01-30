@@ -119,6 +119,7 @@ workflows:
             parameters:
               promise:
                 - argocd-application
+                - cert-manager
                 - crossplane
                 - dex-group-authentication
                 - istio
