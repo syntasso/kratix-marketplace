@@ -6,7 +6,7 @@ exec 3>&1 1>&2
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../.." && pwd )"
 
 promises() {
-    local all_dirs=$(find $ROOT -type d -depth 1)
+    local all_dirs=$(find $ROOT -maxdepth 1 -type d)
 
     declare -a arr
     for dir in $all_dirs; do
