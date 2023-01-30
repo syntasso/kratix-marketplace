@@ -66,7 +66,9 @@ jobs:
           working_directory: ~/repo/<< parameters.promise >>
           command: |
             kubectl create --filename promise.yaml
-            ./internal/scripts/pipeline-image build load
+            if test -f ./internal/scripts/pipeline-image; then
+              ./internal/scripts/pipeline-image build load
+            fi
       - retry/run-with-retry:
           command: << parameters.promise >>/internal/scripts/test promise
           # 5 minutes total retry (3 sec * 100 times = 300 sec)
@@ -92,8 +94,10 @@ jobs:
                 name: GHCR Push
                 working_directory: ~/repo/<< parameters.promise >>
                 command: |
-                  echo "$GITHUB_PACKAGES_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
-                  ./internal/scripts/pipeline-image push
+                  if test -f ./internal/scripts/pipeline-image; then
+                    echo "$GITHUB_PACKAGES_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
+                    ./internal/scripts/pipeline-image push
+                  fi
             - run:
                 name: Verify package is public
                 working_directory: ~/repo/<< parameters.promise >>
