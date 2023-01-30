@@ -22,6 +22,12 @@ This will create a namespace with the name `metadata.name` of the resource
 request, prefixed with `kf`. The kubeflow pipelines will be deployed at that
 namespace.
 
+To verify the deployment (it can take a few minutes):
+
+```
+kubectl wait pods -l application-crd-id=kubeflow-pipelines -n kf-example --for condition=Ready --timeout=600s
+```
+
 To access the Kubeflow Pipelines UI on http://localhost:8080, run:
 
 ```
