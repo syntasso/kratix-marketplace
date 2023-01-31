@@ -50,7 +50,7 @@ jobs:
       - install_software
       - checkout
       - run:
-          working_directory: ~/repo/<< parameters.promise >>
+          working_directory: ~/repo/<< parameters.promise_dir >>
           name: Validate no pending changes
           command: |
             ./internal/scripts/inject-wcr
@@ -63,26 +63,26 @@ jobs:
             fi
       - run:
           name: Install Promise
-          working_directory: ~/repo/<< parameters.promise >>
+          working_directory: ~/repo/<< parameters.promise_dir >>
           command: |
             kubectl create --filename promise.yaml
             if test -f ./internal/scripts/pipeline-image; then
               ./internal/scripts/pipeline-image build load
             fi
       - retry/run-with-retry:
-          command: << parameters.promise >>/internal/scripts/test promise
+          command: << parameters.promise_dir >>/internal/scripts/test promise
           # 5 minutes total retry (3 sec * 100 times = 300 sec)
           sleep: 3
           retry-count: 100
       - run:
           name: Apply resource-request
-          working_directory: ~/repo/<< parameters.promise >>
+          working_directory: ~/repo/<< parameters.promise_dir >>
           command: |
             if test -f "resource-request.yaml"; then
               kubectl apply --filename resource-request.yaml
             fi
       - retry/run-with-retry:
-          command: << parameters.promise >>/internal/scripts/test resource-request
+          command: << parameters.promise_dir >>/internal/scripts/test resource-request
           # 5 minutes total retry (3 sec * 100 times = 300 sec)
           sleep: 3
           retry-count: 100
@@ -92,7 +92,7 @@ jobs:
           steps:
             - run:
                 name: GHCR Push
-                working_directory: ~/repo/<< parameters.promise >>
+                working_directory: ~/repo/<< parameters.promise_dir >>
                 command: |
                   if test -f ./internal/scripts/pipeline-image; then
                     echo "$GITHUB_PACKAGES_TOKEN" | docker login ghcr.io -u syntassodev --password-stdin
@@ -100,15 +100,16 @@ jobs:
                   fi
             - run:
                 name: Verify package is public
-                working_directory: ~/repo/<< parameters.promise >>
+                working_directory: ~/repo/<< parameters.promise_dir >>
                 command: |
                   if test -f "internal/request-pipeline/Dockerfile"; then
+                    image_name=$(yq '.spec.xaasRequestPipeline' promise.yaml | cut -d "/" -f 4 | cut -d ":" -f 1)
                     visibility=$(curl -sL \
                       -H "Accept: application/vnd.github+json"\
                       -H "Authorization: Bearer $GITHUB_PACKAGES_TOKEN" \
                       -H "X-GitHub-Api-Version: 2022-11-28" \
                       "https://api.github.com/orgs/syntasso/packages?package_type=container" |
-                    jq -r '.[] | select(.name | contains ("<< parameters.promise >>-request-pipeline")) | .visibility')
+                    jq -r ".[] | select(.name | contains (\"${image_name}\")) | .visibility")
 
                     test "${visibility}" = "public"
                   fi
@@ -121,4 +122,4 @@ workflows:
             - github-credentials
           matrix:
             parameters:
-              promise: []
+              promise_dir: []

@@ -51,7 +51,7 @@ for promise in $(promises); do
         if [ "${name:0:1}" = "." ]; then
             continue
         fi
-        yq ".workflows.promises.jobs[0].test-and-push.matrix.parameters.promise += [\"$name\"]" $template > $template.upd
+        yq ".workflows.promises.jobs[0].test-and-push.matrix.parameters.promise_dir += [\"$name\"]" $template > $template.upd
         mv $template.upd $template
     fi
 done
