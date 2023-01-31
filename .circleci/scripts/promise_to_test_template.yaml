@@ -42,7 +42,7 @@ commands:
 jobs:
   test-and-push:
     parameters:
-      promise:
+      promise_dir:
         type: string
     executor:
       name: machine-large
