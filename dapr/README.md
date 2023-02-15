@@ -1,48 +1,17 @@
 # Dapr
 
 
+## Generating worker cluster resources
 helm template dapr dapr/dapr -n dapr-system --create-namespace --version 1.9.6 > helm.yaml
-  helm show crds dapr/dapr --version 1.9.6
 
+helm show crds dapr/dapr --version 1.9.6
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-This Promise provides Dapr-as-a-Service. The Promise has 1 field `.spec.size`
-which can be `small` or `large`.
+This Promise provides install Dapr on all clusters
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/dapr/dapr/promise.yaml
 ```
-
-To make a resource request (small by default):
-```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/resource-request.yaml
-```
-
 ## Development
 
 For development see [README.md](./internal/README.md)
