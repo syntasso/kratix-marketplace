@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  # TODO: set reasonable test for Promise installation that can be run on the worker cluster
+  exit 1
+}
+
+test_resource_request() {
+  # TODO: set reasonable test for Resource Request (RR) installation that can be run on the worker cluster
+  exit 1
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
