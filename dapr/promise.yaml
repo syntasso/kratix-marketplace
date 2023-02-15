@@ -1,0 +1,1649 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  creationTimestamp: null
+  name: dapr
+  namespace: default
+spec:
+  workerClusterResources:
+  - apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: dapr
+      name: components.dapr.io
+      namespace: dapr-system
+    spec:
+      group: dapr.io
+      names:
+        categories:
+        - all
+        - dapr
+        kind: Component
+        plural: components
+        singular: component
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            description: Component describes an Dapr component type
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation
+                  of an object. Servers should convert recognized schemas to the latest
+                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              auth:
+                description: Auth represents authentication details for the component
+                properties:
+                  secretStore:
+                    type: string
+                required:
+                - secretStore
+                type: object
+              kind:
+                description: 'Kind is a string value representing the REST resource
+                  this object represents. Servers may infer this from the endpoint
+                  the client submits requests to. Cannot be updated. In CamelCase.
+                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              scopes:
+                items:
+                  type: string
+                type: array
+              spec:
+                description: ComponentSpec is the spec for a component
+                properties:
+                  ignoreErrors:
+                    type: boolean
+                  initTimeout:
+                    type: string
+                  metadata:
+                    items:
+                      description: MetadataItem is a name/value pair for a metadata
+                      properties:
+                        name:
+                          type: string
+                        secretKeyRef:
+                          description: SecretKeyRef is a reference to a secret holding
+                            the value for the metadata item. Name is the secret name,
+                            and key is the field in the secret.
+                          properties:
+                            key:
+                              type: string
+                            name:
+                              type: string
+                          required:
+                          - key
+                          - name
+                          type: object
+                        value:
+                          x-kubernetes-preserve-unknown-fields: true
+                      required:
+                      - name
+                      type: object
+                    type: array
+                  type:
+                    type: string
+                  version:
+                    type: string
+                required:
+                - metadata
+                - type
+                - version
+                type: object
+            type: object
+        served: true
+        storage: true
+  - apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      annotations:
+        controller-gen.kubebuilder.io/version: v0.9.2
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/part-of: dapr
+      name: configurations.dapr.io
+      namespace: dapr-system
+    spec:
+      group: dapr.io
+      names:
+        kind: Configuration
+        listKind: ConfigurationList
+        plural: configurations
+        singular: configuration
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            description: Configuration describes an Dapr configuration setting.
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation
+                  of an object. Servers should convert recognized schemas to the latest
+                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              kind:
+                description: 'Kind is a string value representing the REST resource
+                  this object represents. Servers may infer this from the endpoint
+                  the client submits requests to. Cannot be updated. In CamelCase.
+                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              spec:
+                description: ConfigurationSpec is the spec for an configuration.
+                properties:
+                  accessControl:
+                    description: AccessControlSpec is the spec object in ConfigurationSpec.
+                    properties:
+                      defaultAction:
+                        type: string
+                      policies:
+                        items:
+                          description: AppPolicySpec defines the policy data structure
+                            for each app.
+                          properties:
+                            appId:
+                              type: string
+                            defaultAction:
+                              type: string
+                            namespace:
+                              type: string
+                            operations:
+                              items:
+                                description: AppOperationAction defines the data structure
+                                  for each app operation.
+                                properties:
+                                  action:
+                                    type: string
+                                  httpVerb:
+                                    items:
+                                      type: string
+                                    type: array
+                                  name:
+                                    type: string
+                                required:
+                                - action
+                                - name
+                                type: object
+                              type: array
+                            trustDomain:
+                              type: string
+                          required:
+                          - appId
+                          type: object
+                        type: array
+                      trustDomain:
+                        type: string
+                    type: object
+                  api:
+                    description: APISpec describes the configuration for Dapr APIs.
+                    properties:
+                      allowed:
+                        items:
+                          description: APIAccessRule describes an access rule for
+                            allowing a Dapr API to be enabled and accessible by an
+                            app.
+                          properties:
+                            name:
+                              type: string
+                            protocol:
+                              type: string
+                            version:
+                              type: string
+                          required:
+                          - name
+                          - version
+                          type: object
+                        type: array
+                    type: object
+                  appHttpPipeline:
+                    description: PipelineSpec defines the middleware pipeline.
+                    properties:
+                      handlers:
+                        items:
+                          description: HandlerSpec defines a request handlers.
+                          properties:
+                            name:
+                              type: string
+                            selector:
+                              description: SelectorSpec selects target services to
+                                which the handler is to be applied.
+                              properties:
+                                fields:
+                                  items:
+                                    description: SelectorField defines a selector
+                                      fields.
+                                    properties:
+                                      field:
+                                        type: string
+                                      value:
+                                        type: string
+                                    required:
+                                    - field
+                                    - value
+                                    type: object
+                                  type: array
+                              required:
+                              - fields
+                              type: object
+                            type:
+                              type: string
+                          required:
+                          - name
+                          - type
+                          type: object
+                        type: array
+                    required:
+                    - handlers
+                    type: object
+                  components:
+                    description: ComponentsSpec describes the configuration for Dapr
+                      components
+                    properties:
+                      deny:
+                        description: Denylist of component types that cannot be instantiated
+                        items:
+                          type: string
+                        type: array
+                    type: object
+                  features:
+                    items:
+                      description: FeatureSpec defines the features that are enabled/disabled.
+                      properties:
+                        enabled:
+                          type: boolean
+                        name:
+                          type: string
+                      required:
+                      - enabled
+                      - name
+                      type: object
+                    type: array
+                  httpPipeline:
+                    description: PipelineSpec defines the middleware pipeline.
+                    properties:
+                      handlers:
+                        items:
+                          description: HandlerSpec defines a request handlers.
+                          properties:
+                            name:
+                              type: string
+                            selector:
+                              description: SelectorSpec selects target services to
+                                which the handler is to be applied.
+                              properties:
+                                fields:
+                                  items:
+                                    description: SelectorField defines a selector
+                                      fields.
+                                    properties:
+                                      field:
+                                        type: string
+                                      value:
+                                        type: string
+                                    required:
+                                    - field
+                                    - value
+                                    type: object
+                                  type: array
+                              required:
+                              - fields
+                              type: object
+                            type:
+                              type: string
+                          required:
+                          - name
+                          - type
+                          type: object
+                        type: array
+                    required:
+                    - handlers
+                    type: object
+                  metric:
+                    default:
+                      enabled: true
+                    description: MetricSpec defines metrics configuration.
+                    properties:
+                      enabled:
+                        type: boolean
+                    required:
+                    - enabled
+                    type: object
+                  mtls:
+                    description: MTLSSpec defines mTLS configuration.
+                    properties:
+                      allowedClockSkew:
+                        type: string
+                      enabled:
+                        type: boolean
+                      workloadCertTTL:
+                        type: string
+                    required:
+                    - enabled
+                    type: object
+                  nameResolution:
+                    description: NameResolutionSpec is the spec for name resolution
+                      configuration.
+                    properties:
+                      component:
+                        type: string
+                      configuration:
+                        description: DynamicValue is a dynamic value struct for the
+                          component.metadata pair value.
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                      version:
+                        type: string
+                    required:
+                    - component
+                    - configuration
+                    - version
+                    type: object
+                  secrets:
+                    description: SecretsSpec is the spec for secrets configuration.
+                    properties:
+                      scopes:
+                        items:
+                          description: SecretsScope defines the scope for secrets.
+                          properties:
+                            allowedSecrets:
+                              items:
+                                type: string
+                              type: array
+                            defaultAccess:
+                              type: string
+                            deniedSecrets:
+                              items:
+                                type: string
+                              type: array
+                            storeName:
+                              type: string
+                          required:
+                          - storeName
+                          type: object
+                        type: array
+                    required:
+                    - scopes
+                    type: object
+                  tracing:
+                    description: TracingSpec defines distributed tracing configuration.
+                    properties:
+                      otel:
+                        description: OtelSpec defines Otel exporter configurations.
+                        properties:
+                          endpointAddress:
+                            type: string
+                          isSecure:
+                            type: boolean
+                          protocol:
+                            type: string
+                        required:
+                        - endpointAddress
+                        - isSecure
+                        - protocol
+                        type: object
+                      samplingRate:
+                        type: string
+                      stdout:
+                        type: boolean
+                      zipkin:
+                        description: ZipkinSpec defines Zipkin trace configurations.
+                        properties:
+                          endpointAddress:
+                            type: string
+                        required:
+                        - endpointAddress
+                        type: object
+                    required:
+                    - samplingRate
+                    type: object
+                type: object
+            type: object
+        served: true
+        storage: true
+  - apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      annotations:
+        controller-gen.kubebuilder.io/version: v0.5.0
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/part-of: dapr
+      name: resiliencies.dapr.io
+      namespace: dapr-system
+    spec:
+      group: dapr.io
+      names:
+        categories:
+        - dapr
+        kind: Resiliency
+        listKind: ResiliencyList
+        plural: resiliencies
+        singular: resiliency
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation
+                  of an object. Servers should convert recognized schemas to the latest
+                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              kind:
+                description: 'Kind is a string value representing the REST resource
+                  this object represents. Servers may infer this from the endpoint
+                  the client submits requests to. Cannot be updated. In CamelCase.
+                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              scopes:
+                items:
+                  type: string
+                type: array
+              spec:
+                properties:
+                  policies:
+                    properties:
+                      circuitBreakers:
+                        additionalProperties:
+                          properties:
+                            interval:
+                              type: string
+                            maxRequests:
+                              type: integer
+                            timeout:
+                              type: string
+                            trip:
+                              type: string
+                          type: object
+                        type: object
+                      retries:
+                        additionalProperties:
+                          properties:
+                            duration:
+                              type: string
+                            maxInterval:
+                              type: string
+                            maxRetries:
+                              type: integer
+                            policy:
+                              type: string
+                          type: object
+                        type: object
+                      timeouts:
+                        additionalProperties:
+                          type: string
+                        type: object
+                    type: object
+                  targets:
+                    properties:
+                      actors:
+                        additionalProperties:
+                          properties:
+                            circuitBreaker:
+                              type: string
+                            circuitBreakerCacheSize:
+                              type: integer
+                            circuitBreakerScope:
+                              type: string
+                            retry:
+                              type: string
+                            timeout:
+                              type: string
+                          type: object
+                        type: object
+                      apps:
+                        additionalProperties:
+                          properties:
+                            circuitBreaker:
+                              type: string
+                            circuitBreakerCacheSize:
+                              type: integer
+                            retry:
+                              type: string
+                            timeout:
+                              type: string
+                          type: object
+                        type: object
+                      components:
+                        additionalProperties:
+                          properties:
+                            inbound:
+                              properties:
+                                circuitBreaker:
+                                  type: string
+                                retry:
+                                  type: string
+                                timeout:
+                                  type: string
+                              type: object
+                            outbound:
+                              properties:
+                                circuitBreaker:
+                                  type: string
+                                retry:
+                                  type: string
+                                timeout:
+                                  type: string
+                              type: object
+                          type: object
+                        type: object
+                    type: object
+                required:
+                - policies
+                - targets
+                type: object
+            type: object
+        served: true
+        storage: true
+  - apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: dapr
+      name: subscriptions.dapr.io
+      namespace: dapr-system
+    spec:
+      conversion:
+        strategy: Webhook
+        webhook:
+          clientConfig:
+            service:
+              name: dapr-webhook
+              namespace: replaceme
+              path: /convert
+          conversionReviewVersions:
+          - v1
+          - v2alpha1
+      group: dapr.io
+      names:
+        categories:
+        - all
+        - dapr
+        kind: Subscription
+        listKind: SubscriptionList
+        plural: subscriptions
+        singular: subscription
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            description: Subscription describes an pub/sub event subscription.
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation
+                  of an object. Servers should convert recognized schemas to the latest
+                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              kind:
+                description: 'Kind is a string value representing the REST resource
+                  this object represents. Servers may infer this from the endpoint
+                  the client submits requests to. Cannot be updated. In CamelCase.
+                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              scopes:
+                items:
+                  type: string
+                type: array
+              spec:
+                description: SubscriptionSpec is the spec for an event subscription.
+                properties:
+                  deadLetterTopic:
+                    type: string
+                  metadata:
+                    additionalProperties:
+                      type: string
+                    type: object
+                  pubsubname:
+                    type: string
+                  route:
+                    type: string
+                  topic:
+                    type: string
+                required:
+                - pubsubname
+                - route
+                - topic
+                type: object
+            type: object
+        served: true
+        storage: false
+      - name: v2alpha1
+        schema:
+          openAPIV3Schema:
+            description: Subscription describes an pub/sub event subscription.
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation
+                  of an object. Servers should convert recognized schemas to the latest
+                  internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              kind:
+                description: 'Kind is a string value representing the REST resource
+                  this object represents. Servers may infer this from the endpoint
+                  the client submits requests to. Cannot be updated. In CamelCase.
+                  More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              scopes:
+                items:
+                  type: string
+                type: array
+              spec:
+                description: SubscriptionSpec is the spec for an event subscription.
+                properties:
+                  deadLetterTopic:
+                    description: The optional dead letter queue for this topic to
+                      send events to.
+                    type: string
+                  metadata:
+                    additionalProperties:
+                      type: string
+                    description: The optional metadata to provide the subscription.
+                    type: object
+                  pubsubname:
+                    description: The PubSub component name.
+                    type: string
+                  routes:
+                    description: The Routes configuration for this topic.
+                    properties:
+                      default:
+                        type: string
+                      rules:
+                        description: The list of rules for this topic.
+                        items:
+                          description: Rule is used to specify the condition for sending
+                            a message to a specific path.
+                          properties:
+                            match:
+                              description: The optional CEL expression used to match
+                                the event. If the match is not specified, then the
+                                route is considered the default. The rules are tested
+                                in the order specified, so they should be define from
+                                most-to-least specific. The default route should appear
+                                last in the list.
+                              type: string
+                            path:
+                              description: The path for events that match this rule.
+                              type: string
+                          required:
+                          - match
+                          - path
+                          type: object
+                        type: array
+                    type: object
+                  topic:
+                    description: The topic name to subscribe to.
+                    type: string
+                required:
+                - pubsubname
+                - routes
+                - topic
+                type: object
+            type: object
+        served: true
+        storage: true
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-operator
+      namespace: dapr-system
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dashboard-reader
+      namespace: dapr-system
+  - apiVersion: v1
+    data:
+      tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR0VENDQXAyZ0F3SUJBZ0lRQmwzUTFUUHpiV1pGNHR2ak5WNmR5VEFOQmdrcWhraUc5dzBCQVFzRkFEQWEKTVJnd0ZnWURWUVFERXc5a1lYQnlMWGRsWW1odmIyc3RZMkV3SGhjTk1qTXdNakUxTVRJMU9ESTNXaGNOTXpNdwpNakV5TVRJMU9ESTNXakFYTVJVd0V3WURWUVFERXd4a1lYQnlMWGRsWW1odmIyc3dnZ0VpTUEwR0NTcUdTSWIzCkRRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRGNxVDA0K0s1TUhZNElldlJZNXI1NjRzZUpoOG8yRC9yZ2g0NzcKOGxpaGtWV25aaElZZWUxeXE3Vk5ORUtUTHhTek1jL3pqVDU2SWpHd0o5VllROGJUck8zYXBzRzhkRjJsbTRCagpFRDRTTnRUa2dwNzdzN0lkcVM0NzNmQXZ1TmMzWnhmTFpQbzU4R081aGxnbDlTT29yN3Z5ZmtzZjUvbFBtYWhiCkthVGNRcVI0REx5dHNmbW10b2xMSDg4VTFSRGRQUnd3a2xoTXY4K2VHL1NuWVBPc1lpM0l4ZGtCL29EQU5CdXUKMkhpM2hvSktuM1dYcmllMG5vVFZtczF3aGEzdithN1Z4QitsUE9kTzFZWjVuOWcxUmNtc3hsMEUwVHQyZUt5Sgo0amhXYXYycWFWSllyOXZsMU5WZkl3YURXOFh0UUg2RHBndlI5WkFYTi81UEdrTjdBZ01CQUFHamdma3dnZll3CkRnWURWUjBQQVFIL0JBUURBZ1dnTUIwR0ExVWRKUVFXTUJRR0NDc0dBUVVGQndNQkJnZ3JCZ0VGQlFjREFqQU0KQmdOVkhSTUJBZjhFQWpBQU1COEdBMVVkSXdRWU1CYUFGQWNlaDM3QUVyYmU4TmRnaHNaQngzMGUrMkNVTUlHVgpCZ05WSFJFRWdZMHdnWXFDR0dSaGNISXRkMlZpYUc5dmF5NWtZWEJ5TFhONWMzUmxiWUljWkdGd2NpMTNaV0pvCmIyOXJMbVJoY0hJdGMzbHpkR1Z0TG5OMlk0SWtaR0Z3Y2kxM1pXSm9iMjlyTG1SaGNISXRjM2x6ZEdWdExuTjIKWXk1amJIVnpkR1Z5Z2lwa1lYQnlMWGRsWW1odmIyc3VaR0Z3Y2kxemVYTjBaVzB1YzNaakxtTnNkWE4wWlhJdQpiRzlqWVd3d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFISnN3TzNYRW02dHFqZm45Y2lncmsrRWFHU01yb2ZmCjJMeWIvU1JUb3JtMC8zR0V6ZzNRSE1KVFJhdUR5d2o2QU1TR0ZzYkc4Q1BCYWQzZ29YOEtpT0VmaS9BaS82bXIKVnEwdDRxY0s5Zmx3SS9WbGgvdE5EUkt0ZG9JWkkvRG1PYVA4WVNVZmtReVM1NkJ4T1VaeXBycWkvUXZSeEtCWgozak1yMi9nQXpCY2gwa0lDTEliZzF4QTY2aFFxUFVIM1FXQy93TW9Pd0RQeHdlNE82TDY0RTdhOUNKNEdYMkYxCmpnc2VNNVAraklJRW5FcklrdEJhYnBIQ3pDZHVzT3EvNWdGY0Z5VkJ0Nkhib3N4NTd0WDBNRXJQcWxLMGZwYlUKemNHa3hxbWEvaTNRZmZLSlNQVFlkWnZsNzdjWGhNell3YkFWUnUra3gwSkxCV1VTVklHSlorQT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFb3dJQkFBS0NBUUVBM0trOU9QaXVUQjJPQ0hyMFdPYStldUxIaVlmS05nLzY0SWVPKy9KWW9aRlZwMllTCkdIbnRjcXUxVFRSQ2t5OFVzekhQODQwK2VpSXhzQ2ZWV0VQRzA2enQycWJCdkhSZHBadUFZeEErRWpiVTVJS2UKKzdPeUhha3VPOTN3TDdqWE4yY1h5MlQ2T2ZCanVZWllKZlVqcUsrNzhuNUxIK2Y1VDVtb1d5bWszRUtrZUF5OApyYkg1cHJhSlN4L1BGTlVRM1QwY01KSllUTC9Qbmh2MHAyRHpyR0l0eU1YWkFmNkF3RFFicnRoNHQ0YUNTcDkxCmw2NG50SjZFMVpyTmNJV3Q3L211MWNRZnBUem5UdFdHZVovWU5VWEpyTVpkQk5FN2RuaXNpZUk0Vm1yOXFtbFMKV0svYjVkVFZYeU1HZzF2RjdVQitnNllMMGZXUUZ6ZitUeHBEZXdJREFRQUJBb0lCQUJMZVZlSGRRZW80VE1Eawo0cWdIY3hwRzhoRU1qM24zKzlmZlA1YkRybGlDZVBTTGdkaWQ5SFB0d3Q4TExQWXcvSEFtUGtYeE9mcHZtaGdhCkQrQXdTM3dtT1dDTkNkdjNoMXAxNVpDUy92dkh2SVNkdHNLSEp4L3FLNDNxK0hMY04yc0JZY04rcXZieFcxV3QKNnpPenRvemlHZ3d1U0hZOSs4K1dzQks3aU9GY21NVUZsOUVZdjRPV2NqOEU2MUFnR2tFVFNKUEwwMjlGUS9hSwp0WXZaVXUzS3hnblJic0E1U0RPYi9ISDJ3Qzd5L2pSNFdKb29PWDNSa1hjd1ZPaklNSE5aTU5LZU5BdHp1L0JUCkFSaVh5aHVKbUxYM1NKcUh5bUR4QWxic29CUldyMDd2ZkF6ZWNxdnZoMU9oelBqZnV1Rkg3bkRJUHM5bVdmS2IKMHpmMzVxRUNnWUVBKzZsQm1zNWhiekVRZFNmR2pqK2dVYkxuUys1bGJPaEZrQVNjNnVKcW1oMHNTQVI0djA3eQovWW9WUDU3aXlPZTBnZmNxeldSYjZ3SmQwNVZCbkw0WERXN3ZJQW43b1pzTldNcmorTkN6dWFjY3Z4Rm1GWU0rCjB5NXNDbE1ZdkNFT2FoeHdoeEV6YzBkdysyVFRObWk0aGNUc0dmMFVRbWJBb2l3ODRwbFJ0bmNDZ1lFQTRIY28KMVMvZkNpdU9Ec1dsNUZOUWFaaHkrV245ejZqSkNlTURWQVd5K3NQQ0RuemhGVDBBaDQ1ZWNpeXZQU29mK1FxZApMR0ZVb090OU5TVTVCcDUyK2VEbDBtbmkzYmFCejc4RE5vU0U4Q3hxUTNSMG9KZ0hmbHVoQ2w4SXdRMW1wSGxnCi9wdjVhaWVFYVJkUVZWOVBrclFyZVlHeUplVUlTRkxmRVUzYUtCMENnWUErRThReEVaT0xRQWtWUFJpSFlqNkQKcUtQUllSNzN2RnZjYUtia2NiRm1EcWdybzU2OVloWWlZSHRaVkRJUTZNYm9BRFk0ci9iVWc2THRYRFh4R2hySgpuNEd3MzRXSW1aeXpPR2ovcVV1TUVpTFBKdFdOblBCVVczRWZJdHhKRzhaWWVtZHZpZGl0S1FRL251RlMzSVlYCnlUbU1ONWRWd2M3bXNnN2F2b01maFFLQmdFSnN3TmFsdmZsQ2ZsMTh1K1RmaXRKVTNPRldMbGYvZU03R01UdnkKRzg3OWt6VzZXdGx3SGZIL2ZZK0lEYXVxQmFBck5ldm1PYWNOU1JZckY3OFBzZUdzWGhad1kwUjlOOWtFaTZ6Ywpkb0trZ2lYSUZxTlhtaEFZaVlXS0xnc0RMamJKL0p3Y0NDa1QzS2xFenU4VXIzV1lmNjBMWm02MFlra1V6UkpQCjJaazVBb0dCQUoxQUZXaFBraVBxOTdBRCs4UEZnejVGZDBsNFFLb1FHc2tXT2w0YStva042a2ZEbmdKNTk2bU8KZno2OGdNVUxINVY0QWtqZUVWY2t2T2ozQ0FxVTc1eG5nWEtvcUZxUkcyK1R3dThacktJKzRJRk5mODdOUkhyNQpBVks5azNaM3lOaUtqc0hmZ0RhMjgxWUhtd3RycVVHamJ1ZDRvaXRoQjI2SDlDU3c2U2FvCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0tCg==
+    kind: Secret
+    metadata:
+      labels:
+        app: dapr-operator
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-webhook-cert
+      namespace: dapr-system
+  - apiVersion: v1
+    data:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURJRENDQWdpZ0F3SUJBZ0lSQUxjODNLblFDekFTM0FpOFVZWHpSaTR3RFFZSktvWklodmNOQVFFTEJRQXcKR2pFWU1CWUdBMVVFQXhNUFpHRndjaTEzWldKb2IyOXJMV05oTUI0WERUSXpNREl4TlRFeU5UZ3lObG9YRFRNegpNREl4TWpFeU5UZ3lObG93R2pFWU1CWUdBMVVFQXhNUFpHRndjaTEzWldKb2IyOXJMV05oTUlJQklqQU5CZ2txCmhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBMGNYWkJnTndhMURUay9lQUNKdDJFdW0yek95eWNOZkkKVmo3V1dPWGpIRkowTkI4UU1rRFFiS2RvaFFZMFp2MmRZTXZnWWU4VThoUVJOMEkzZ1hUSW4yWEQ3OGgrRzdyTApNZENCcHQvZkxRcWJKM0RuQUptRzUraEN2MkJGaE00L1lFTktZdmtOcVpFNy81RFlSYVVSRHNEQ3E2ODgrYWJMCnZ2Y2ZMelNmcEZwMW1aUEFzMTB3UXhKeHVodTEyNFpHMEJtKytMSzFiY204WFVJTENQN2dLVFdLYmtERXp2VXEKRWs0ZGovM0xSR2dmQUpOeTFna0picGtPWEcrK1pVemtPdzNwSnVhdllrZkg2RUxVVTFQbXc1R0RxUW95emN4UQpXc2JhWllYQjljVTY5V2ZFSHdYdTJDUURvSTJLb2lpNExaYXEwUW14UDgvTzFXam4rMGFxSVFJREFRQUJvMkV3Clh6QU9CZ05WSFE4QkFmOEVCQU1DQXFRd0hRWURWUjBsQkJZd0ZBWUlLd1lCQlFVSEF3RUdDQ3NHQVFVRkJ3TUMKTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRkFjZWgzN0FFcmJlOE5kZ2hzWkJ4MzBlKzJDVQpNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUI3QXNMZ3dqamVqdnJGdjlyMm42NzBLODA1RmNUYXdsNlVyRjFzCkx0VW11ODFFODZNcHBJQ1c5bThGbGZncWxqSDJUS2FhSWpVMUp2Wlh2azVoWXVwbjlVSTh5MWJYdUd2a1pEdEIKY1c5STZoVWF5VUJkRkIzSmlQU1lBR1pHemc2ZXdlV1VTeWo1bkdTYm54YXV0UUljbHNsY0d6T0dmMjBnT3Y1bwpWK2lsK1RQVnI2UTVOVWRjOVlNdWd5Z0lDaVBJVUVBNGJJUmNSOG10OXg2T05lQk0vbXlOdFJWcld5OS80dXFVClJncEtReHRVbVA3RStaVEpIdGJrSDlPNElVREs2NWMvaC95RG1RaTdOVmZ2TzlRVVFrekxqbm1mYW14TVJvUHkKKzBodVNQdkh1MjV5ZXgzdXM1NTJqUXRJcm9LS2Z1eHYwYnJlOGhITjFhUlBoa2JECi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    kind: Secret
+    metadata:
+      labels:
+        app: dapr-operator
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-webhook-ca
+      namespace: dapr-system
+  - apiVersion: v1
+    data: null
+    kind: Secret
+    metadata:
+      labels:
+        app: dapr-sentry
+        app.kubernetes.io/component: sentry
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-trust-bundle
+      namespace: dapr-system
+  - apiVersion: v1
+    data:
+      tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ3VENDQXRXZ0F3SUJBZ0lRR1M5OERHTDU4amh0cDgvNHVLSnlnVEFOQmdrcWhraUc5dzBCQVFzRkFEQWoKTVNFd0h3WURWUVFERXhoa1lYQnlMWE5wWkdWallYSXRhVzVxWldOMGIzSXRZMkV3SGhjTk1qTXdNakUxTVRJMQpPREkyV2hjTk16TXdNakV5TVRJMU9ESTJXakFnTVI0d0hBWURWUVFERXhWa1lYQnlMWE5wWkdWallYSXRhVzVxClpXTjBiM0l3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRQytOY2R0YkdHcGdNd28KZE5tUFpmRytPNDkzMGNZYnd6UWsrN0oxUUlscXkvd21hOWp3REk1Y3YyNDJReVZPdHViMXlTZXpXTUVEdDFpSwpVNEFMRjdMaURLR2VMTElaSGlKSUZCRnhMbjlTcmJNN3V3UThDUURaOGRYUlhzUjNQSlFxR1hMUEpVK0xhbHMrClY2UTBodkpWNE4xWnhZK1FRWWFJcEZmcExFcFYyL2tqdmxmSVREQXFxY01JQ2FGSDJBbE85VjR0WmQwV3orRVcKNThuaHJJdDZCRnhxK3duazd0WXpCSHBVS05KTllBTmszY2dPVDdBQlg2UVlUUGhJbUpmNGNyK0hTNE4yclNlQgpXTGRRdGlEQzZkdHFFVWNsMHhQVEFINldNOFRCQWRSSWhiM3dDQ3l0ejRQZk5YR3ZiRWxFdFpZWFc2NUtzaTNXCkJGVlQ4eGNYQWdNQkFBR2pnZ0VlTUlJQkdqQU9CZ05WSFE4QkFmOEVCQU1DQmFBd0hRWURWUjBsQkJZd0ZBWUkKS3dZQkJRVUhBd0VHQ0NzR0FRVUZCd01DTUF3R0ExVWRFd0VCL3dRQ01BQXdId1lEVlIwakJCZ3dGb0FVYlNPMwpvSjhFdTdpNmc0L0E5ZittVE05UHQ2OHdnYmtHQTFVZEVRU0JzVENCcm9JaFpHRndjaTF6YVdSbFkyRnlMV2x1CmFtVmpkRzl5TG1SaGNISXRjM2x6ZEdWdGdpVmtZWEJ5TFhOcFpHVmpZWEl0YVc1cVpXTjBiM0l1WkdGd2NpMXoKZVhOMFpXMHVjM1pqZ2kxa1lYQnlMWE5wWkdWallYSXRhVzVxWldOMGIzSXVaR0Z3Y2kxemVYTjBaVzB1YzNaagpMbU5zZFhOMFpYS0NNMlJoY0hJdGMybGtaV05oY2kxcGJtcGxZM1J2Y2k1a1lYQnlMWE41YzNSbGJTNXpkbU11ClkyeDFjM1JsY2k1c2IyTmhiREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBc0dwNFgwWXY1Tnd6M2FzQ09JVVoKUjA2NnkzdFJvWWJzTldIQUdvcHhERzA4YkozWDN6allwcmhPQlc0eG01NFpNTUZwbnNlTG41bFRBN3NMamQ2YQpCU0NVQ0FVVjcyQlJmZXJ5UmdNOE5hSHZESlBqMGNsK1NmeCs2SGZCVG01L3VzTFVORlFtd2RNN0ZZREFLc0NxCk4rZHVaaUF0b2xmUTBEMjBlOW8zVi9NdzdMUkFidG92VWQxNCtWaTFLa2M0MndJQU9EV1pVRS84Z0ZEdlRuRjQKRXlYcTFzSlhJY1JHQjJNVENNZXU5cUw1Mm1KanBjR2tQUjUzbzVSMG4xeEhkVWdxMGlid2lNNE9OcTVITDNUNgphUm9HYlkxSU1MNllHYnJxSGhhUTM2YzZUQ2dpbFJrSHk4bjMzeEFlU2RjT05jcUxwUnI4UjFpZ0ZpYzN6bExaCkN3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBdmpYSGJXeGhxWURNS0hUWmoyWHh2anVQZDlIR0c4TTBKUHV5ZFVDSmFzdjhKbXZZCjhBeU9YTDl1TmtNbFRyYm05Y2tuczFqQkE3ZFlpbE9BQ3hleTRneWhuaXl5R1I0aVNCUVJjUzUvVXEyek83c0UKUEFrQTJmSFYwVjdFZHp5VUtobHl6eVZQaTJwYlBsZWtOSWJ5VmVEZFdjV1BrRUdHaUtSWDZTeEtWZHY1STc1WAp5RXd3S3FuRENBbWhSOWdKVHZWZUxXWGRGcy9oRnVmSjRheUxlZ1JjYXZzSjVPN1dNd1I2VkNqU1RXQURaTjNJCkRrK3dBVitrR0V6NFNKaVgrSEsvaDB1RGRxMG5nVmkzVUxZZ3d1bmJhaEZISmRNVDB3QitsalBFd1FIVVNJVzkKOEFnc3JjK0QzelZ4cjJ4SlJMV1dGMXV1U3JJdDFnUlZVL01YRndJREFRQUJBb0lCQUZFUzN5UVcxREhKZ2p1awpRcTlLaHBYTkVVUERHQ3Z4TWlLcFhkRjRacG9zeEJja1ZOMU1uTW1QbHN4dUpsSzh4d2p3YW9tWlJQdnVoRURCCmdvdzMxN2xlSk8wa28renMyVFBieWV0eUpEYjdickFBOExjZUoweStOYUwrUDhPTEFLUkpJSlNHbExjWjZEWlUKYU5zeXdjdzFBbVFuUHgvL3JmWkVCbXlPd2tpQnREcDJEU3hUUzlyR3l2SmlqT0xqVVF1bWU0dGZCMU56Q2ZWZgo1TmFmM0U4UVh4WHlkVGZNWjlBNmZ3SFdRc2NDN0F5dC9CeWJmcHFQKzRFMEdhMkY4Rm42dTBDRVdlbXFKMkdUCmNQMUpibTJ6VHpQQnkrVUtxTk4xY0dNQkZGSG0wUmVJRjNYcUVvV05jK3JRalFJZE5XbmJMQTRFM1RTaXJUSmMKTnVVWGQ3RUNnWUVBMnBHZURyRkNNQkhsd3R5TnI0N2FtMXZITHUzbTBMWXVCT1FSNGlpa1dzN2FQQ0xoTm9BRwpSeEFkcGtYQm5IVnR1MUthODdTSFBmQWxBTFoxTmhkSkh0ZWp0VlVjejVWV040RVpWMmJFcDlrVzltVTFSbDlCCkd1TnVFUmtWOFFPMEp5WnIvUEwyUGlNai93aUEvZktUZ09FWTFrcVdqK200YXRFU29HTnIxdXNDZ1lFQTNzamYKUFZIQ3Q3SmtoeUlhdDB1UWdGZmlRVmNMTDFPS3hXbDFCRHppUWsrV1NKN2tlbG1WcVRaclRHYWdnRHFkSFp0YwpiWUJ4T2JsRFlXZlNWK3pNNnR3ZTBIZUJpNkU1ZEh3Z0M1ekxBS1dmMG14MnJ4Z2xxd1M5VE9vSUpuTHFESzI4CjMwU1RUOGV2N0RZYVJWZFNLVVFaZW5OZkZyUWQzdzJWSGExbmpZVUNnWUVBZ0o2TWFvejVMQng4SHExM1cwWXYKY3BrUm41WXo2OElwVm90MzBxU2tBeVFTM0t5UjUyWnpTMEk2a0d3Z1FSZ0JXT2lGY3NCYmphRlJ4UmVaNWhqUgoyS3FCRmVaZUsvSHZhSDQ2RVdyU2N3dVhMYXZsSytKR0I3S3FSTG1FWmU0T0I3UGVmRjNsZGk5cnNWcXB2Y2NQCjhobUVhaVkrYjdYVDVsZmVKREFkZDcwQ2dZRUF0c2pFTUVGR3F3VFlhZTdYVUkvVTdSZ3Q4RUlFVVQ0UDIweGMKejY5TVMrK1VjOXk1eEpCL3RDZUwvVkV1V2thODVhKzBNN3R3S2xZUUxIak1JWXVOelJ2d3hFVm9xakVMUE1FaQpZYVN4QWNUaHpmbGpudUVHOXJ1YXZPSSs4WnpTM3JnbEFHSDVJem5JNHRxNHp5K0huNGZhQjVkazZ2RzRtR3RDCmJ1ajR6eWtDZ1lCcHh3aHF1ZGYweVBzNy9vbTltYkt1OGNqbHMxOTZtSEpOWDgxQyt4NkQwbUhZMUVvSDFTb2cKRVRISTh2dFFiUGFGR3RPQ1FsVlZ0eXZRVkg5OFNja2QvbkZ0Z2ZzK1V6UVNPTCsydHd1QzJLeFE2N0NHbnVSVQoybnlvQzZuakcxWmJ1dHdpL1FpblVBNC94ZEdVYkp3SS9IRStPbjFyYyt2RHE1Y1FibUpEY1E9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+    kind: Secret
+    metadata:
+      labels:
+        app: dapr-sidecar-injector
+        app.kubernetes.io/component: sidecar-injector
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-sidecar-injector-cert
+      namespace: dapr-system
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-operator-admin
+      namespace: dapr-system
+    rules:
+    - apiGroups:
+      - apiextensions.k8s.io
+      resources:
+      - customresourcedefinitions
+      verbs:
+      - get
+      - patch
+    - apiGroups:
+      - ""
+      resources:
+      - serviceaccounts
+      verbs:
+      - get
+      - list
+    - apiGroups:
+      - apps
+      resources:
+      - deployments
+      - deployments/finalizers
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+    - apiGroups:
+      - apps
+      resources:
+      - statefulsets
+      - statefulsets/finalizers
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+    - apiGroups:
+      - ""
+      resources:
+      - pods
+      - services
+      - services/finalizers
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - delete
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      verbs:
+      - get
+      - update
+      - create
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+    - apiGroups:
+      - dapr.io
+      resources:
+      - components
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - dapr.io
+      resources:
+      - pluggablecomponents
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - dapr.io
+      resources:
+      - configurations
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - dapr.io
+      resources:
+      - subscriptions
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+    - apiGroups:
+      - dapr.io
+      resources:
+      - resiliencies
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - coordination.k8s.io
+      resources:
+      - leases
+      verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - delete
+    - apiGroups:
+      - ""
+      - events.k8s.io
+      resources:
+      - events
+      verbs:
+      - create
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dashboard-reader
+      namespace: dapr-system
+    rules:
+    - apiGroups:
+      - ""
+      - dapr.io
+      - apps
+      - extensions
+      resources:
+      - deployments
+      - pods
+      - pods/log
+      - components
+      - configurations
+      - namespaces
+      - pluggablecomponents
+      verbs:
+      - get
+      - list
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-operator
+      namespace: dapr-system
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: dapr-operator-admin
+    subjects:
+    - kind: ServiceAccount
+      name: dapr-operator
+      namespace: dapr-system
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-role-tokenreview-binding
+      namespace: dapr-system
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: system:auth-delegator
+    subjects:
+    - kind: ServiceAccount
+      name: dapr-operator
+      namespace: dapr-system
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dashboard-reader-global
+      namespace: dapr-system
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: dashboard-reader
+    subjects:
+    - kind: ServiceAccount
+      name: dashboard-reader
+      namespace: dapr-system
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: secret-reader
+      namespace: dapr-system
+    rules:
+    - apiGroups:
+      - ""
+      resources:
+      - secrets
+      verbs:
+      - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      labels:
+        app.kubernetes.io/component: rbac
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-secret-reader
+      namespace: dapr-system
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: secret-reader
+    subjects:
+    - kind: ServiceAccount
+      name: default
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      annotations: null
+      labels:
+        app.kubernetes.io/component: dashboard
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-dashboard
+      namespace: dapr-system
+    spec:
+      ports:
+      - port: 8080
+        protocol: TCP
+        targetPort: 8080
+      selector:
+        app: dapr-dashboard
+      type: ClusterIP
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-api
+      namespace: dapr-system
+    spec:
+      ports:
+      - port: 80
+        protocol: TCP
+        targetPort: 6500
+      selector:
+        app: dapr-operator
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-webhook
+      namespace: dapr-system
+    spec:
+      ports:
+      - port: 443
+        protocol: TCP
+        targetPort: 19443
+      selector:
+        app: dapr-operator
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app: dapr-placement-server
+        app.kubernetes.io/component: placement
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-placement-server
+      namespace: dapr-system
+    spec:
+      clusterIP: None
+      ports:
+      - name: api
+        port: 50005
+      - name: raft-node
+        port: 8201
+      publishNotReadyAddresses: true
+      selector:
+        app: dapr-placement-server
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: sentry
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-sentry
+      namespace: dapr-system
+    spec:
+      ports:
+      - port: 80
+        protocol: TCP
+        targetPort: 50001
+      selector:
+        app: dapr-sentry
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      labels:
+        app.kubernetes.io/component: sidecar-injector
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-sidecar-injector
+      namespace: dapr-system
+    spec:
+      ports:
+      - name: https
+        port: 443
+        protocol: TCP
+        targetPort: https
+      selector:
+        app: dapr-sidecar-injector
+      type: ClusterIP
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: dapr-dashboard
+        app.kubernetes.io/component: dashboard
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-dashboard
+      namespace: dapr-system
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: dapr-dashboard
+      template:
+        metadata:
+          labels:
+            app: dapr-dashboard
+            app.kubernetes.io/component: dashboard
+            app.kubernetes.io/managed-by: helm
+            app.kubernetes.io/name: dapr
+            app.kubernetes.io/part-of: dapr
+            app.kubernetes.io/version: 1.9.6
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                    - linux
+          containers:
+          - env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            image: docker.io/daprio/dashboard:0.11.0
+            imagePullPolicy: IfNotPresent
+            name: dapr-dashboard
+            ports:
+            - containerPort: 8080
+            resources: {}
+            securityContext:
+              runAsNonRoot: true
+          serviceAccountName: dashboard-reader
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: dapr-operator
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-operator
+      namespace: dapr-system
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: dapr-operator
+      template:
+        metadata:
+          annotations:
+            prometheus.io/path: /
+            prometheus.io/port: "9090"
+            prometheus.io/scrape: "true"
+          labels:
+            app: dapr-operator
+            app.kubernetes.io/component: operator
+            app.kubernetes.io/managed-by: helm
+            app.kubernetes.io/name: dapr
+            app.kubernetes.io/part-of: dapr
+            app.kubernetes.io/version: 1.9.6
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                    - linux
+          containers:
+          - args:
+            - --watch-interval
+            - "0"
+            - --max-pod-restarts-per-minute
+            - "20"
+            - --log-level
+            - info
+            - --enable-metrics
+            - --metrics-port
+            - "9090"
+            command:
+            - /operator
+            env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            image: docker.io/daprio/dapr:1.9.6
+            imagePullPolicy: IfNotPresent
+            livenessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            name: dapr-operator
+            ports:
+            - containerPort: 6500
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            readinessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            resources: {}
+            securityContext:
+              runAsNonRoot: true
+            volumeMounts:
+            - mountPath: /var/run/dapr/credentials
+              name: credentials
+              readOnly: true
+            - mountPath: /tmp/k8s-webhook-server/serving-certs
+              name: webhook-creds
+              readOnly: true
+          serviceAccountName: dapr-operator
+          volumes:
+          - name: credentials
+            secret:
+              secretName: dapr-trust-bundle
+          - name: webhook-creds
+            secret:
+              secretName: dapr-webhook-cert
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: dapr-sentry
+        app.kubernetes.io/component: sentry
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-sentry
+      namespace: dapr-system
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: dapr-sentry
+      template:
+        metadata:
+          annotations:
+            prometheus.io/path: /
+            prometheus.io/port: "9090"
+            prometheus.io/scrape: "true"
+          labels:
+            app: dapr-sentry
+            app.kubernetes.io/component: sentry
+            app.kubernetes.io/managed-by: helm
+            app.kubernetes.io/name: dapr
+            app.kubernetes.io/part-of: dapr
+            app.kubernetes.io/version: 1.9.6
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                    - linux
+          containers:
+          - args:
+            - --log-level
+            - info
+            - --enable-metrics
+            - --metrics-port
+            - "9090"
+            - --trust-domain
+            - cluster.local
+            command:
+            - /sentry
+            env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            image: docker.io/daprio/dapr:1.9.6
+            imagePullPolicy: IfNotPresent
+            livenessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            name: dapr-sentry
+            ports:
+            - containerPort: 50001
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            readinessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            resources: {}
+            securityContext:
+              runAsNonRoot: true
+            volumeMounts:
+            - mountPath: /var/run/dapr/credentials
+              name: credentials
+              readOnly: true
+          serviceAccountName: dapr-operator
+          volumes:
+          - name: credentials
+            secret:
+              secretName: dapr-trust-bundle
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: dapr-sidecar-injector
+        app.kubernetes.io/component: sidecar-injector
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-sidecar-injector
+      namespace: dapr-system
+    spec:
+      selector:
+        matchLabels:
+          app: dapr-sidecar-injector
+      template:
+        metadata:
+          annotations:
+            prometheus.io/path: /
+            prometheus.io/port: "9090"
+            prometheus.io/scrape: "true"
+          labels:
+            app: dapr-sidecar-injector
+            app.kubernetes.io/component: sidecar-injector
+            app.kubernetes.io/managed-by: helm
+            app.kubernetes.io/name: dapr
+            app.kubernetes.io/part-of: dapr
+            app.kubernetes.io/version: 1.9.6
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                    - linux
+          containers:
+          - args:
+            - --log-level
+            - info
+            - --enable-metrics
+            - --metrics-port
+            - "9090"
+            - --healthz-port
+            - "8080"
+            command:
+            - /injector
+            env:
+            - name: TLS_CERT_FILE
+              value: /dapr/cert/tls.crt
+            - name: TLS_KEY_FILE
+              value: /dapr/cert/tls.key
+            - name: KUBE_CLUSTER_DOMAIN
+              value: cluster.local
+            - name: SIDECAR_IMAGE
+              value: docker.io/daprio/daprd:1.9.6
+            - name: SIDECAR_IMAGE_PULL_POLICY
+              value: IfNotPresent
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: IGNORE_ENTRYPOINT_TOLERATIONS
+              value: '[{"effect":"NoSchedule","key":"alibabacloud.com/eci"},{"effect":"NoSchedule","key":"azure.com/aci"},{"effect":"NoSchedule","key":"aws"},{"effect":"NoSchedule","key":"huawei.com/cci"}]'
+            image: docker.io/daprio/dapr:1.9.6
+            imagePullPolicy: IfNotPresent
+            livenessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            name: dapr-sidecar-injector
+            ports:
+            - containerPort: 4000
+              name: https
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            readinessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            resources: {}
+            securityContext:
+              runAsNonRoot: true
+            volumeMounts:
+            - mountPath: /dapr/cert
+              name: cert
+              readOnly: true
+          serviceAccountName: dapr-operator
+          volumes:
+          - name: cert
+            secret:
+              secretName: dapr-sidecar-injector-cert
+  - apiVersion: apps/v1
+    kind: StatefulSet
+    metadata:
+      labels:
+        app: dapr-placement-server
+        app.kubernetes.io/component: placement
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-placement-server
+      namespace: dapr-system
+    spec:
+      podManagementPolicy: Parallel
+      replicas: 1
+      selector:
+        matchLabels:
+          app: dapr-placement-server
+      serviceName: dapr-placement-server
+      template:
+        metadata:
+          annotations:
+            prometheus.io/path: /
+            prometheus.io/port: "9090"
+            prometheus.io/scrape: "true"
+          labels:
+            app: dapr-placement-server
+            app.kubernetes.io/component: placement
+            app.kubernetes.io/managed-by: helm
+            app.kubernetes.io/name: dapr
+            app.kubernetes.io/part-of: dapr
+            app.kubernetes.io/version: 1.9.6
+        spec:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                    - linux
+          containers:
+          - args:
+            - --log-level
+            - info
+            - --enable-metrics
+            - --replicationFactor
+            - "100"
+            - --metrics-port
+            - "9090"
+            - --tls-enabled
+            command:
+            - /placement
+            env:
+            - name: PLACEMENT_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            image: docker.io/daprio/dapr:1.9.6
+            imagePullPolicy: IfNotPresent
+            livenessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 10
+              periodSeconds: 3
+            name: dapr-placement-server
+            ports:
+            - containerPort: 50005
+              name: api
+            - containerPort: 8201
+              name: raft-node
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+            readinessProbe:
+              failureThreshold: 5
+              httpGet:
+                path: /healthz
+                port: 8080
+              initialDelaySeconds: 3
+              periodSeconds: 3
+            resources: {}
+            securityContext:
+              runAsUser: 0
+            volumeMounts:
+            - mountPath: /var/run/dapr/credentials
+              name: credentials
+              readOnly: true
+          serviceAccountName: dapr-operator
+          volumes:
+          - name: credentials
+            secret:
+              secretName: dapr-trust-bundle
+  - apiVersion: dapr.io/v1alpha1
+    kind: Configuration
+    metadata:
+      labels:
+        app.kubernetes.io/component: config
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: daprsystem
+      namespace: dapr-system
+    spec:
+      mtls:
+        allowedClockSkew: 15m
+        enabled: true
+        workloadCertTTL: 24h
+  - apiVersion: admissionregistration.k8s.io/v1
+    kind: MutatingWebhookConfiguration
+    metadata:
+      labels:
+        app: dapr-sidecar-injector
+        app.kubernetes.io/component: sidecar-injector
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: dapr
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.9.6
+      name: dapr-sidecar-injector
+      namespace: dapr-system
+    webhooks:
+    - admissionReviewVersions:
+      - v1
+      - v1beta1
+      clientConfig:
+        caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURNakNDQWhxZ0F3SUJBZ0lSQUxjYUhVc2tHMjhUWkZ1bnNTc0V0S0l3RFFZSktvWklodmNOQVFFTEJRQXcKSXpFaE1COEdBMVVFQXhNWVpHRndjaTF6YVdSbFkyRnlMV2x1YW1WamRHOXlMV05oTUI0WERUSXpNREl4TlRFeQpOVGd5TmxvWERUTXpNREl4TWpFeU5UZ3lObG93SXpFaE1COEdBMVVFQXhNWVpHRndjaTF6YVdSbFkyRnlMV2x1CmFtVmpkRzl5TFdOaE1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBMyt3bnJibkEKRHRScXZ2NkdtOGZKK0QyeU1CZUM0RVJXaXRNL3dHKzZjN3VOY1ZRUDNOdjlZdStZdzBXVmVGSHVsdmwwWlBRTgpoWkJ2ZldzN2FjYkdxWjIzcG9IMUVLYXhrUkxtaGVOZGt6T21tKzJDcjVnL1VSajU5MFUwWDFUbTRTMmpELzBQCjgrR1hVd0s0MEg0Nlg4SG4veE5FWXBZUC9DVEFWUEltTG9qaDlBanhKVEdFV2xIbEVRTXFqWmw1cWtzajNsdlYKSXhUMlBaSWJuSlB1c0hWdFJjbFpEbTFQNzczVlF0WFp2L1UxMC9jZHNvemNINnNWek5RK1A2MDk0MUdxMWkxZQpCZ0ovMjN1M2RxVmIyWDI2NWwrcnVFM0VMaHhzYWdaeCs5RytEdFYraUp0MFNOOUhEcW5rT3M4aStFWDZUYjRKCmFVT0hLc1RPbHgvZ1ZRSURBUUFCbzJFd1h6QU9CZ05WSFE4QkFmOEVCQU1DQXFRd0hRWURWUjBsQkJZd0ZBWUkKS3dZQkJRVUhBd0VHQ0NzR0FRVUZCd01DTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRkcwagp0NkNmQkx1NHVvT1B3UFgvcGt6UFQ3ZXZNQTBHQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUI4cnZiYk1XRFZkeFRICjdwWjVvUm51a3AxeDVmVUl5OWVXNEx0OWR5cC9CSHNNMnE3RE9jaGZWbGJjMkIrdEpLTnlIOWpqNFU1SmliTjgKTXFzODJjaGgwLzZTbldwLzlkWXljMlpiMjEvdWg3MmsyMm5QK3hYbVk1TFY0Mm91dGpDMmY0WG5kVCtaNmxUdgpZVmJaYVk0M0FzeEUvdkNiT2prL3dSMkNvQjhlUjltbnhyYkN5NE5Xbk1aR1F0anE5MTJNZ1Y1dHpCY1ZjVnY5Cmx2dWV4NS9CS1ZhVXB0cDV2b1p3emlyQm5rTTNrRXREZnJ3VG12VXpNa2dINVJZcWNsczg5NDIwN24zZjBIQngKVC9vTi85SzZ1bDliZGlEVUlrQmpSTVAreWNGaEplRktvbnVYSWxBam5yWU1QQWkrL0pQSzBLR21YaGoyWUx6QQozem1oMEtvMwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+        service:
+          name: dapr-sidecar-injector
+          namespace: dapr-system
+          path: /mutate
+      failurePolicy: Ignore
+      name: sidecar-injector.dapr.io
+      rules:
+      - apiGroups:
+        - ""
+        apiVersions:
+        - v1
+        operations:
+        - CREATE
+        resources:
+        - pods
+      sideEffects: None
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: dapr-system
+      namespace: dapr-system
+  xaasCrd: null
+status: {}
