@@ -1354,6 +1354,7 @@ spec:
       - name: v1
         schema:
           openAPIV3Schema:
+            properties: {}
             type: object
         served: true
         storage: true
