@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl wait -n dapr-system deployment/dapr-operator --for condition=Available --timeout=60s
+  kubectl wait crd/components.dapr.io --for condition=established --timeout=60s
+  kubectl wait crd/configurations.dapr.io --for condition=established --timeout=60s
+}
+
+test_resource_request() {
+  exit 0
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
