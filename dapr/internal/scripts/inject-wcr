@@ -2,4 +2,7 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
+echo -e "a manual build of the worker-resource-builder is required for this to work, see branch: https://github.com/syntasso/kratix/commit/72c1ec6603dc3f2b5adb4bc4558b82d4838538ad"
+exit 0
+export KNAMESPACE="dapr-system"
 source ${PWD}/../../scripts/inject-wcr
