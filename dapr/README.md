@@ -1,6 +1,6 @@
 # Dapr
 
-This Promise provides install [Dapr](https://docs.dapr.io/) on all clusters.
+This Promise provides [Dapr](https://docs.dapr.io/).
 Installing the Promise will install Dapr on all matching clusters.
 There's no need to request individual resources once the Promise is installed.
 
