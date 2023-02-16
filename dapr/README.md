@@ -8,6 +8,9 @@ To install:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dapr/promise.yaml
 ```
+
+Thanks to @salaboy for helping build the Promise!
+
 ## Development
 
 For development see [README.md](./internal/README.md)
