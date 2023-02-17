@@ -1,15 +1,15 @@
-# TODO: Promise Name
+# Kubevela global instance
 
-TODO: Describe the Promise
+This Promise will install global instance of Kubevela onto a Worker cluster. To use `apply` the Promise and then apply Kubevela objects directly to the Worker cluster. There is a sample Kubeveal Application in `application.yaml` to get started with. 
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/<TODO: promise directory>/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
 ```
 
 To make a resource request (small by default):
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/<TODO: promise directory>/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
 ```
 
 ## Development

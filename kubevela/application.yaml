@@ -1,0 +1,15 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  annotations:
+    helm.sh/hook: test-success
+    helm.sh/hook-delete-policy: hook-succeeded
+  name: helm-test-vela-app
+  namespace: vela-system
+spec:
+  components:
+  - name: helm-test-express-server
+    properties:
+      image: oamdev/hello-world:v1
+      port: 8000
+    type: webservice
