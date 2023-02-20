@@ -9,11 +9,19 @@ To install:
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/dapr/promise.yaml
 ```
 
-Thanks to @salaboy for helping build the Promise!
+To verify Dapr dashboard, you can use the [Dapr CLI](https://docs.dapr.io/getting-started/install-dapr-cli/) while targeting the Worker Cluster:
+
+```
+dapr dashboard -k
+```
+
+Check [Dapr docs](https://docs.dapr.io/getting-started/quickstarts/) for more use-cases of Dapr.
+
+Thanks to [@salaboy](https://github.com/salaboy/) for helping build the Promise!
 
 ## Requirements
 
-This Promises requires your are using Flux as the method for registering a
+This Promise requires you are using Flux as the method for registering a
 cluster with Kratix.
 
 ## Development
