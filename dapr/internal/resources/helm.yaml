@@ -1,0 +1,25 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dapr
+  namespace: dapr-system
+spec:
+  releaseName: dapr
+  chart:
+    spec:
+      chart: dapr
+      sourceRef:
+        kind: HelmRepository
+        name: dapr
+        namespace: dapr-system
+  interval: 5m
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: dapr
+  namespace: dapr-system
+spec:
+  interval: 5m0s
+  url: https://dapr.github.io/helm-charts/

@@ -11,6 +11,11 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 
 Thanks to @salaboy for helping build the Promise!
 
+## Requirements
+
+This Promises requires your are using Flux as the method for registering a
+cluster with Kratix.
+
 ## Development
 
 For development see [README.md](./internal/README.md)
