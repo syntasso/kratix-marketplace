@@ -1,16 +1,26 @@
 # Kubevela global instance
 
-This Promise will install global instance of Kubevela onto a Worker cluster. To use `apply` the Promise and then apply Kubevela objects directly to the Worker cluster. There is a sample Kubeveal Application in `application.yaml` to get started with. 
+This Promise will install global instance of Kubevela onto a Worker cluster.
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
+kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
 ```
 
-To make a resource request (small by default):
+You can deploy Kubevela applications directly to the Worker cluster. There is a sample app `application.yaml`:
+
+```bash
+# targeting the Worker Cluster
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/application.yaml
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
+
+To validate the application, you can use the [`vela` CLI](https://kubevela.io/docs/cli/vela):
+
+```bash
+vela port-forward helm-test-vela-app 8000:8000 -n vela-system
 ```
+
+The app will be available on [http://localhost:8000](http://localhost:8000).
 
 ## Development
 
