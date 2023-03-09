@@ -77,9 +77,7 @@ jobs:
       - retry/run-with-retry:
           command: |
             cd ~/repo/<< parameters.promise_dir >>;
-            if test -f "resource-request.yaml"; then
-              kubectl get crds $(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml);
-            fi
+            retry test -f "resource-request.yaml" && kubectl get crds $(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml)
           sleep: 3
           retry-count: 10
       - run:
