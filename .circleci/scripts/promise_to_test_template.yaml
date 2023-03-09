@@ -78,7 +78,7 @@ jobs:
           command:
             cd ~/repo/<< parameters.promise_dir >>;
             if test -f "resource-request.yaml"; then
-              kubectl get crds $(yq e '.spec.xaasCrd.metadata.name' promise.yaml);
+              kubectl get crds $(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml);
             fi
           sleep: 3
           retry-count: 10
