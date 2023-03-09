@@ -74,10 +74,13 @@ jobs:
           # 5 minutes total retry (3 sec * 100 times = 300 sec)
           sleep: 3
           retry-count: 100
-      - retry/run-with-retry:
+      - run:
+          name: Wait for CRDs
+          working_directory: ~/repo/<< parameters.promise_dir >>
           command: |
-            cd ~/repo/<< parameters.promise_dir >>;
-            retry test -f "resource-request.yaml" && kubectl get crds $(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml)
+            if test -f "resource-request.yaml"; then
+              kubectl wait crd/$(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml) --for condition=established --timeout=60s
+            fi
           sleep: 3
           retry-count: 10
       - run:
