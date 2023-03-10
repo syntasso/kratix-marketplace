@@ -2,13 +2,12 @@
 set -e
 
 test_promise() {
-  # TODO: set reasonable test for Promise installation that can be run on the worker cluster
-  exit 1
+  kubectl wait --for=condition=Available deployment/kubevela-vela-core --timeout=5s -n vela-system
 }
 
 test_resource_request() {
-  # TODO: set reasonable test for Resource Request (RR) installation that can be run on the worker cluster
-  exit 1
+  echo "no resource request"
+  exit 0
 }
 
 if [ "$1" = "promise" ]; then
