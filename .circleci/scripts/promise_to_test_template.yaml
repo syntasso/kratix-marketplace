@@ -77,12 +77,17 @@ jobs:
       - run:
           name: Wait for CRDs
           working_directory: ~/repo/<< parameters.promise_dir >>
+          no_output_timeout: 1m
           command: |
             if test -f "resource-request.yaml"; then
-              kubectl wait crd/$(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml) --for condition=established --timeout=60s
+              crd=$(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml)
+
+              while ! kubectl get crd ${crd} 2>/dev/null; do
+                sleep 1
+              done
+
+              kubectl wait crd/${crd} --for condition=established --timeout=60s
             fi
-          sleep: 3
-          retry-count: 10
       - run:
           name: Apply resource-request
           working_directory: ~/repo/<< parameters.promise_dir >>
