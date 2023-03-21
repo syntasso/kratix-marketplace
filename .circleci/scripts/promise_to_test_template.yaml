@@ -36,19 +36,8 @@ commands:
             sleep 5
             kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
 
-            cat \<<EOF > /tmp/cluster.yaml
-            apiVersion: platform.kratix.io/v1alpha1
-            kind: Cluster
-            metadata:
-              name: platform-cluster-worker-1
-              labels:
-                environment: platform
-            spec:
-              id: platform-cluster-worker-1-id
-              bucketPath: platform-cluster-worker-1
-            EOF
-            kubectl apply --filename /tmp/cluster.yaml
-            rm /tmp/cluster.yaml
+            curl -sL https://raw.githubusercontent.com/syntasso/kratix/main/test/system/assets/platform_gitops-tk-resources.yaml | kubectl apply -f -
+            curl -sL https://raw.githubusercontent.com/syntasso/kratix/main/test/system/assets/platform_kratix_cluster.yaml | kubectl apply -f -
             sleep 5
       - attach_workspace:
           at: .
