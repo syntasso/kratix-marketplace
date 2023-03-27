@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+resources_dir=$PWD/request-pipeline/resources
+mkdir -p ${resources_dir}
+rm -rf ${resources_dir}/*
+
+instance_urls=(
+    'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/v0.7.1/config/samples/jenkins.io_v1alpha2_jenkins.yaml'
+)
+
+for url in "${instance_urls[@]}"; do
+    curl -sL -o ${resources_dir}/$(basename $url) $url
+done
+
+# basePlugin must be set because operator defaults are out of date
+# version starting point found in: https://github.com/jenkinsci/kubernetes-operator/issues/794#issuecomment-1397889838
+# then updated based on errors on startup
+yq -i '. | 
+    .spec.master.containers[0].image="jenkins/jenkins:2.361.4-jdk17" | 
+    .spec.master.basePlugins= [
+    { "name": "kubernetes", "version": "3802.vb_b_600831fcb_3"},
+    { "name": "workflow-job", "version": "1284.v2fe8ed4573d4"},
+    { "name": "workflow-aggregator", "version": "2.6"},
+    { "name": "git", "version": "4.11.3"},
+    { "name": "job-dsl", "version": "1.78.3"},
+    { "name": "configuration-as-code", "version": "1569.vb_72405b_80249"},
+    { "name": "kubernetes-credentials-provider", "version": "1.208.v128ee9800c04"}
+    ] |
+    del(.spec.seedJobs)' ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml
+
+
+yq '. | .metadata.name="dev-NAME"' ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml > ${resources_dir}/dev-jenkins-instance.yaml
+yq '. | .metadata.name="prod-NAME"' ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml > ${resources_dir}/prod-jenkins-instance.yaml
+rm ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml

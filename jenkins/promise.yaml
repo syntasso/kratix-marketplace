@@ -14,45 +14,6 @@ spec:
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: Role
     metadata:
-      name: leader-election-role
-      namespace: default
-    rules:
-    - apiGroups:
-      - ""
-      - coordination.k8s.io
-      resources:
-      - configmaps
-      - leases
-      verbs:
-      - get
-      - list
-      - watch
-      - create
-      - update
-      - patch
-      - delete
-    - apiGroups:
-      - ""
-      resources:
-      - events
-      verbs:
-      - create
-      - patch
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: RoleBinding
-    metadata:
-      name: leader-election-rolebinding
-      namespace: default
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: Role
-      name: leader-election-role
-    subjects:
-    - kind: ServiceAccount
-      name: jenkins-operator
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: Role
-    metadata:
       name: jenkins-operator
       namespace: default
     rules:
@@ -216,6 +177,46 @@ spec:
       - update
       - watch
   - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: leader-election-role
+      namespace: default
+    rules:
+    - apiGroups:
+      - ""
+      - coordination.k8s.io
+      resources:
+      - configmaps
+      - leases
+      verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - patch
+      - delete
+    - apiGroups:
+      - ""
+      resources:
+      - events
+      verbs:
+      - create
+      - patch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: leader-election-rolebinding
+      namespace: default
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: leader-election-role
+    subjects:
+    - kind: ServiceAccount
+      name: jenkins-operator
+      namespace: default
+  - apiVersion: rbac.authorization.k8s.io/v1
     kind: RoleBinding
     metadata:
       name: manager-rolebinding
@@ -227,6 +228,7 @@ spec:
     subjects:
     - kind: ServiceAccount
       name: jenkins-operator
+      namespace: default
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
@@ -254,7 +256,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            image: virtuslab/jenkins-operator:v0.7.1
+            image: virtuslab/jenkins-operator:60b8ee5
             imagePullPolicy: IfNotPresent
             livenessProbe:
               httpGet:
@@ -272,10 +274,10 @@ spec:
             resources:
               limits:
                 cpu: 100m
-                memory: 30Mi
+                memory: 90Mi
               requests:
                 cpu: 100m
-                memory: 20Mi
+                memory: 60Mi
             securityContext:
               allowPrivilegeEscalation: false
           securityContext:
@@ -287,6 +289,7 @@ spec:
     metadata:
       annotations:
         controller-gen.kubebuilder.io/version: v0.4.1
+      creationTimestamp: null
       name: jenkins.jenkins.io
     spec:
       group: jenkins.io
@@ -440,11 +443,12 @@ spec:
                         type: object
                       basePlugins:
                         description: 'BasePlugins contains plugins required by operator
-                          Defaults to : - name: kubernetes version: "1.29.6" - name:
-                          workflow-job version: "2.41" - name: workflow-aggregator
-                          version: "2.6" - name: git version: "4.7.2" - name: job-dsl
-                          version: "1.77" - name: configuration-as-code version: "1.51"
-                          - name: kubernetes-credentials-provider version: "0.18-1"'
+                          Defaults to : - name: kubernetes version: "1.31.3" - name:
+                          workflow-job version: "1145.v7f2433caa07f" - name: workflow-aggregator
+                          version: "2.6" - name: git version: "4.11.3" - name: job-dsl
+                          version: "1.78.1" - name: configuration-as-code version:
+                          "1346.ve8cfa_3473c94" - name: kubernetes-credentials-provider
+                          version: "0.20"'
                         items:
                           description: Plugin defines Jenkins plugin.
                           properties:
@@ -1422,6 +1426,24 @@ spec:
                         description: DisableCSRFProtection allows you to toggle CSRF
                           Protection on Jenkins
                         type: boolean
+                      hostAliases:
+                        description: HostAliases for Jenkins master pod and SeedJob
+                          agent
+                        items:
+                          description: HostAlias holds the mapping between IP and
+                            hostnames that will be injected as an entry in the pod's
+                            hosts file.
+                          properties:
+                            hostnames:
+                              description: Hostnames for the above IP address.
+                              items:
+                                type: string
+                              type: array
+                            ip:
+                              description: IP address of the host file entry.
+                              type: string
+                          type: object
+                        type: array
                       imagePullSecrets:
                         description: 'ImagePullSecrets is an optional list of references
                           to secrets in the same namespace to use for pulling any
@@ -1448,6 +1470,11 @@ spec:
                           match selectors of replication controllers and services.
                           More info: http://kubernetes.io/docs/user-guide/labels'
                         type: object
+                      latestPlugins:
+                        description: 'Allow to override jenkins-plugin-cli default
+                          behavior while downloading the plugin and dependencies,
+                          see: https://github.com/jenkinsci/plugin-installation-manager-tool#cli-options'
+                        type: boolean
                       nodeSelector:
                         additionalProperties:
                           type: string
@@ -3505,6 +3532,11 @@ spec:
                       - name
                       type: object
                     type: array
+                  seedJobAgentImage:
+                    description: SeedJobAgentImage defines the image that will be
+                      used by the seed job agent. If not defined jenkins/inbound-agent:4.10-3
+                      will be used.
+                    type: string
                   seedJobs:
                     description: 'SeedJobs defines list of Jenkins Seed Job configurations
                       More info: https://jenkinsci.github.io/kubernetes-operator/docs/getting-started/latest/configuration#configure-seed-jobs-and-pipelines'
@@ -3726,6 +3758,11 @@ spec:
                           cloud) which routes to the clusterIP. More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services---service-types'
                         type: string
                     type: object
+                  validateSecurityWarnings:
+                    description: ValidateSecurityWarnings enables or disables validating
+                      potential security warnings in Jenkins plugins via admission
+                      webhooks.
+                    type: boolean
                 required:
                 - jenkinsAPISettings
                 - master

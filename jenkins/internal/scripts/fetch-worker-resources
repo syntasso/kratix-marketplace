@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+mkdir -p ${PWD}/resources
+
+urls=(
+  'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/605669de0df749d38636fb3aaee7059b532837eb/config/crd/bases/jenkins.io_jenkins.yaml'
+)
+
+for url in "${urls[@]}"; do
+    curl -sL -o ${PWD}/resources/$(basename $url) $url
+done
+
+DIR=$(mktemp -d)
+echo """---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default
+
+resources:
+  - 'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/605669de0df749d38636fb3aaee7059b532837eb/deploy/all-in-one-v1alpha2.yaml'
+
+# Fix found in: https://github.com/jenkinsci/kubernetes-operator/issues/794#issuecomment-1397412049
+patchesJson6902:
+- target:
+    group: apps
+    version: v1
+    kind: Deployment
+    name: jenkins-operator
+  patch: |-
+    - op: replace
+      path: '/spec/template/spec/containers/0/image'
+      value: 'virtuslab/jenkins-operator:60b8ee5'
+""" > $DIR/kustomization.yaml
+
+kubectl kustomize $DIR --output $PWD/resources/all-in-one-v1alpha2.yaml
