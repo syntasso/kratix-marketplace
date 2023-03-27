@@ -5,6 +5,6 @@ metadata:
   namespace: default
 spec:
   env: dev
-  # plugins:
-  #   - name: greenballs
-  #     version: 1.15.1
+  plugins:
+    - name: opentelemetry
+      version: 2.11.0
