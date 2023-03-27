@@ -18,7 +18,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.361.4-jdk17
+        image: jenkins/jenkins:2.396-jdk17
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 12
@@ -47,6 +47,11 @@ spec:
           requests:
             cpu: "1"
             memory: 500Mi
+        env:
+          - name: DEBUG_JENKINS_OPERATOR
+            value: "true"
+          - name: JAVA_OPTS
+            value: -Xmx2048m -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=80.0 -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true
     basePlugins:
       - name: kubernetes
         version: 3802.vb_b_600831fcb_3
