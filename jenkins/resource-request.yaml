@@ -5,6 +5,3 @@ metadata:
   namespace: default
 spec:
   env: dev
-  plugins:
-    - name: opentelemetry
-      version: 2.11.0
