@@ -1,0 +1,14 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: VaultNamespace
+metadata:
+  name: example
+  namespace: default
+spec:
+  team: kratix
+  kubernetes:
+    host: https://kubernetes.example.com
+    caCert: |
+      -----BEGIN CERTIFICATE-----
+      ...
+      -----END CERTIFICATE-----
+
