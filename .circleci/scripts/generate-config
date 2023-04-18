@@ -60,4 +60,6 @@ done
 
 if something_changed; then
     cat ${template} >&3
+else
+    cat empty.yaml >&3
 fi
