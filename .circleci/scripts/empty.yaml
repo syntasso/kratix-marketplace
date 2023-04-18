@@ -1,0 +1,12 @@
+version: 2.1
+
+executors:
+  my-executor:
+    docker:
+      - image: cimg/base:2022.09
+workflows:
+  jobs:
+    be_happy:
+      executor: my-executor
+      steps:
+        - run: echo "No changes in promises detected!"
