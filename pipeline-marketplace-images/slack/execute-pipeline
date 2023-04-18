@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+
+set -e
+
+touch /tmp/status.yaml
+if [ -f /metadata/status.yaml ]; then
+  mv /metadata/status.yaml /tmp/status.yaml
+fi
+
+notifications_status="$(yq '.conditions[] | select(.type == "NotificationsSent") | .status' /tmp/status.yaml)"
+if [ "$notifications_status" = "True" ]; then
+  echo "Notifications already sent, skipping pipeline execution"
+  exit 0
+fi
+
+if [ ! -d /metadata/notifications ]; then
+  echo "No notifications to send, skipping pipeline execution"
+  exit 0
+fi
+
+for f in $(ls /metadata/notifications/*); do
+  message="$(yq '.message' $f)"
+  url="$(yq '.slackHook.url // "null"' $f)"
+
+  if [ "$url" = "null" ]; then
+    secret_name="$(yq '.slackHook.secretName // "null"' $f)"
+    if [ "$secret_name" = "null" ]; then
+      echo "One of slackHook.secretName or slackHook.url must be set (file: $f)"
+      exit 1
+    fi
+    namespace="$(yq '.slackHook.namespace // "default"' $f)"
+    url="$(kubectl get secret "${secret_name}" --namespace "${namespace}" -o=jsonpath='{.data.url}' | base64 -d)"
+  fi
+  curl -X POST -H 'Content-type: application/json' \
+    --data "{
+      \"blocks\": [{
+        \"type\": \"section\",
+        \"text\": {
+          \"type\": \"mrkdwn\",
+          \"text\": \"${message}\"
+        }
+      }]
+    }" \
+    ${url}
+done
+
+yq '.conditions += [{"type": "NotificationsSent", "status": "True"}]' /tmp/status.yaml > /metadata/status.yaml
+
+cp /input/* /output/

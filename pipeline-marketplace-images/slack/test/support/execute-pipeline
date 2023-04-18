@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+set -xe
+
+mkdir -p /metadata/notifications
+
+cat > /metadata/notifications/message.yml <<EOF
+message: |
+    :gem: :raised_hands: :rocket: :moon: :doge:
+slackHook:
+  secretName: slack-channel-hook
+  namespace: default
+EOF

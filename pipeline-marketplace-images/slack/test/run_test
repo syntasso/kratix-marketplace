@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if [ -z "${SLACK_HOOK_URL}" ]; then
+    echo "please set SLACK_HOOK_URL"
+    exit 1
+fi
+
+docker build --tag syntasso/generate-slack-message:dev ./support
+kind load docker-image syntasso/generate-slack-message:dev --name platform
+../scripts/image build load
+
+kubectl delete secret slack-channel-hook
+kubectl --namespace default create secret generic \
+  slack-channel-hook --from-literal=url=${SLACK_HOOK_URL}
+
+kubectl delete -f job.yaml
+kubectl apply -f job.yaml

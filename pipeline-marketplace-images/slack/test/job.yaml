@@ -1,0 +1,68 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: slack-cr
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - slack-channel-hook
+  - slack-channel-hook-2
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: slack-crb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: slack-cr
+subjects:
+- kind: ServiceAccount
+  name: slack-sa
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: slack-sa
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: slack-notification-job
+spec:
+  template:
+    spec:
+      serviceAccountName: slack-sa
+      volumes:
+        - name: input
+          emptyDir: {}
+        - name: output
+          emptyDir: {}
+        - name: metadata
+          emptyDir: {}
+      initContainers:
+        - image: syntasso/generate-slack-message:dev
+          name: generate-slack-message
+          resources: {}
+          volumeMounts:
+            - name: metadata
+              mountPath: /metadata
+      containers:
+        - image: ghcr.io/syntasso/kratix-marketplace/pipeline-slack-image:v0.1.0
+          name: slack-notification-job
+          resources: {}
+          volumeMounts:
+            - name: metadata
+              mountPath: /metadata
+            - name: input
+              mountPath: /input
+            - name: output
+              mountPath: /output
+      restartPolicy: Never
