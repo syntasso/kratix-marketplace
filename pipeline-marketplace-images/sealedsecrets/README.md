@@ -6,8 +6,8 @@ xaasRequestPipeline:
 - ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
 ```
 
-This image finds all `kind: Secret` documents in `/input`, encrypt them with
-[kubeseal](https://github.com/bitnami-labs/sealed-secrets), and create the sealed
+This image finds all `kind: Secret` documents in `/input`, encrypts them with
+[kubeseal](https://github.com/bitnami-labs/sealed-secrets), and creates the sealed
 documents in `/output`. All non-secret documents are copied over.
 
 ## Pre-requisites
