@@ -3,7 +3,14 @@
 set -e
 
 root=$(cd $(dirname $0)/..; pwd)
-pipeline_image="ghcr.io/syntasso/kratix-marketplace/pipeline-slack-image:v0.1.0"
+image_name="$1"
+shift
+pipeline_image="ghcr.io/syntasso/kratix-marketplace/pipeline-${image_name}-image:v0.1.0"
+
+if [ ! -d "${root}/${image_name}" ]; then
+  echo "Directory ${image_name} does not exist"
+  exit 1
+fi
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -11,7 +18,7 @@ while [ $# -gt 0 ]; do
       docker build \
         --tag "${pipeline_image}" \
         --platform linux/amd64 \
-        "${root}" ;;
+        "${root}/${image_name}" ;;
 
     load)
       kind load docker-image "${pipeline_image}" --name platform ;;

@@ -22,6 +22,8 @@ kubectl --namespace <NAMESPACE> create secret generic \
 
 ## Usage in the Pipeline
 
+Add the image to the `xaasRequestPipeline` definition in your Promise.
+
 This image is intented to be used alongide with other container images in a
 Promise Pipeline. It relies on the existence of one or more YAML files in a
 `/metadata/notifications` with the following format:

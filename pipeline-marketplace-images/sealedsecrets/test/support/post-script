@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+set -xe
+
+ls -l /input
+
+cat /input/*
+
+if yq --exit-status 'select(.kind == "Secret")' /input/* >/dev/null; then
+    echo "found secrets input"
+    exit 1
+fi
+
+if ! yq --exit-status 'select(.kind == "ConfigMap")' /input/* >/dev/null; then
+    echo "didnt find the expected configmap in input"
+    exit 1
+fi
+
+if ! yq --exit-status 'select(.kind == "SealedSecret")' /input/* >/dev/null; then
+    echo "didnt find the expected sealedsecret in input"
+    exit 1
+fi
+
+echo "all documents accounted for!!"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+docker build --tag syntasso/pre-test-image:dev ./support --file ./support/Dockerfile.pre
+kind load docker-image syntasso/pre-test-image:dev --name platform
+
+docker build --tag syntasso/post-test-image:dev ./support --file ./support/Dockerfile.post
+kind load docker-image syntasso/post-test-image:dev --name platform
+
+../../scripts/image sealedsecrets build load
+
+export PUBLICKEY="keys/mytls.crt"
+if [ ! -d keys ]; then
+  mkdir keys
+  export PRIVATEKEY="keys/mytls.key"
+  openssl req -x509 -days 365 -nodes -newkey rsa:4096 -keyout "$PRIVATEKEY" -out "$PUBLICKEY" -subj "/CN=sealed-secret/O=sealed-secret"
+fi
+
+kubectl delete -f job.yaml
+kubectl delete configmap sealed-secrets
+kubectl --namespace default create configmap sealed-secrets \
+    --from-literal=certificate="$(cat "$PUBLICKEY")"
+kubectl apply -f job.yaml
