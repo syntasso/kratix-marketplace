@@ -3,7 +3,7 @@
 ```yaml
 xaasRequestPipeline:
 - # images
-- ghcr.io/syntasso/kratix-marketplace/pipelines/slack-image:v0.1.0
+- ghcr.io/syntasso/kratix-marketplace/pipeline-slack-image:v0.1.0
 ```
 
 ## Pre-requisites
