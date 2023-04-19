@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -ex
+set -e
 
 # copy everything thats not of `kind: Secret` to output
 cd /output
