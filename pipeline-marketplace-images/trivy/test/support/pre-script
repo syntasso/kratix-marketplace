@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+set -xe
+
+kubectl run nginx --image nginx --dry-run=client -o yaml > /output/nginx.yaml
+kubectl run mongo --image mongo:5.0.6 --dry-run=client -o yaml > /output/mongo.yaml
+kubectl create deployment kratix --image syntassodev/kratix-platform:2d4792c46094ffb7ce92a58c148c9ee3cc5499ab --dry-run=client -o yaml > /output/kratix-deployment.yaml

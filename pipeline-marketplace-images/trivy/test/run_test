@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -e
+
+docker build --tag syntasso/pre-test-image:dev ./support --file ./support/Dockerfile.pre
+kind load docker-image syntasso/pre-test-image:dev --name platform
+
+../../scripts/image trivy build load
+
+kubectl delete -f job.yaml || true
+kubectl apply -f job.yaml

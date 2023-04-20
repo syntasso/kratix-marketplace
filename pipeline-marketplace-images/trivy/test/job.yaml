@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: trivy
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      volumes:
+        - name: images-to-scan
+          emptyDir: {}
+        - name: results
+          emptyDir: {}
+      initContainers:
+        - image: syntasso/pre-test-image:dev
+          name: generate-yaml
+          resources: {}
+          volumeMounts:
+            - name: images-to-scan
+              mountPath: /output
+      containers:
+        - image: ghcr.io/syntasso/kratix-marketplace/pipeline-trivy-image:v0.1.0
+          name: trivy-scan
+          resources: {}
+          volumeMounts:
+            - name: images-to-scan
+              mountPath: input
+            - name: results
+              mountPath: /output
+      restartPolicy: Never

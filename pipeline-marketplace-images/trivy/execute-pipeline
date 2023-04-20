@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -ex
+
+to_scan=()
+IFS=$'\n'
+for f in $(cat /input/* | grep "image: "); do
+  image="$(echo $f | sed -e 's/^[[:space:]]*//' | sed 's/^- //' | yq '.image')"
+  to_scan+=( $image )
+done
+
+echo "Scanning images: ${to_scan[@]}"
+
+found_vulns=false
+for image in "${to_scan[@]}"; do
+  if ! trivy --cache-dir /trivy image --skip-db-update --skip-java-db-update --offline-scan $image --exit-code 1 --severity HIGH,CRITICAL; then
+    found_vulns=true
+  fi
+done
+
+if $found_vulns; then
+  echo "Found vulnerabilities in some of the images"
+  echo "See report above"
+  exit 1
+fi
+
+echo "No vulnerabilities found"
+cp /input/* /output
