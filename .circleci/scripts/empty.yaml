@@ -4,9 +4,14 @@ executors:
   my-executor:
     docker:
       - image: cimg/base:2022.09
+
+jobs:
+  noop:
+    executor: my-executor
+    steps:
+      - run: echo "No changes in promises detected!"
+
 workflows:
-  jobs:
-    be_happy:
-      executor: my-executor
-      steps:
-        - run: echo "No changes in promises detected!"
+  noop:
+    jobs:
+      - noop
