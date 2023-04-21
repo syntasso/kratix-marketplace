@@ -1,4 +1,4 @@
-# Sealed Secrets
+# Vault
 
 ```yaml
 xaasRequestPipeline:
