@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+
+set -xe
+
+export VAULT_ADDR="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.url}')"
+export AUTHPATH="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.authpath}')"
+
+echo "logging into vault"
+role="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.role}')"
+jwt=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+
+vault login $(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token) >/dev/null
+
+echo "verifying vault is accessible"
+vault status
+
+kubectl create secret generic supersecret \
+    --from-literal=accesskey=superkey \
+    --from-literal=secretkey=supersecret \
+    --dry-run=client -o yaml > /output/secrets.yaml
+echo -e "\n---\n" >> /output/secrets.yaml
+kubectl create secret generic topsecret \
+    --from-literal=private=value \
+    --from-literal=password=secr3t \
+    --dry-run=client -o yaml >> /output/secrets.yaml
+
+cat > /output/object.yaml <<EOF
+apiVersion: v1
+kind: ResourceRequest
+metadata:
+  name: myresource
+  namespace: default
+EOF

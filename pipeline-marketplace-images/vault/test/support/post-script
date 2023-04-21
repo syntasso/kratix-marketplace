@@ -1,0 +1,29 @@
+#!/usr/bin/env sh
+
+set -xe
+
+ls -l /input
+
+if yq --exit-status 'select(.kind == "Secret")' /input/* >/dev/null; then
+    echo "found secrets input"
+    exit 1
+fi
+
+if [ ! -f cat /metadata/status.yaml ]; then
+    echo "no status file found"
+    exit 1
+fi
+
+cat /metadata/status.yaml
+
+export VAULT_ADDR="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.url}')"
+export AUTHPATH="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.authpath}')"
+
+echo "logging into vault"
+role="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.role}')"
+jwt=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+
+vault login $(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token) >/dev/null
+
+vault kv get secret/default/myresource/supersecret
+vault kv get secret/default/myresource/topsecret

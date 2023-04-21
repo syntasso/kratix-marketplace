@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+vault_cm="vault-pipeline-image"
+
+split_files() {
+  # copy everything thats not of `kind: Secret` to output
+  cd /output
+  yq 'select(.kind != "Secret")' --split-exp '.metadata.name + $index' /input/*
+  cd ..
+
+  # split the secrets into their own files
+  mkdir secrets
+  cd secrets
+  yq 'select(.kind == "Secret")' --split-exp '.metadata.name + $index' /input/*
+  cd ..
+}
+
+login_to_vault() {
+    echo "logging into vault"
+    role="$(kubectl get configmap ${vault_cm} -o jsonpath='{.data.role}')"
+    jwt=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+
+    vault login $(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token) >/dev/null
+}
+
+store_secrets() {
+  local namespace="$1"
+  local resource_name="$2"
+
+  secret_path="secret/${namespace}/${resource_name}/"
+
+  for f in $(ls secrets/*); do
+    secret_name=$(yq -r '.metadata.name' $f)
+    secrets=""
+    props=""
+
+    if [ "$(yq 'has("data")' $f)" = "true" ]; then
+      props=$(yq -o csv -r '.data | to_entries | .[] | [.key, .value | @base64d]' $f)
+    elif [ "$(yq 'has("stringData")' $f)" = "true" ]; then
+      props=$(yq -o csv -r '.stringData | to_entries | .[] | [.key, .value ]' $f)
+    else
+      echo "no data found in secret ${secret_name}"
+      continue
+    fi
+
+    while IFS=$"," read -r key value; do
+      secrets="${secrets} ${key}=${value}"
+    done <<< "$props"
+
+    if [ -n "$secrets" ]; then
+      vault kv put ${secret_path}/${secret_name} ${secrets}
+      wrote_secrets=true
+    fi
+
+  done
+  if $wrote_secrets; then
+    echo "vault-secrets: run 'vault kv list ${secret_path}' to see the secrets" > /metadata/status.yaml
+  fi
+}
+
+main() {
+   export VAULT_ADDR="$(kubectl get configmap ${vault_cm} -o jsonpath='{.data.url}')"
+   export AUTHPATH="$(kubectl get configmap ${vault_cm} -o jsonpath='{.data.authpath}')"
+
+  login_to_vault
+  resource_name="request-$RANDOM"
+  namespace="default"
+  if [ -f /input/object.yaml ]; then
+    resource_name=$(yq '.metadata.name' /input/object.yaml)
+    namespace=$(yq '.metadata.namespace // "default"' /input/object.yaml)
+  fi
+  split_files
+  store_secrets $namespace $resource_name
+}
+
+main

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+
+set -x
+docker build --tag syntasso/pre-test-image:dev ./support --file ./support/Dockerfile.pre
+kind load docker-image syntasso/pre-test-image:dev --name platform
+
+docker build --tag syntasso/post-test-image:dev ./support --file ./support/Dockerfile.post
+kind load docker-image syntasso/post-test-image:dev --name platform
+
+../../scripts/image vault build load
+
+
+if [ -z "${VAULT_PORT}" ]; then
+    echo "VAULT_PORT is not set"
+    exit 1
+fi
+
+pipeline_sa="vault-pipeline-image"
+vault_role="vault-writer"
+k8surl=$(TERM=dumb kubectl cluster-info | grep "control plane" | awk '{print $7}')
+
+kubectl config view --raw -o go-template='{{index ((index (index .clusters 0) "cluster")) "certificate-authority-data" | base64decode}}' > ca.crt
+kubectl create serviceaccount ${pipeline_sa} -n default
+
+kubectl create serviceaccount vault-auth -n default
+kubectl create clusterrolebinding role-tokenreview-binding \
+    --clusterrole=system:auth-delegator \
+    --serviceaccount=default:vault-auth
+
+kubectl apply -f - <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-auth-token
+  annotations:
+    kubernetes.io/service-account.name: vault-auth
+type: kubernetes.io/service-account-token
+EOF
+jwt=$(kubectl describe secrets/vault-auth-token | tail -1 | yq '.token')
+
+vault auth enable kubernetes 2>/dev/null || true
+vault write auth/kubernetes/config \
+    token_reviewer_jwt="${jwt}" \
+    kubernetes_host="${k8surl}" \
+    kubernetes_ca_cert=@ca.crt
+
+vault policy write secret-writer policy.hcl
+vault write auth/kubernetes/role/${vault_role} \
+    bound_service_account_names=${pipeline_sa} \
+    bound_service_account_namespaces=default \
+    policies=secret-writer \
+    ttl=1h
+
+
+kubectl delete configmap vault-pipeline-image
+kubectl create configmap vault-pipeline-image \
+    --from-literal=url=http://host.docker.internal:${VAULT_PORT} \
+    --from-literal=role=${vault_role} \
+    --from-literal=authpath=kubernetes
+
+kubectl delete -f job.yaml
+kubectl apply -f job.yaml
