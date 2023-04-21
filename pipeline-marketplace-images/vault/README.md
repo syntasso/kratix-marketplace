@@ -151,6 +151,6 @@ fetch the Vault config the ConfigMap and store the Secrets in Vault.
 * If any other document in `/input` refer to the Secret (like via a `volumeMount` in a
   `Pod`), this image won't remove those references, nor will it add any Vault-agent
   annotations. Please add an extra job in the pipeline to do that.
-* Only keys in the `data` part of the Secret will be parsed and stored in Vault.
-  `stringData` is not currently supported.
+* Only keys in the `data` and `stringData` part of the Secret will be parsed
+  and stored in Vault.
 
