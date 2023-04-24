@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 
-set -x
+set -ex
+
 docker build --tag syntasso/pre-test-image:dev ./support --file ./support/Dockerfile.pre
 kind load docker-image syntasso/pre-test-image:dev --name platform
 
@@ -10,23 +11,23 @@ kind load docker-image syntasso/post-test-image:dev --name platform
 
 ../../scripts/image vault build load
 
-
 if [ -z "${VAULT_PORT}" ]; then
     echo "VAULT_PORT is not set"
     exit 1
 fi
+export VAULT_ADDR="http://127.0.0.1:${VAULT_PORT}"
 
 pipeline_sa="vault-pipeline-image"
 vault_role="vault-writer"
 k8surl=$(TERM=dumb kubectl cluster-info | grep "control plane" | awk '{print $7}')
 
 kubectl config view --raw -o go-template='{{index ((index (index .clusters 0) "cluster")) "certificate-authority-data" | base64decode}}' > ca.crt
-kubectl create serviceaccount ${pipeline_sa} -n default
+kubectl create serviceaccount ${pipeline_sa} -n default || true
 
-kubectl create serviceaccount vault-auth -n default
+kubectl create serviceaccount vault-auth -n default || true
 kubectl create clusterrolebinding role-tokenreview-binding \
     --clusterrole=system:auth-delegator \
-    --serviceaccount=default:vault-auth
+    --serviceaccount=default:vault-auth || true
 
 kubectl apply -f - <<EOF
 apiVersion: v1
