@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export SNYK_TOKEN="$(kubectl get secret snyk-token -o=jsonpath='{.data.token}' | base64 -d)"
+
+set -x
+
+to_scan=()
+IFS=$'\n'
+for f in $(cat /input/* | grep "image: "); do
+  image="$(echo $f | sed -e 's/^[[:space:]]*//' | sed 's/^- //' | yq '.image')"
+  to_scan+=( $image )
+done
+
+echo "Scanning images: ${to_scan[@]}"
+
+found_vulns=false
+for image in "${to_scan[@]}"; do
+  if ! snyk container test $image; then
+    found_vulns=true
+  fi
+done
+
+if $found_vulns; then
+  echo "Found vulnerabilities in some of the images"
+  echo "See report above"
+  exit 1
+fi
+
+echo "No vulnerabilities found"
+cp /input/* /output

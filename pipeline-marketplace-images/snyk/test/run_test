@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ -z "${SNYK_TOKEN}" ]; then
+    echo "please set SLACK_HOOK_URL"
+    exit 1
+fi
+
+docker build --tag syntasso/pre-test-image:dev ./support --file ./support/Dockerfile.pre
+kind load docker-image syntasso/pre-test-image:dev --name platform
+
+../../scripts/image snyk build load
+
+kubectl delete secret snyk-token || true
+kubectl --namespace default create secret generic \
+  snyk-token --from-literal=token=${SNYK_TOKEN}
+
+kubectl delete -f job.yaml || true
+kubectl apply -f job.yaml

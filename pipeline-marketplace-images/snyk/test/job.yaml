@@ -1,0 +1,64 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: snyk-cr
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - snyk-token
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: snyk-crb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: snyk-cr
+subjects:
+- kind: ServiceAccount
+  name: snyk-sa
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: snyk-sa
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: snyk
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      serviceAccountName: snyk-sa
+      volumes:
+        - name: images-to-scan
+          emptyDir: {}
+        - name: results
+          emptyDir: {}
+      initContainers:
+        - image: syntasso/pre-test-image:dev
+          name: generate-yaml
+          resources: {}
+          volumeMounts:
+            - name: images-to-scan
+              mountPath: /output
+      containers:
+        - image: ghcr.io/syntasso/kratix-marketplace/pipeline-snyk-image:v0.1.0
+          name: snyk-scan
+          resources: {}
+          volumeMounts:
+            - name: images-to-scan
+              mountPath: input
+            - name: results
+              mountPath: /output
+      restartPolicy: Never
