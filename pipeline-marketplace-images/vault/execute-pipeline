@@ -31,7 +31,8 @@ store_secrets() {
 
   secret_path="secret/${namespace}/${resource_name}/"
 
-  for f in $(ls secrets/*); do
+  for f in secrets/*; do
+    [ -e "$f" ] || continue
     secret_name=$(yq -r '.metadata.name' $f)
     secrets=""
     props=""
