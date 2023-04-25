@@ -203,6 +203,7 @@ spec:
     targetPort: 80
     protocol: TCP
     name: http
+    nodePort: 31338
   - port: 443
     targetPort: 443
     protocol: TCP
