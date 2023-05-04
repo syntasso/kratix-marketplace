@@ -56,7 +56,7 @@ spec:
       - name: kubernetes
         version: 3802.vb_b_600831fcb_3
       - name: workflow-job
-        version: 1284.v2fe8ed4573d4
+        version: 1289.vd1c337fd5354
       - name: workflow-aggregator
         version: "2.6"
       - name: git
