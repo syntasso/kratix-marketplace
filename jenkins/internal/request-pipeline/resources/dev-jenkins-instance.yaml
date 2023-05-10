@@ -4,6 +4,10 @@ metadata:
   name: dev-NAME
   namespace: default
 spec:
+  service:
+    type: NodePort
+    port: 8080
+    nodePort: 32001
   configurationAsCode:
     configurations: []
     secret:

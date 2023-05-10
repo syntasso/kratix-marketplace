@@ -5,11 +5,18 @@ set -x
 # Read current values from the provided resource request
 export name="$(yq eval '.metadata.name' /input/object.yaml)"
 
-
 export plugins="$(yq eval '.spec.plugins // []' /input/object.yaml)"
 env_type="$(yq eval '.spec.env // "dev"' /input/object.yaml)"
 base_instance="/tmp/transfer/${env_type}-jenkins-instance.yaml"
 
+if [ "${env_type}" = "dev" ]; then
+  # derive a nodePort from the name
+  nodePort="$(echo "${name}" | md5sum | grep -Eo "[[:digit:]]{3}" | head -n1)"
+  nodePort=$(( 30000 + nodePort ))
+fi
+
 # Replace defaults with user provided values
+export nodePort
 yq eval '.spec.master.plugins = env(plugins)' ${base_instance} |
+  yq eval '.spec.service.nodePort = env(nodePort)' |
   sed "s/NAME/${name}/g" > /output/jenkins-instance.yaml
