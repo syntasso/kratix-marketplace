@@ -3,6 +3,8 @@
 This Promise provides Jenkins-as-a-Service. The Promise has 1 field `.spec.env`
 which can be `dev` or `prod`.
 
+`prod` Jenkins comes with Backups pre-configured.
+
 To install:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/jenkins/promise.yaml
