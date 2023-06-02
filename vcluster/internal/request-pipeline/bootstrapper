@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+function run() {
+until ${@:2}
+do
+  echo "$1"
+  sleep 5
+done
+}
+
+
+run "Waiting for vcluster secret to exist" kubectl -n $NAME get secret vc-$NAME
+
+kubectl -n $NAME get secret vc-$NAME -o yaml > secret.yaml
+
+cat secret.yaml | yq .data.config | base64 -d > kubeconfig.old
+
+sed "s/localhost:8443/${NAME}.${NAME}:10250/g" kubeconfig.old > kubeconfig.updated
+
+kubectl -n $NAME create secret generic vc-${NAME}-flux --from-file=config=kubeconfig.updated

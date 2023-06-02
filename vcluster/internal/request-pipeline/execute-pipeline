@@ -1,0 +1,101 @@
+#!/usr/bin/env sh
+
+set -x
+#
+# Read current values from the provided resource request
+export name="$(yq eval '.metadata.name' /input/object.yaml)"
+
+helm template $name vcluster \
+  --values /tmp/transfer/vcluster.yaml \
+  --repo https://charts.loft.sh \
+  --namespace $name \
+  --repository-config='' > /output/vcluster.yaml
+
+cat > /output/namespace.yaml <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: $name
+EOF
+
+sed "s/CLUSTERNAME/${name}/g" /tmp/transfer/flux-push.yaml > /output/flux-push.yaml
+
+cat > /output/cluster.yaml <<EOF
+apiVersion: platform.kratix.io/v1alpha1
+kind: Cluster
+metadata:
+  name: $name
+  namespace: default
+  labels:
+    type: vcluster
+    clusterName: $name
+spec:
+  stateStoreRef:
+    kind: BucketStateStore
+    name: default
+EOF
+
+
+# Bootstrapper creates a valid kubeconfig for Flux to push down to the vcluster
+cat > /output/job.yaml <<EOF
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bootstrapper
+  namespace: $name
+spec:
+  template:
+    spec:
+      serviceAccount: bootstrapper
+      containers:
+      - name: bootstrapper
+        image: ghcr.io/syntasso/kratix-marketplace/vcluster-request-pipeline:v0.1.0
+        command: ["sh",  "-c", "./bootstrapper"]
+        env:
+        - name: NAME
+          value: $name
+      restartPolicy: Never
+  backoffLimit: 4
+EOF
+
+
+cat > /output/sa.yaml <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bootstrapper
+  namespace: $name
+EOF
+
+cat > /output/role.yaml <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: $name-bootstrapper-admin
+  namespace: $name
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+  - list
+EOF
+
+cat > /output/rolebinding.yaml <<EOF
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: $name-bootstrapper-admin
+  namespace: $name
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: $name-bootstrapper-admin
+subjects:
+- kind: ServiceAccount
+  name: bootstrapper
+  namespace: $name
+EOF

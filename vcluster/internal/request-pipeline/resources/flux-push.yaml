@@ -1,0 +1,40 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: CLUSTERNAME-resources
+  namespace: CLUSTERNAME
+spec:
+  interval: 3s
+  prune: true
+  dependsOn:
+    - name: CLUSTERNAME-crds
+  sourceRef:
+    kind: Bucket
+    name: kratix-bucket
+    namespace: flux-system
+  path: ./default/CLUSTERNAME/resources
+  validation: client
+  kubeConfig:
+    secretRef:
+      name: vc-CLUSTERNAME-flux
+      key: config
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: CLUSTERNAME-crds
+  namespace: CLUSTERNAME
+spec:
+  interval: 8s
+  prune: true
+  sourceRef:
+    kind: Bucket
+    name: kratix-bucket
+    namespace: flux-system
+  validation: client
+  path: ./default/CLUSTERNAME/crds
+  kubeConfig:
+    secretRef:
+      name: vc-CLUSTERNAME-flux
+      key: config

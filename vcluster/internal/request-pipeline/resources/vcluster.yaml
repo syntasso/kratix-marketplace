@@ -1,0 +1,2 @@
+vcluster:
+  image: rancher/k3s:v1.23.5-k3s1
