@@ -1,3 +1,8 @@
+# WARNING- dapr helm chart generates static pub/priv key pair that are published in the repository.
+# This promise should only be used locally for demo purposes
+# If you wish to use this promise for more than demo purposes you should manually
+# update all the secrets with keys in the promise with your own credentials
+
 # Dapr
 
 This Promise provides [Dapr](https://docs.dapr.io/).
@@ -18,11 +23,6 @@ dapr dashboard -k
 Check [Dapr docs](https://docs.dapr.io/getting-started/quickstarts/) for more use-cases of Dapr.
 
 Thanks to [@salaboy](https://github.com/salaboy/) for helping build the Promise!
-
-## Requirements
-
-This Promise requires you are using Flux as the method for registering a
-cluster with Kratix.
 
 ## Development
 
