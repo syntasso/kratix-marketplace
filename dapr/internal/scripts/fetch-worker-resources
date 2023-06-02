@@ -8,8 +8,19 @@ helm repo update
 
 # helm template dapr dapr/dapr -n dapr-system --create-namespace --version 1.9.6 > $PWD/resources/helm.yaml
 
-helm show crds dapr/dapr --version 1.9.6 $PWD/resources/crds.yaml
+helm show crds dapr/dapr --version 1.10.7 > $PWD/resources/crds.yaml
+DIR=$(mktemp -d)
+helm template dapr/dapr --version 1.10.7 > $DIR/resources.yaml
 
-echo "The charts for dapr is broken. Two manuals steps: \n 1. Add the namespaces to the resources (see inject-wcr script for info on how to do this) \n 2. Make the crd.yaml file a valid list of yaml documents, its missing some seperators by default"
-exit 1
+echo """---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dapr-system
+
+resources:
+  - resources.yaml
+""" > $DIR/kustomization.yaml
+
+kubectl kustomize $DIR --output $PWD/resources/dapr.yaml
 

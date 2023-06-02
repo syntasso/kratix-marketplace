@@ -1,0 +1,1209 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-dashboard
+  namespace: dapr-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-injector
+  namespace: dapr-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-operator
+  namespace: dapr-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-placement
+  namespace: dapr-system
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+  namespace: dapr-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-injector
+  namespace: dapr-system
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - dapr-trust-bundle
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-operator
+  namespace: dapr-system
+rules:
+- apiGroups:
+  - coordination.k8s.io
+  resourceNames:
+  - operator.dapr.io
+  - webhooks.dapr.io
+  resources:
+  - leases
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+- apiGroups:
+  - ""
+  resourceNames:
+  - operator.dapr.io
+  - webhooks.dapr.io
+  resources:
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - events
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+  namespace: dapr-system
+rules:
+- apiGroups:
+  - ""
+  resourceNames:
+  - dapr-trust-bundle
+  resources:
+  - secrets
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: secret-reader
+  namespace: dapr-system
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-dashboard
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  - namespaces
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - components
+  - configurations
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - dapr.io
+  resources:
+  - components
+  - configurations
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-injector
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - serviceaccounts
+  verbs:
+  - get
+  - list
+- apiGroups:
+  - dapr.io
+  resources:
+  - configurations
+  - components
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-operator-admin
+rules:
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - patch
+- apiGroups:
+  - apps
+  resources:
+  - deployments
+  - deployments/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  - statefulsets/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - delete
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - services/finalizers
+  verbs:
+  - get
+  - list
+  - watch
+  - update
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - dapr.io
+  resources:
+  - components
+  - configurations
+  - subscriptions
+  - resiliencies
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-placement
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - dapr.io
+  resources:
+  - configurations
+  verbs:
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-injector
+  namespace: dapr-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dapr-injector
+subjects:
+- kind: ServiceAccount
+  name: dapr-injector
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-operator
+  namespace: dapr-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dapr-operator
+subjects:
+- kind: ServiceAccount
+  name: dapr-operator
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-secret-reader
+  namespace: dapr-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: secret-reader
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: dapr-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+  namespace: dapr-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: dapr-sentry
+subjects:
+- kind: ServiceAccount
+  name: dapr-sentry
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dapr-dashboard
+subjects:
+- kind: ServiceAccount
+  name: dapr-dashboard
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-injector
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dapr-injector
+subjects:
+- kind: ServiceAccount
+  name: dapr-injector
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-operator-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dapr-operator-admin
+subjects:
+- kind: ServiceAccount
+  name: dapr-operator
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-placement
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dapr-placement
+subjects:
+- kind: ServiceAccount
+  name: dapr-placement
+  namespace: dapr
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: dapr-sentry
+subjects:
+- kind: ServiceAccount
+  name: dapr-sentry
+  namespace: dapr
+---
+apiVersion: v1
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQwRENDQXJpZ0F3SUJBZ0lRUmtPUExkZG50ZlNDTXlGS3lOR01FakFOQmdrcWhraUc5dzBCQVFzRkFEQWoKTVNFd0h3WURWUVFERXhoa1lYQnlMWE5wWkdWallYSXRhVzVxWldOMGIzSXRZMkV3SGhjTk1qTXdOakF5TVRReApNRFV3V2hjTk16TXdOVE13TVRReE1EVXdXakFnTVI0d0hBWURWUVFERXhWa1lYQnlMWE5wWkdWallYSXRhVzVxClpXTjBiM0l3Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRQzBETzl3Y2RvdHEya1gKNGkyd3dMd04xemhZWnc1N1RvRkI1NUJrT0w3QURUUjh0bjdrYVh3clVUMG9sRFEzUjk3ME95T0tMMnQxaVorRwpXOXZ5eFVKYUxQU0lFczJiQ0E3bFZ1RldKdUhzSTd1OUgyOVdWdGZtQ255c0szSHVvMzlENWRmbEVTdGdlV2RrCkpYeDZ5VDErODNYSGtUTHNaS1FVaWJKU2pFZTk1UjZPOUlLeHpKVDR0QmpRa1BFWnFaVFFOUUtFVFh3ZEJmaVAKMXBVUkZxZXc5MFFRKzdTNTlyN2pvMk5qYTF0NGs2YllzY3lFMUFzNjgvZmRYRmtFcVdSOHRCcjQraEtBaU93RgpYQ1FteG90OHFmWEpvaC9JZ1E1K0RuTGdoODdiVEMwQjVoL0pMMUtNWDdxNStBbU9neXZsYjdyazVsekRqZzRBCmpOckVDWHJ0QWdNQkFBR2pnZ0VCTUlIK01BNEdBMVVkRHdFQi93UUVBd0lGb0RBZEJnTlZIU1VFRmpBVUJnZ3IKQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3REFZRFZSMFRBUUgvQkFJd0FEQWZCZ05WSFNNRUdEQVdnQlRJYm5oTgpRWGlMRXQrVmo4NEVoQ1BlRWpBTHp6Q0JuUVlEVlIwUkJJR1ZNSUdTZ2hwa1lYQnlMWE5wWkdWallYSXRhVzVxClpXTjBiM0l1WkdGd2NvSWVaR0Z3Y2kxemFXUmxZMkZ5TFdsdWFtVmpkRzl5TG1SaGNISXVjM1pqZ2laa1lYQnkKTFhOcFpHVmpZWEl0YVc1cVpXTjBiM0l1WkdGd2NpNXpkbU11WTJ4MWMzUmxjb0lzWkdGd2NpMXphV1JsWTJGeQpMV2x1YW1WamRHOXlMbVJoY0hJdWMzWmpMbU5zZFhOMFpYSXViRzlqWVd3d0RRWUpLb1pJaHZjTkFRRUxCUUFECmdnRUJBR2hoRkcyalFMYTdwVDN1VEd4Nmp2aFBCYm01RnQycDFDb2IxL0dLV0hnclBRYkFTSUdnRFFmZ3J4T0IKU0Zzbm9Ec2NtRzBwNmJKSW4wa2VRVm5GTFhPSTNJdHhLNUlXVkVSWVFNVWtxamw3eS9ZVk9TNGZNVEtqZnVZYgpXNkx4WGRyakRnU0NCVCtndE5KU00yZGlhVndOb3RUMzkwa2szTFdsc1Z1REpuRjQvbXJHS2F4N0FleFBIUGNrCkx1RmJEYWRYZ0ZNWU9ycjdLNHdrTjAyRXlzZyt0dFJaWktobTJWd05ROS8wVGxpL0pzZ1NtYVhaOTBsV1VPajcKdmNqMmhVRytTYmZ5dFp4bEtjZ2daMDZlSFBOOWZ0S1hlOUM5TVJVdzVhOEFPVHpDbEFxUVN3UEtWVHRnMXU5dAozSTBqd01tSnY5TUpqV2FVTE1LczZ4aW5JN2s9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBdEF6dmNISGFMYXRwRitJdHNNQzhEZGM0V0djT2UwNkJRZWVRWkRpK3dBMDBmTForCjVHbDhLMUU5S0pRME4wZmU5RHNqaWk5cmRZbWZobHZiOHNWQ1dpejBpQkxObXdnTzVWYmhWaWJoN0NPN3ZSOXYKVmxiWDVncDhyQ3R4N3FOL1ErWFg1UkVyWUhsblpDVjhlc2s5ZnZOMXg1RXk3R1NrRklteVVveEh2ZVVlanZTQwpzY3lVK0xRWTBKRHhHYW1VMERVQ2hFMThIUVg0ajlhVkVSYW5zUGRFRVB1MHVmYSs0Nk5qWTJ0YmVKT20yTEhNCmhOUUxPdlAzM1Z4WkJLbGtmTFFhK1BvU2dJanNCVndrSnNhTGZLbjF5YUlmeUlFT2ZnNXk0SWZPMjB3dEFlWWYKeVM5U2pGKzZ1ZmdKam9NcjVXKzY1T1pjdzQ0T0FJemF4QWw2N1FJREFRQUJBb0lCQUh4cmsrcTRRblRjeHJyaQphWUNETDNEQkVRYkY4SlAxSkExTzM5RGlCYTdoY1N2ZFVNSzJ3aitNM0I1Mmk3N0h3Nkl5VzlUYUFBQXhJalBPCnRxZUUrTjBudzdOa2l3QmZDU3dpWllVTFNZUE5EYWNiV2V6b0JqbkpkVzNrZDg3WTNORW11NUpuMHZuUDYwcWgKUE92OHRLcE53MDR0WUd0TEFMZlFqNUhMcnFmaHk3dzVNeVN4RUtSdHB5QnZGbVB5Y05KaURGb3lJeWF3ZDlyQgoxZkNVVUJRb2Y1QVBpSGx5NktCSEprem50eXFoSjM3TnQ1ZG1iblNNeG9PZXNybFU0dGZVT2lKdXMxVm5hNWNtCnJGR0RPVkRvU1FTV09aczZ5WjVmM05LZEx3RVRvNm5MRTM4UG9zWkxkbEtyeHBhMDduWFRwV2RybnJrS1dRSUoKVnFvd3FBRUNnWUVBelI4Rk9xaVFFVkhTWWQzem0vWXJQcmJzdDhEWWZFcStUNDBTWlhFanJ3N2FqcGxKTlFKVgplME90N0tZNEo5OWgxU2VVVVQ4ZjVMSzl4V3ZTRktNWG93SU1DSVB2VVJCVzBha3ZmUjFaREprbE1wUzJ4UkJvCm53QmNxYm0xMHNjY3pWTy9jUGxYYnlZMWpqM3MwVlVKczllVGgvUzlXalM3dmNaeE93bzJjc0VDZ1lFQTRMWDAKaDlzV0l0aXVMK0dmRHNHc25jc0lXeENGK1BGcXprRlg5M0lnZGVVSmQvYUJCZm1XMmZnTlRiN0xRbFBTblkwdAoveHdjWmcwOFZIS3Z1RlJTVk5SNDJYeEYwK2tsN3NaQWNLSlRLU0FFSkNKdGpzNW8vai9TcE5NYWd0bHRXSXk5ClNWS0VMQ3dud0R2L2dBWEVKVitRV0F3OHNTSHI4VWdvbVQwK0R5MENnWUVBbDNhRmZQZ0ZVZFN5WGZQdnM4V0YKejB4eDVZbndFVzk3c2ZCQW1rbCtDUUVWMytCT2oyY0d5ZnVDelZFNy9DMVY1M2pQYTJNS1lPeWZkczBVRm9zTApwQ0daMHh2aE5tR3pTaVA4M2cweXVUdkluTjMxUy9TKzNGSC9HcEQ0TXdrMk9tUFI1RkVwLy9nZDZjZk9QQkRvCkZqVmtTaXN0T3hQZllkWEx2TVhneU1FQ2dZRUF3SWRGZncwWVZ6emRhVXJmYzg0K3JtZWh2aHhYSFNjRFFycTcKdXRmK3RlUktDNDJabUZ2emdzZkQ1a085ZFJQS2xaQzd3eUw3dGZoTEkzT3IyTHZ1V3A0OCtPSkFGY05oNjhYUwp1bTVwNEFkOVpOUldtQStENTZzWk9IMWk3bytKMzErZVltOGZyWlViYmRvNkhCOVVva3pScUk2N2hXeXg4ZVhJCld4c2N5L1VDZ1lBVUI0c3ArUEJCWWJtU3BlOHFCYXZZVEFQNFlDeGlpUTludCt4RVJEemh0bGhvNEZqMVRSTEEKSFZ5elZ0bEUycFA5NnpESkhQMTFneUdqTVlaTVhTWWlqOUVOeHRzbDhVUmVDYmZYQytIcjZkSkxQOG1aSnFsaQpxalZPVXhsT1hVVEs2SFl3MXJhMXRVVU9kOG05Y1Q5ZC90dUNoVzNFYmczck0rK3dsZm9pNXc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+kind: Secret
+metadata:
+  labels:
+    app: dapr-sidecar-injector
+    app.kubernetes.io/component: sidecar-injector
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sidecar-injector-cert
+  namespace: dapr-system
+---
+apiVersion: v1
+data: null
+kind: Secret
+metadata:
+  labels:
+    app: dapr-sentry
+    app.kubernetes.io/component: sentry
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-trust-bundle
+  namespace: dapr-system
+---
+apiVersion: v1
+data:
+  caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURIekNDQWdlZ0F3SUJBZ0lRRTZKb2E1QmoxOEdwVENlT1BuN2lYREFOQmdrcWhraUc5dzBCQVFzRkFEQWEKTVJnd0ZnWURWUVFERXc5a1lYQnlMWGRsWW1odmIyc3RZMkV3SGhjTk1qTXdOakF5TVRReE1EVXdXaGNOTXpNdwpOVE13TVRReE1EVXdXakFhTVJnd0ZnWURWUVFERXc5a1lYQnlMWGRsWW1odmIyc3RZMkV3Z2dFaU1BMEdDU3FHClNJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUMydzc2Ny9IRFNwWFFRUFJMRFI2SFlsOUJaMXA0dDRjWS8KRTVRbmZzTDdsRE5mdmZnSWlZdzhZVHVKbXZjZUpyT1dxNGd1ekhxYnhMOHVCZE85VmRmUFVBOVg1RkJ1WDlVRApNMnNZMzN5Q2xyM0JzdFVmVnhKbkllQVpveEFQSTZNb3d5NFRyVHRpanNKRzhXcU13eFRlY2dJUlRPbkU0aVZtCm1Oc2VIbGZ2Q1hrcW8vRW1mTjg2L3ZSZnNqY3BUcTJsRHdCU255T0NobTEyMFgrUDM4TTloRFRvOWFCUjIycXMKL3hDc2tYOFY5UURqcnorT2Y5MXZpMDkwUnVObVdQNnczeVROeGhHOXdXU0NVMFlBQzA4cWRPVmw1SGNwTXgvaQo2T3EzaDRBeU1rV2V2aUlTZUFyd1Z1VDV4aFFNQjNoeXVBRncvSWs4WUV0K0l1M2xwdys5QWdNQkFBR2pZVEJmCk1BNEdBMVVkRHdFQi93UUVBd0lDcERBZEJnTlZIU1VFRmpBVUJnZ3JCZ0VGQlFjREFRWUlLd1lCQlFVSEF3SXcKRHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVkhRNEVGZ1FVMWdwVkgrdHBGbVd6MzZCYWZnYXh1VzhETDA4dwpEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBQ3RvSGZWWTkrTXhrajRZVEJ1dVlYWDhkTVFIMFJmT2dSdTlXVXFDCjlxbEdqWUthdUQ5NnJ3S0UySHNvenR4NGJYQzQzQlNzUmVCdWlQQmpKUlZjZzhiV01OUGpMYmhTOE10dC9IajMKM1Z6SENYMXd2ekJqVWdGS2dZa0JydzUxcW9MdFJkSTNhcjcyT2ZkcUxab3M4aS91VGkrRnhMa1hiV3BPYXJrYQpzdFZRY3hPWDBlczFYM0NHdWMwRGwwSkpKd1ZjUFZkNlR3bHV6VXUvUkhib2FOVDZuZWhKRkM4TU9ITXN3YnMrCnJuWmM4RmpQV2hqc3VudVUyZ2VRSVFZbUhFSkRINTNySDlTUWNEbmhuN2k1MkVUUmFzMDZnczBsc3lxS1ovYWsKTmYwMW9aWjYwb1dVVlZTV1pwZ2kwWnZ1L0VaZHQxd1VZM3JIOWcwdGl3ZkJkNm89Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+kind: Secret
+metadata:
+  labels:
+    app: dapr-operator
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-webhook-ca
+  namespace: dapr-system
+---
+apiVersion: v1
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURsakNDQW42Z0F3SUJBZ0lRTk9YYm1PRE1OcWVKcGcrZ01nYkhWakFOQmdrcWhraUc5dzBCQVFzRkFEQWEKTVJnd0ZnWURWUVFERXc5a1lYQnlMWGRsWW1odmIyc3RZMkV3SGhjTk1qTXdOakF5TVRReE1EVXdXaGNOTXpNdwpOVE13TVRReE1EVXdXakFYTVJVd0V3WURWUVFERXd4a1lYQnlMWGRsWW1odmIyc3dnZ0VpTUEwR0NTcUdTSWIzCkRRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRQ1RTNU40VC9DODVYaTBNLzczaWZTZkhuSTlGS00wTkhLTjR2RnEKQVdZYnQ0a0FpVUkxSGZkczBCY29ENEdEOTArSXU1eFk4UERrZjVkalpFb2xOeEUwMFdLNmdLYzd1NjQxa2RySgpJZngyN1hRUzBmUUtndlN1MXRJZ0FvVjlXRXZqRXA0S1plVTF0NEdFd2VjZ2xpalhIdlF6eE5qdlQySHhzb3lOCm1rOHNtdHdHV0QrcEdvdnFocWlabXp5WHJ2emgwMTNPZEhBTzNYQlpiNVRGRUt3TmlPWDR5VkdpaGo2VHR5VzgKdWtQYnNpRVpKLzZieWVBVTM2aHBlUTUxMU9JbUdGdU84dzVmSThIbTlnZndxenFXV1dqKzJyNTZqWVg1UXhsdgphdWViaGNWdUNFcVhML0JxNE9VdGVHOTBVeXpwVTVuL0lxRWxSa296cWs5d1FhUlBBZ01CQUFHamdkb3dnZGN3CkRnWURWUjBQQVFIL0JBUURBZ1dnTUIwR0ExVWRKUVFXTUJRR0NDc0dBUVVGQndNQkJnZ3JCZ0VGQlFjREFqQU0KQmdOVkhSTUJBZjhFQWpBQU1COEdBMVVkSXdRWU1CYUFGTllLVlIvcmFSWmxzOStnV240R3NibHZBeTlQTUhjRwpBMVVkRVFSd01HNkNFV1JoY0hJdGQyVmlhRzl2YXk1a1lYQnlnaFZrWVhCeUxYZGxZbWh2YjJzdVpHRndjaTV6CmRtT0NIV1JoY0hJdGQyVmlhRzl2YXk1a1lYQnlMbk4yWXk1amJIVnpkR1Z5Z2lOa1lYQnlMWGRsWW1odmIyc3UKWkdGd2NpNXpkbU11WTJ4MWMzUmxjaTVzYjJOaGJEQU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFkejJLcUNhRQpDL3ZTRURYQXMvc2haSyt6bXBYaDRNbE85Zms0NjVGV2tRNFNtZ09NcUZUQUJQZklpb0NNc29qYkFFaDJyNEk0CmtvSDJZLzBIcVdVM0FYamFYUW1QSTFocWpUUG9PRHJJUTVGSkQwYUNJc0VJQS9ZMlRoU0lJblYyVUZmTkxGcW0KQ3hZZkZsRnlDOFYvMVBIcnlxRjVpYlFLK2ZLcGllTzVxeEs5ZHR5R3JNcC9vWTg2RkxGQUYvd29HR2Q1U2JZWQpzVGprTDFjZGEwbVd6bGNHU2NVaTl5MjNORzhRY3NTOGVqT0gwUE9IaWQ2MUl6aTlWc001RGdKcm1pcksrS25LCjhnSFU1SkcyamVxdTI3a2t0ekhFZzEwVkdSZ3dBNnVCcWVVcERzSEJEdmE0VC9zeS91WXpkeFVKdzdUR0dYU1YKN3BUMFZzZzhGSVVCUVE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBazB1VGVFL3d2T1Y0dERQKzk0bjBueDV5UFJTak5EUnlqZUx4YWdGbUc3ZUpBSWxDCk5SMzNiTkFYS0ErQmcvZFBpTHVjV1BEdzVIK1hZMlJLSlRjUk5ORml1b0NuTzd1dU5aSGF5U0g4ZHUxMEV0SDAKQ29MMHJ0YlNJQUtGZlZoTDR4S2VDbVhsTmJlQmhNSG5JSllvMXg3ME04VFk3MDloOGJLTWpacFBMSnJjQmxnLwpxUnFMNm9hb21aczhsNjc4NGROZHpuUndEdDF3V1crVXhSQ3NEWWpsK01sUm9vWStrN2NsdkxwRDI3SWhHU2YrCm04bmdGTitvYVhrT2RkVGlKaGhianZNT1h5UEI1dllIOEtzNmxsbG8vdHErZW8yRitVTVpiMnJubTRYRmJnaEsKbHkvd2F1RGxMWGh2ZEZNczZWT1oveUtoSlVaS002cFBjRUdrVHdJREFRQUJBb0lCQVFDTlIxUXZkaDJtVVVPeApOSjQ5dUNqVjVsSVVuQkxlSStBc2o1eVczTGlmcFM3WFFOQXNPbzN6NUxRUlRLNGhjYmpyb1dlWk42RVd5ZnJlCjduYmZzeTNoeDJRM0Z1ZFF0L2Vra2oyVDVmRk44UHdBZ1RqZVREVjg3YmVsMUVWTnNMODVFY1pjbXRkNjZvUmsKWGNmZXphaG1qZDRWT1o0S0M4NGFFZlFXYmdlNjgybk1NTTZ1QjR2eEdYSmhSN3FJdmhxa3FOR3JDZG9Od1BBTgpLeC9ieXo3d2RHbUFhbkkxU05FZUhxUzFjRkd4U2F5SU82dVZ4M2dvanhnSjdUck56NnhkTU1aZFlFSFlZbEN4CnJsYUJoRzl5M0RTNHlUcVZ4aGQxM25sd1h1Tm1VUk5JK2NjbisvUjIvNW5FZHpJcFdZQTBqbFA4eEdUV3hLQUQKcnlMRGVMbmhBb0dCQU1KazR5N0QrazdYRjVVZnMrSDdoK2s3MWwwQTl6ZGgvc1dDaytSL2VEOFVEczZuM2F6eApyVHkzSnNTYjN4V1RWM1JxR0FVNnkrME9QajUwNSt5dEtISUJ3THlhNDRKdHpXSTd1SHpXdVBoS2N6RExtNVkzCnpJdjhLbGZ0dWswQjdCbHRqNjRNL2wyR1B3eG84eUVVUlFoZTJKd1ZsRnUwY0xKN3JlQ0lUYlkxQW9HQkFNSDUKazVVRFZjcnBhbmZVTE4xbTNXcEVyRXJMRUZtSXZnZmhVZDZiQWlkdTJhaFQ2d2VubVUyTXp1d1JIWjJhWk9HTgowRGNVZzNTbGkwNUNCWUdHYlh2bVl0aTkrNlNyS0tCang0VTBkR25hRk0rbFZjbHdrMGNPdjFOZm5BZkZsUER6CkpEWXFUQXNpbFYySVFteWZzOHFIaFllRTRZWVZaRVJUKy9OcWZQRHpBb0dCQUtHVjB2SHduWVFqYnNyYVMyQXgKQU14eW5NRTZLRVMxQkYyUktQWHFyejFmb3Q5TTBnc0w2UUJyRGFLb0hrdUU2bEV1VDBFcG1wRTJJYTh3NWdmcAo5NUNzdkZVS09zc1VFb0R4TzIwcDN4OGtZNVBQNjBoMm9XUksrN2VUT0NVQzBBcGk4K2V0alZLWVlKZ2tOTlR1ClVHT2cwMVVLNndNL2ZkNGV5RzIzWDBGeEFvR0FMK2p2N2I4OElua1NoZlJPL0lSYXJkTzJabWJQYS8zZFNkNzYKTkt3K2xQVEpKODFLWU1LaGw4anVsdG9IWVpUdjA5SU9HbnlqbDEwSUVsVTJQTzZ4L2dkQ1pOeFAyalU0UEoxSQplM3NnUWNET29SYnFJRzRBd20wL0RsMndFUzlaQVVaY3JGQTRKZ3Z0cm9Ob1BLSVpheTJiNm9RRW0vU09wbDNECi9qUlFGY2NDZ1lCaS80aldwYXY5c3hzNFhoMm55ZHFQZXpOWGRMNlFBVUkyc29WamYvNGU2N0lRbXRLTVd6WlcKMzdvaGx2dmZ1TytpUjVMYno0THUySDhSUC9sS0FyUnhYamN5SEJ2TlJaN1d6Z2xqK1ZkeC84bSthMHk5aExkaApzU0JNN3pnd0FIWG9pSGhNSDg2d2VyZTQ5MkJPeHZScnpXaUtQaU1xa1V6RTd6akoxbkk3Z0E9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+kind: Secret
+metadata:
+  labels:
+    app: dapr-operator
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-webhook-cert
+  namespace: dapr-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-api
+  namespace: dapr-system
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 6500
+  selector:
+    app: dapr-operator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-dashboard
+  namespace: dapr-system
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: dapr-dashboard
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dapr-placement-server
+    app.kubernetes.io/component: placement
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-placement-server
+  namespace: dapr-system
+spec:
+  clusterIP: None
+  ports:
+  - name: api
+    port: 50005
+  - name: raft-node
+    port: 8201
+  publishNotReadyAddresses: true
+  selector:
+    app: dapr-placement-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: sentry
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+  namespace: dapr-system
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 50001
+  selector:
+    app: dapr-sentry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: sidecar-injector
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sidecar-injector
+  namespace: dapr-system
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  selector:
+    app: dapr-sidecar-injector
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-webhook
+  namespace: dapr-system
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 19443
+  selector:
+    app: dapr-operator
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dapr-dashboard
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-dashboard
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-dashboard
+  template:
+    metadata:
+      labels:
+        app: dapr-dashboard
+        app.kubernetes.io/component: dashboard
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: release-name
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.10.7
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+      - env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: docker.io/daprio/dashboard:0.12.0
+        imagePullPolicy: IfNotPresent
+        name: dapr-dashboard
+        ports:
+        - containerPort: 8080
+        resources: {}
+        securityContext:
+          runAsNonRoot: true
+      serviceAccountName: dapr-dashboard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dapr-operator
+    app.kubernetes.io/component: operator
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-operator
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-operator
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
+      labels:
+        app: dapr-operator
+        app.kubernetes.io/component: operator
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: release-name
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.10.7
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+      - args:
+        - --watch-interval
+        - "0"
+        - --max-pod-restarts-per-minute
+        - "20"
+        - --log-level
+        - info
+        - --enable-metrics
+        - --metrics-port
+        - "9090"
+        command:
+        - /operator
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: docker.io/daprio/operator:1.10.7
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        name: dapr-operator
+        ports:
+        - containerPort: 6500
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        resources: {}
+        securityContext:
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /var/run/dapr/credentials
+          name: credentials
+          readOnly: true
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: webhook-creds
+          readOnly: true
+      serviceAccountName: dapr-operator
+      volumes:
+      - name: credentials
+        secret:
+          secretName: dapr-trust-bundle
+      - name: webhook-creds
+        secret:
+          secretName: dapr-webhook-cert
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dapr-sentry
+    app.kubernetes.io/component: sentry
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sentry
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-sentry
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
+      labels:
+        app: dapr-sentry
+        app.kubernetes.io/component: sentry
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: release-name
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.10.7
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+      - args:
+        - --log-level
+        - info
+        - --enable-metrics
+        - --metrics-port
+        - "9090"
+        - --trust-domain
+        - cluster.local
+        command:
+        - /sentry
+        env:
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: docker.io/daprio/sentry:1.10.7
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        name: dapr-sentry
+        ports:
+        - containerPort: 50001
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        resources: {}
+        securityContext:
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /var/run/dapr/credentials
+          name: credentials
+          readOnly: true
+      serviceAccountName: dapr-sentry
+      volumes:
+      - name: credentials
+        secret:
+          secretName: dapr-trust-bundle
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: dapr-sidecar-injector
+    app.kubernetes.io/component: sidecar-injector
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sidecar-injector
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-sidecar-injector
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
+      labels:
+        app: dapr-sidecar-injector
+        app.kubernetes.io/component: sidecar-injector
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: release-name
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.10.7
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+      - args:
+        - --log-level
+        - info
+        - --enable-metrics
+        - --metrics-port
+        - "9090"
+        - --healthz-port
+        - "8080"
+        command:
+        - /injector
+        env:
+        - name: TLS_CERT_FILE
+          value: /dapr/cert/tls.crt
+        - name: TLS_KEY_FILE
+          value: /dapr/cert/tls.key
+        - name: KUBE_CLUSTER_DOMAIN
+          value: cluster.local
+        - name: SIDECAR_IMAGE
+          value: docker.io/daprio/daprd:1.10.7
+        - name: SIDECAR_IMAGE_PULL_POLICY
+          value: IfNotPresent
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: IGNORE_ENTRYPOINT_TOLERATIONS
+          value: '[{"effect":"NoSchedule","key":"alibabacloud.com/eci"},{"effect":"NoSchedule","key":"azure.com/aci"},{"effect":"NoSchedule","key":"aws"},{"effect":"NoSchedule","key":"huawei.com/cci"}]'
+        - name: SIDECAR_RUN_AS_NON_ROOT
+          value: "true"
+        - name: SIDECAR_READ_ONLY_ROOT_FILESYSTEM
+          value: "true"
+        image: docker.io/daprio/injector:1.10.7
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        name: dapr-sidecar-injector
+        ports:
+        - containerPort: 4000
+          name: https
+          protocol: TCP
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        resources: {}
+        securityContext:
+          runAsNonRoot: true
+        volumeMounts:
+        - mountPath: /dapr/cert
+          name: cert
+          readOnly: true
+      serviceAccountName: dapr-injector
+      volumes:
+      - name: cert
+        secret:
+          secretName: dapr-sidecar-injector-cert
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: dapr-placement-server
+    app.kubernetes.io/component: placement
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-placement-server
+  namespace: dapr-system
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-placement-server
+  serviceName: dapr-placement-server
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
+      labels:
+        app: dapr-placement-server
+        app.kubernetes.io/component: placement
+        app.kubernetes.io/managed-by: helm
+        app.kubernetes.io/name: release-name
+        app.kubernetes.io/part-of: dapr
+        app.kubernetes.io/version: 1.10.7
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+      containers:
+      - args:
+        - --log-level
+        - info
+        - --enable-metrics
+        - --replicationFactor
+        - "100"
+        - --metrics-port
+        - "9090"
+        - --tls-enabled
+        command:
+        - /placement
+        env:
+        - name: PLACEMENT_ID
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: docker.io/daprio/placement:1.10.7
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 3
+        name: dapr-placement-server
+        ports:
+        - containerPort: 50005
+          name: api
+        - containerPort: 8201
+          name: raft-node
+        - containerPort: 9090
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        resources: {}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/run/dapr/credentials
+          name: credentials
+          readOnly: true
+      serviceAccountName: dapr-placement
+      volumes:
+      - name: credentials
+        secret:
+          secretName: dapr-trust-bundle
+---
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  labels:
+    app.kubernetes.io/component: config
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: daprsystem
+  namespace: dapr-system
+spec:
+  mtls:
+    allowedClockSkew: 15m
+    enabled: true
+    workloadCertTTL: 24h
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  labels:
+    app: dapr-sidecar-injector
+    app.kubernetes.io/component: sidecar-injector
+    app.kubernetes.io/managed-by: helm
+    app.kubernetes.io/name: release-name
+    app.kubernetes.io/part-of: dapr
+    app.kubernetes.io/version: 1.10.7
+  name: dapr-sidecar-injector
+webhooks:
+- admissionReviewVersions:
+  - v1
+  - v1beta1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURNVENDQWhtZ0F3SUJBZ0lRRWJPcFBQZjZ0THJXVU1tNWRsQXRVakFOQmdrcWhraUc5dzBCQVFzRkFEQWoKTVNFd0h3WURWUVFERXhoa1lYQnlMWE5wWkdWallYSXRhVzVxWldOMGIzSXRZMkV3SGhjTk1qTXdOakF5TVRReApNRFV3V2hjTk16TXdOVE13TVRReE1EVXdXakFqTVNFd0h3WURWUVFERXhoa1lYQnlMWE5wWkdWallYSXRhVzVxClpXTjBiM0l0WTJFd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUR0TzJua0tQMGwKZDBtb1RuQmpMcE9nTEliYjFWQVFBTGROMzlYdHBLTW5oQ1g4cW51VDBkR2I5M0xvT2lRazZiNVZDZHB5ekQzVAplZ0hLKzI1TEVXUGl2NkZVQXhvNEF3c09EVEljcXJaRVEzNDRNV24yaTdMZHpHTmQ3TW54QVFSL0RLMjZHRENjCjgvb2VNT0piekViUm9YdkFDTXFTb2lpMkxRemRKMmVaWDRhMlpMT1ZKR1dJcmpoYjdCb0U1OVZraVBiT2RQT3oKNFlGUFk1TEszdWVpeGp0VDhROU5SRjRocDQvK1VyN0Y5ZUlVbmVSamR6cWk2OXdiTy9PZXdzTURraExBemNVTApzd1RRZm1JL29ITUcxbExHUm5kSjl2Uk9KdStBRjNCbkVPOEFEYUVNTUZOek1lK3ZvQnZYL3VESXYrNm1lblE0CitXeFlYR3RiVTBudEFnTUJBQUdqWVRCZk1BNEdBMVVkRHdFQi93UUVBd0lDcERBZEJnTlZIU1VFRmpBVUJnZ3IKQmdFRkJRY0RBUVlJS3dZQkJRVUhBd0l3RHdZRFZSMFRBUUgvQkFVd0F3RUIvekFkQmdOVkhRNEVGZ1FVeUc1NApUVUY0aXhMZmxZL09CSVFqM2hJd0M4OHdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBT1VKWDZtMUM0MmxMMDF1CjFKK2RPdC8veUFZWWFNaDRyTWJBRXEyQTVncTdVK0tZOVVsKzNBN01xL3U0UFVMV2FpMDg1TEpWakZzU0pNY3cKNDl2SjdnLzdYU3hLMWY4NWd4dXFhc0lBd3E2d2J4SVIxbTBkTGpqeDV6QWlhcFBvQ05BZ1cwTjVobmJuLzdQaQpQeVZ3RzNpZEdIMlQvd2NFSWxLUVlRUWVrcjN4bzVXeFVWV3draUxhTEZpQ0h6K053aVJDcWlRYUlnV25JSEhpCnZRNmROMHVtOTZwWEFaakpXZkJpYXp1ZHkxT0QrVXFIV2JLSHM3NHJINUNkTjRFbWQwb0pFTWRjQkFDbnNyYXUKVk40dWRmdGdTenN1U0I4c2wwaDNkRmFGVG5VbkZqNllDYVNodm5ZSTFTTitldVFvRUpjbk14WFl4WFJuMi84MgpobnRIaWNRPQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+    service:
+      name: dapr-sidecar-injector
+      namespace: dapr
+      path: /mutate
+  failurePolicy: Ignore
+  name: sidecar-injector.dapr.io
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+  sideEffects: None
