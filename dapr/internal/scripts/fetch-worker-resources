@@ -24,3 +24,6 @@ resources:
 
 kubectl kustomize $DIR --output $PWD/resources/dapr.yaml
 
+echo "This is nearly complete. Final step is to add --- to seperate crds in the internal/resources/crd.yaml file"
+exit 1
+
