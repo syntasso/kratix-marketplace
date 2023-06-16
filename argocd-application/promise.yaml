@@ -13,6 +13,7 @@ spec:
         app.kubernetes.io/name: applications.argoproj.io
         app.kubernetes.io/part-of: argocd
       name: applications.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -2240,6 +2241,7 @@ spec:
         app.kubernetes.io/name: applicationsets.argoproj.io
         app.kubernetes.io/part-of: argocd
       name: applicationsets.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -9000,6 +9002,7 @@ spec:
         app.kubernetes.io/name: appprojects.argoproj.io
         app.kubernetes.io/part-of: argocd
       name: appprojects.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -9600,6 +9603,7 @@ spec:
         app.kubernetes.io/name: argocd-application-controller
         app.kubernetes.io/part-of: argocd
       name: argocd-application-controller
+      namespace: default
     rules:
     - apiGroups:
       - '*'
@@ -9619,6 +9623,7 @@ spec:
         app.kubernetes.io/name: argocd-server
         app.kubernetes.io/part-of: argocd
       name: argocd-server
+      namespace: default
     rules:
     - apiGroups:
       - '*'
@@ -9755,6 +9760,7 @@ spec:
         app.kubernetes.io/name: argocd-application-controller
         app.kubernetes.io/part-of: argocd
       name: argocd-application-controller
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9771,6 +9777,7 @@ spec:
         app.kubernetes.io/name: argocd-server
         app.kubernetes.io/part-of: argocd
       name: argocd-server
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole

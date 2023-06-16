@@ -12,6 +12,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: applicationrevisions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -5226,6 +5227,7 @@ spec:
         cert-manager.io/inject-ca-from: vela-system/kubevela-vela-core-root-cert
         controller-gen.kubebuilder.io/version: v0.9.2
       name: applications.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -6913,6 +6915,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: componentdefinitions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -7596,6 +7599,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: definitionrevisions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -8963,6 +8967,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.6.2
       name: envbindings.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -9284,6 +9289,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: healthscopes.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -9902,6 +9908,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: policies.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -9952,6 +9959,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: policydefinitions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -10242,6 +10250,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: resourcetrackers.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -10431,6 +10440,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: scopedefinitions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -10580,6 +10590,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: traitdefinitions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -11265,6 +11276,7 @@ spec:
         controller-gen.kubebuilder.io/version: v0.9.0
       creationTimestamp: null
       name: workflows.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -11437,6 +11449,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: workflowstepdefinitions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -11724,6 +11737,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: workloaddefinitions.core.oam.dev
+      namespace: default
     spec:
       group: core.oam.dev
       names:
@@ -12509,6 +12523,7 @@ spec:
         app.kubernetes.io/version: 1.7.4
         helm.sh/chart: vela-core-1.7.4
       name: kubevela-vela-core-admission
+      namespace: default
     rules:
     - apiGroups:
       - admissionregistration.k8s.io
@@ -12529,6 +12544,7 @@ spec:
     kind: ClusterRole
     metadata:
       name: kubevela-vela-core:cluster-gateway:proxy
+      namespace: default
     rules:
     - apiGroups:
       - cluster.core.oam.dev
@@ -12627,6 +12643,7 @@ spec:
         app.kubernetes.io/version: 1.7.4
         helm.sh/chart: vela-core-1.7.4
       name: kubevela-vela-core-admission
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -12639,6 +12656,7 @@ spec:
     kind: ClusterRoleBinding
     metadata:
       name: kubevela-vela-core:cluster-gateway:proxy
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -12654,6 +12672,7 @@ spec:
     kind: ClusterRoleBinding
     metadata:
       name: kubevela-vela-core:manager-rolebinding
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -13187,6 +13206,7 @@ spec:
         api: cluster-extension-apiserver
         apiserver: "true"
       name: v1alpha1.cluster.core.oam.dev
+      namespace: default
     spec:
       caBundle: Cg==
       group: cluster.core.oam.dev
@@ -21266,6 +21286,7 @@ spec:
       annotations:
         controller-gen.kubebuilder.io/version: v0.9.2
       name: rollouts.standard.oam.dev
+      namespace: default
     spec:
       group: standard.oam.dev
       names:

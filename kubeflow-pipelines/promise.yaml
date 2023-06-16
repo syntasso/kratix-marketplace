@@ -19,6 +19,7 @@ spec:
       labels:
         controller-tools.k8s.io: "1.0"
       name: applications.app.k8s.io
+      namespace: default
     spec:
       group: app.k8s.io
       names:
@@ -555,6 +556,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: clusterworkflowtemplates.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -591,6 +593,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: cronworkflows.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -631,6 +634,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: scheduledworkflows.kubeflow.org
+      namespace: default
     spec:
       group: kubeflow.org
       names:
@@ -670,6 +674,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: viewers.kubeflow.org
+      namespace: default
     spec:
       group: kubeflow.org
       names:
@@ -704,6 +709,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: workfloweventbindings.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -739,6 +745,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: workflows.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -789,6 +796,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: workflowtaskresults.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -1214,6 +1222,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: workflowtasksets.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -1255,6 +1264,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: workflowtemplates.argoproj.io
+      namespace: default
     spec:
       group: argoproj.io
       names:
@@ -1297,6 +1307,7 @@ spec:
       labels:
         app: kubeflow-pipelines-cache-deployer-clusterrole
       name: kubeflow-pipelines-cache-deployer-clusterrole
+      namespace: default
     rules:
     - apiGroups:
       - certificates.k8s.io
@@ -1330,6 +1341,7 @@ spec:
     kind: ClusterRoleBinding
     metadata:
       name: kubeflow-pipelines-cache-deployer-clusterrolebinding
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole

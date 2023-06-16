@@ -117,6 +117,7 @@ spec:
         controller-gen.kubebuilder.io/version: (devel)
       creationTimestamp: null
       name: redisfailovers.databases.spotahome.com
+      namespace: default
     spec:
       group: databases.spotahome.com
       names:

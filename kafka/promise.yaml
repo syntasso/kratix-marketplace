@@ -16,6 +16,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-kafka-broker
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -29,6 +30,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator-namespaced
+      namespace: default
     rules:
     - apiGroups:
       - rbac.authorization.k8s.io
@@ -171,6 +173,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkamirrormaker2s.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -2406,6 +2409,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkaconnectors.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -2526,6 +2530,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkabridges.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -3833,6 +3838,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkamirrormakers.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -5263,6 +5269,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator-kafka-broker-delegation
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -5292,6 +5299,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -5307,6 +5315,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkatopics.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -5608,6 +5617,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkaconnects.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -7960,6 +7970,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator-global
+      namespace: default
     rules:
     - apiGroups:
       - rbac.authorization.k8s.io
@@ -7992,6 +8003,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkarebalances.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -8177,6 +8189,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator-leader-election
+      namespace: default
     rules:
     - apiGroups:
       - coordination.k8s.io
@@ -8203,6 +8216,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator-kafka-client-delegation
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -8218,6 +8232,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkausers.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -9085,6 +9100,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-cluster-operator-watched
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -9137,6 +9153,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-kafka-client
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -9182,6 +9199,7 @@ spec:
       labels:
         app: strimzi
       name: strimzi-entity-operator
+      namespace: default
     rules:
     - apiGroups:
       - kafka.strimzi.io
@@ -9260,6 +9278,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: strimzipodsets.core.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -9389,6 +9408,7 @@ spec:
         app: strimzi
         strimzi.io/crd-install: "true"
       name: kafkas.kafka.strimzi.io
+      namespace: default
     spec:
       conversion:
         strategy: None

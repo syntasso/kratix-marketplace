@@ -10,6 +10,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: compositeresourcedefinitions.apiextensions.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -395,6 +396,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: compositionrevisions.apiextensions.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -2740,6 +2742,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: compositions.apiextensions.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -3873,6 +3876,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: configurationrevisions.pkg.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -4151,6 +4155,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: configurations.pkg.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -4314,6 +4319,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: controllerconfigs.pkg.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -5965,6 +5971,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane
+      namespace: default
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -5980,6 +5987,7 @@ spec:
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
         rbac.crossplane.io/aggregate-to-crossplane: "true"
       name: crossplane:system:aggregate-to-crossplane
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6080,6 +6088,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane:allowed-provider-permissions
+      namespace: default
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -6093,6 +6102,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-rbac-manager
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6192,6 +6202,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-admin
+      namespace: default
   - aggregationRule:
       clusterRoleSelectors:
       - matchLabels:
@@ -6209,6 +6220,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-edit
+      namespace: default
   - aggregationRule:
       clusterRoleSelectors:
       - matchLabels:
@@ -6226,6 +6238,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-view
+      namespace: default
   - aggregationRule:
       clusterRoleSelectors:
       - matchLabels:
@@ -6243,6 +6256,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-browse
+      namespace: default
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -6257,6 +6271,7 @@ spec:
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
         rbac.crossplane.io/aggregate-to-admin: "true"
       name: crossplane:aggregate-to-admin
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6326,6 +6341,7 @@ spec:
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
         rbac.crossplane.io/aggregate-to-edit: "true"
       name: crossplane:aggregate-to-edit
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6378,6 +6394,7 @@ spec:
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
         rbac.crossplane.io/aggregate-to-view: "true"
       name: crossplane:aggregate-to-view
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6428,6 +6445,7 @@ spec:
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
         rbac.crossplane.io/aggregate-to-browse: "true"
       name: crossplane:aggregate-to-browse
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6460,6 +6478,7 @@ spec:
         rbac.crossplane.io/aggregate-to-ns-admin: "true"
         rbac.crossplane.io/base-of-ns-admin: "true"
       name: crossplane:aggregate-to-ns-admin
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6504,6 +6523,7 @@ spec:
         rbac.crossplane.io/aggregate-to-ns-edit: "true"
         rbac.crossplane.io/base-of-ns-edit: "true"
       name: crossplane:aggregate-to-ns-edit
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6534,6 +6554,7 @@ spec:
         rbac.crossplane.io/aggregate-to-ns-view: "true"
         rbac.crossplane.io/base-of-ns-view: "true"
       name: crossplane:aggregate-to-ns-view
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -6556,6 +6577,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -6577,6 +6599,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-rbac-manager
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -6598,6 +6621,7 @@ spec:
         app.kubernetes.io/version: 1.11.0-rc.0.168.g8c77706f
         helm.sh/chart: crossplane-1.11.0-rc.0.168.g8c77706f
       name: crossplane-admin
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -6832,6 +6856,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: environmentconfigs.apiextensions.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -6882,6 +6907,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: locks.pkg.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -6980,6 +7006,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: providerrevisions.pkg.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -7258,6 +7285,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: providers.pkg.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -7431,6 +7459,7 @@ spec:
     kind: CustomResourceDefinition
     metadata:
       name: storeconfigs.secrets.crossplane.io
+      namespace: default
     spec:
       conversion:
         strategy: None

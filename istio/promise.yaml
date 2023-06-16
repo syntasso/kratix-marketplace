@@ -33,6 +33,7 @@ spec:
         heritage: Tiller
         release: istio
       name: wasmplugins.extensions.istio.io
+      namespace: default
     spec:
       group: extensions.istio.io
       names:
@@ -172,6 +173,7 @@ spec:
         heritage: Tiller
         release: istio
       name: destinationrules.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -3045,6 +3047,7 @@ spec:
         heritage: Tiller
         release: istio
       name: envoyfilters.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -3287,6 +3290,7 @@ spec:
         heritage: Tiller
         release: istio
       name: gateways.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -3544,6 +3548,7 @@ spec:
         heritage: Tiller
         release: istio
       name: proxyconfigs.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -3608,6 +3613,7 @@ spec:
         heritage: Tiller
         release: istio
       name: serviceentries.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -3883,6 +3889,7 @@ spec:
         heritage: Tiller
         release: istio
       name: sidecars.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -4252,6 +4259,7 @@ spec:
         heritage: Tiller
         release: istio
       name: virtualservices.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -5857,6 +5865,7 @@ spec:
         heritage: Tiller
         release: istio
       name: workloadentries.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -5984,6 +5993,7 @@ spec:
         heritage: Tiller
         release: istio
       name: workloadgroups.networking.istio.io
+      namespace: default
     spec:
       group: networking.istio.io
       names:
@@ -6320,6 +6330,7 @@ spec:
         istio: security
         release: istio
       name: authorizationpolicies.security.istio.io
+      namespace: default
     spec:
       group: security.istio.io
       names:
@@ -6527,6 +6538,7 @@ spec:
         istio: security
         release: istio
       name: peerauthentications.security.istio.io
+      namespace: default
     spec:
       group: security.istio.io
       names:
@@ -6618,6 +6630,7 @@ spec:
         istio: security
         release: istio
       name: requestauthentications.security.istio.io
+      namespace: default
     spec:
       group: security.istio.io
       names:
@@ -6717,6 +6730,7 @@ spec:
         istio: telemetry
         release: istio
       name: telemetries.telemetry.istio.io
+      namespace: default
     spec:
       group: telemetry.istio.io
       names:
@@ -6979,6 +6993,7 @@ spec:
       labels:
         release: istio
       name: istiooperators.install.istio.io
+      namespace: default
     spec:
       conversion:
         strategy: None
@@ -7026,6 +7041,7 @@ spec:
         app: istiod
         release: istio-base
       name: istiod-istio-system
+      namespace: default
     rules:
     - apiGroups:
       - admissionregistration.k8s.io
@@ -7226,6 +7242,7 @@ spec:
         app: istio-reader
         release: istio-base
       name: istio-reader-istio-system
+      namespace: default
     rules:
     - apiGroups:
       - config.istio.io
@@ -7320,6 +7337,7 @@ spec:
         app: istio-reader
         release: istio-base
       name: istio-reader-istio-system
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -7335,6 +7353,7 @@ spec:
         app: istiod
         release: istio-base
       name: istiod-istio-system
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -7394,6 +7413,7 @@ spec:
         istio.io/rev: default
         release: istio-base
       name: istiod-default-validator
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1beta1
@@ -8735,6 +8755,7 @@ spec:
         app: istiod
         release: istiod
       name: istiod-clusterrole-istio-system
+      namespace: default
     rules:
     - apiGroups:
       - admissionregistration.k8s.io
@@ -8937,6 +8958,7 @@ spec:
         app: istiod
         release: istiod
       name: istiod-gateway-controller-istio-system
+      namespace: default
     rules:
     - apiGroups:
       - apps
@@ -8969,6 +8991,7 @@ spec:
         app: istio-reader
         release: istiod
       name: istio-reader-clusterrole-istio-system
+      namespace: default
     rules:
     - apiGroups:
       - config.istio.io
@@ -9065,6 +9088,7 @@ spec:
         app: istiod
         release: istiod
       name: istiod-clusterrole-istio-system
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9080,6 +9104,7 @@ spec:
         app: istiod
         release: istiod
       name: istiod-gateway-controller-istio-system
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9095,6 +9120,7 @@ spec:
         app: istio-reader
         release: istiod
       name: istio-reader-clusterrole-istio-system
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -10253,6 +10279,7 @@ spec:
         operator.istio.io/component: Pilot
         release: istiod
       name: istio-sidecar-injector
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1beta1
@@ -10633,6 +10660,7 @@ spec:
         helm.sh/chart: kiali-server-1.60.0
         version: v1.60.0
       name: kiali-viewer
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -10734,6 +10762,7 @@ spec:
         helm.sh/chart: kiali-server-1.60.0
         version: v1.60.0
       name: kiali
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -10842,6 +10871,7 @@ spec:
         helm.sh/chart: kiali-server-1.60.0
         version: v1.60.0
       name: kiali
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -11388,6 +11418,7 @@ spec:
         heritage: Helm
         release: prometheus
       name: prometheus
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -11428,6 +11459,7 @@ spec:
         heritage: Helm
         release: prometheus
       name: prometheus
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole

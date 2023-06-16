@@ -20,6 +20,7 @@ spec:
     kind: ClusterRole
     metadata:
       name: dex
+      namespace: default
     rules:
     - apiGroups:
       - dex.coreos.com
@@ -37,6 +38,7 @@ spec:
     kind: ClusterRoleBinding
     metadata:
       name: dex
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -155,6 +157,7 @@ spec:
     kind: ClusterRoleBinding
     metadata:
       name: oidc-cluster-admin
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole

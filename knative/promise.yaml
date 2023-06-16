@@ -26,6 +26,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: knative-serving-aggregated-addressable-resolver
+      namespace: default
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRole
     metadata:
@@ -34,6 +35,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         duck.knative.dev/addressable: "true"
       name: knative-serving-addressable-resolver
+      namespace: default
     rules:
     - apiGroups:
       - serving.knative.dev
@@ -54,6 +56,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         rbac.authorization.k8s.io/aggregate-to-admin: "true"
       name: knative-serving-namespaced-admin
+      namespace: default
     rules:
     - apiGroups:
       - serving.knative.dev
@@ -79,6 +82,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         rbac.authorization.k8s.io/aggregate-to-edit: "true"
       name: knative-serving-namespaced-edit
+      namespace: default
     rules:
     - apiGroups:
       - serving.knative.dev
@@ -107,6 +111,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         rbac.authorization.k8s.io/aggregate-to-view: "true"
       name: knative-serving-namespaced-view
+      namespace: default
     rules:
     - apiGroups:
       - serving.knative.dev
@@ -127,6 +132,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         serving.knative.dev/controller: "true"
       name: knative-serving-core
+      namespace: default
     rules:
     - apiGroups:
       - ""
@@ -259,6 +265,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         duck.knative.dev/podspecable: "true"
       name: knative-serving-podspecable-binding
+      namespace: default
     rules:
     - apiGroups:
       - serving.knative.dev
@@ -289,6 +296,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: knative-serving-admin
+      namespace: default
   - apiVersion: rbac.authorization.k8s.io/v1
     kind: ClusterRoleBinding
     metadata:
@@ -297,6 +305,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: knative-serving-controller-admin
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -313,6 +322,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: knative-serving-controller-addressable-resolver
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -329,6 +339,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: images.caching.internal.knative.dev
+      namespace: default
     spec:
       group: caching.internal.knative.dev
       names:
@@ -464,6 +475,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: certificates.networking.internal.knative.dev
+      namespace: default
     spec:
       group: networking.internal.knative.dev
       names:
@@ -625,6 +637,7 @@ spec:
         duck.knative.dev/podspecable: "true"
         knative.dev/crd-install: "true"
       name: configurations.serving.knative.dev
+      namespace: default
     spec:
       group: serving.knative.dev
       names:
@@ -1966,6 +1979,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: clusterdomainclaims.networking.internal.knative.dev
+      namespace: default
     spec:
       group: networking.internal.knative.dev
       names:
@@ -2022,6 +2036,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: domainmappings.serving.knative.dev
+      namespace: default
     spec:
       group: serving.knative.dev
       names:
@@ -2345,6 +2360,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: ingresses.networking.internal.knative.dev
+      namespace: default
     spec:
       group: networking.internal.knative.dev
       names:
@@ -2710,6 +2726,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: metrics.autoscaling.internal.knative.dev
+      namespace: default
     spec:
       group: autoscaling.internal.knative.dev
       names:
@@ -2838,6 +2855,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: podautoscalers.autoscaling.internal.knative.dev
+      namespace: default
     spec:
       group: autoscaling.internal.knative.dev
       names:
@@ -3013,6 +3031,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: revisions.serving.knative.dev
+      namespace: default
     spec:
       group: serving.knative.dev
       names:
@@ -4272,6 +4291,7 @@ spec:
         duck.knative.dev/addressable: "true"
         knative.dev/crd-install: "true"
       name: routes.serving.knative.dev
+      namespace: default
     spec:
       group: serving.knative.dev
       names:
@@ -4509,6 +4529,7 @@ spec:
         app.kubernetes.io/version: 1.8.3
         knative.dev/crd-install: "true"
       name: serverlessservices.networking.internal.knative.dev
+      namespace: default
     spec:
       group: networking.internal.knative.dev
       names:
@@ -4701,6 +4722,7 @@ spec:
         duck.knative.dev/podspecable: "true"
         knative.dev/crd-install: "true"
       name: services.serving.knative.dev
+      namespace: default
     spec:
       group: serving.knative.dev
       names:
@@ -7048,6 +7070,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: config.webhook.serving.knative.dev
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1
@@ -7083,6 +7106,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: webhook.serving.knative.dev
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1
@@ -7124,6 +7148,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: webhook.domainmapping.serving.knative.dev
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1
@@ -7165,6 +7190,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: validation.webhook.domainmapping.serving.knative.dev
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1
@@ -7198,6 +7224,7 @@ spec:
         app.kubernetes.io/name: knative-serving
         app.kubernetes.io/version: 1.8.3
       name: validation.webhook.serving.knative.dev
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1

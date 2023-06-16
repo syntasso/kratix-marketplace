@@ -18,6 +18,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: clusterissuers.cert-manager.io
+      namespace: default
     spec:
       group: cert-manager.io
       names:
@@ -2922,6 +2923,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: challenges.acme.cert-manager.io
+      namespace: default
     spec:
       group: acme.cert-manager.io
       names:
@@ -5100,6 +5102,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: certificaterequests.cert-manager.io
+      namespace: default
     spec:
       group: cert-manager.io
       names:
@@ -5358,6 +5361,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: issuers.cert-manager.io
+      namespace: default
     spec:
       group: cert-manager.io
       names:
@@ -8260,6 +8264,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: certificates.cert-manager.io
+      namespace: default
     spec:
       group: cert-manager.io
       names:
@@ -8801,6 +8806,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: orders.acme.cert-manager.io
+      namespace: default
     spec:
       group: acme.cert-manager.io
       names:
@@ -9095,6 +9101,7 @@ spec:
         app.kubernetes.io/name: cainjector
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-cainjector
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9159,6 +9166,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-issuers
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9204,6 +9212,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-clusterissuers
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9249,6 +9258,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-certificates
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9317,6 +9327,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-orders
+      namespace: default
     rules:
     - apiGroups:
       - acme.cert-manager.io
@@ -9382,6 +9393,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-challenges
+      namespace: default
     rules:
     - apiGroups:
       - acme.cert-manager.io
@@ -9486,6 +9498,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-ingress-shim
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9557,6 +9570,7 @@ spec:
         rbac.authorization.k8s.io/aggregate-to-edit: "true"
         rbac.authorization.k8s.io/aggregate-to-view: "true"
       name: cert-manager-view
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9589,6 +9603,7 @@ spec:
         rbac.authorization.k8s.io/aggregate-to-admin: "true"
         rbac.authorization.k8s.io/aggregate-to-edit: "true"
       name: cert-manager-edit
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9629,6 +9644,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-approve:cert-manager-io
+      namespace: default
     rules:
     - apiGroups:
       - cert-manager.io
@@ -9649,6 +9665,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-certificatesigningrequests
+      namespace: default
     rules:
     - apiGroups:
       - certificates.k8s.io
@@ -9691,6 +9708,7 @@ spec:
         app.kubernetes.io/name: webhook
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-webhook:subjectaccessreviews
+      namespace: default
     rules:
     - apiGroups:
       - authorization.k8s.io
@@ -9708,6 +9726,7 @@ spec:
         app.kubernetes.io/name: cainjector
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-cainjector
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9726,6 +9745,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-issuers
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9744,6 +9764,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-clusterissuers
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9762,6 +9783,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-certificates
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9780,6 +9802,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-orders
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9798,6 +9821,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-challenges
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9816,6 +9840,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-ingress-shim
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9834,6 +9859,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-approve:cert-manager-io
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9852,6 +9878,7 @@ spec:
         app.kubernetes.io/name: cert-manager
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-controller-certificatesigningrequests
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -9870,6 +9897,7 @@ spec:
         app.kubernetes.io/name: webhook
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-webhook:subjectaccessreviews
+      namespace: default
     roleRef:
       apiGroup: rbac.authorization.k8s.io
       kind: ClusterRole
@@ -10276,6 +10304,7 @@ spec:
         app.kubernetes.io/name: webhook
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-webhook
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1
@@ -10312,6 +10341,7 @@ spec:
         app.kubernetes.io/name: webhook
         app.kubernetes.io/version: v1.11.0
       name: cert-manager-webhook
+      namespace: default
     webhooks:
     - admissionReviewVersions:
       - v1

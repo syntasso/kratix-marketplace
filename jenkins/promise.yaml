@@ -291,6 +291,7 @@ spec:
         controller-gen.kubebuilder.io/version: v0.4.1
       creationTimestamp: null
       name: jenkins.jenkins.io
+      namespace: default
     spec:
       group: jenkins.io
       names:
