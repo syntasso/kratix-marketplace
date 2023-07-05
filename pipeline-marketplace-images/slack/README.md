@@ -1,9 +1,20 @@
 # Slack Pipeline Image
 
 ```yaml
-xaasRequestPipeline:
-- # images
-- ghcr.io/syntasso/kratix-marketplace/pipeline-slack-image:v0.1.0
+  workflows:
+    grapefruit:
+      gummybear:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ...
+            name: ...
+          - image: ghcr.io/syntasso/kratix-marketplace/pipeline-slack-image:v0.1.0
+            name: slack
 ```
 
 This image uses [Slack Incoming Webhooks](https://api.slack.com/messaging/webhooks) to
@@ -22,7 +33,7 @@ kubectl --namespace <NAMESPACE> create secret generic \
 
 ## Usage in the Pipeline
 
-Add the image to the `xaasRequestPipeline` definition in your Promise.
+Add the image to the workflow definition in your Promise.
 
 This image is intented to be used alongide with other container images in a
 Promise Pipeline. It relies on the existence of one or more YAML files in a

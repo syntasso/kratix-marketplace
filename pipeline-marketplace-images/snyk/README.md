@@ -1,9 +1,20 @@
 # Snyk
 
 ```yaml
-xaasRequestPipeline:
-- # images
-- ghcr.io/syntasso/kratix-marketplace/pipeline-snyk-image:v0.1.0
+  workflows:
+    grapefruit:
+      gummybear:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ...
+            name: ...
+          - image: ghcr.io/syntasso/kratix-marketplace/pipeline-snyk-image:v0.1.0
+            name: snyk
 ```
 
 This image finds all container images in the documents in `/input` and run a
@@ -27,7 +38,7 @@ for further details.
 
 ## Usage in the Pipeline
 
-Add the image to the `xaasRequestPipeline` definition in your Promise and make
+Add the image to the workflow definition in your Promise and make
 sure the `/input` contains the document you want to scan prior to the execution
 of this image.
 

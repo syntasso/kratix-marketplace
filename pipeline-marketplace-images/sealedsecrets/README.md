@@ -1,9 +1,20 @@
 # Sealed Secrets
 
 ```yaml
-xaasRequestPipeline:
-- # images
-- ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
+  workflows:
+    grapefruit:
+      gummybear:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ...
+            name: ...
+          - image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
+            name: sealed-secrets
 ```
 
 This image finds all `kind: Secret` documents in `/input`, encrypts them with
@@ -47,7 +58,7 @@ kubectl create clusterrolebinding PROMISE-sealed-secret \
 
 ## Usage in the Pipeline
 
-Add the image to the `xaasRequestPipeline` definition in your Promise. The image will
+Add the image to the workflow definition in your Promise. The image will
 fetch the certificate from the ConfigMap and replace any Secret with the SealedSecret
 equivalent.
 

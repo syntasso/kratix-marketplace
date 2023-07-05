@@ -1,9 +1,20 @@
 # Vault
 
 ```yaml
-xaasRequestPipeline:
-- # images
-- ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
+  workflows:
+    grapefruit:
+      gummybear:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ...
+            name: ...
+          - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
+            name: vault
 ```
 
 This image finds all `kind: Secret` documents in `/input` and store them in Vault. It then
@@ -142,7 +153,7 @@ kubectl create clusterrolebinding vault-pipeline-image \
 
 ## Usage in the Pipeline
 
-Add the image to the `xaasRequestPipeline` definition in your Promise. The image will
+Add the image to the workflow definition in your Promise. The image will
 fetch the Vault config the ConfigMap and store the Secrets in Vault.
 
 ## Limitations
