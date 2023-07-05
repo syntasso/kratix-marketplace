@@ -1,9 +1,11 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: istio
   namespace: default
 spec:
+  api: null
   dependencies:
   - apiVersion: v1
     kind: ServiceAccount
@@ -11585,4 +11587,6 @@ spec:
             name: config-volume
           - emptyDir: {}
             name: storage-volume
-
+  workflows:
+    grapefruit: {}
+status: {}

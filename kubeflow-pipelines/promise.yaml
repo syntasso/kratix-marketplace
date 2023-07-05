@@ -1,6 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: kubeflow-pipelines
 spec:
   api:
@@ -1381,4 +1382,4 @@ spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/kubeflow-pipelines-request-pipeline:v0.1.0
             name: kubeflow-pipelines-request-pipeline
-
+status: {}

@@ -1,6 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: kafka
   namespace: default
 spec:
@@ -16768,4 +16769,4 @@ spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/kafka-request-pipeline:v0.1.0
             name: kafka-request-pipeline
-
+status: {}

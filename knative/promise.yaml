@@ -1,6 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: knative
   namespace: default
 spec:
@@ -7311,4 +7312,4 @@ spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/knative-request-pipeline:v0.1.0
             name: knative-request-pipeline
-
+status: {}

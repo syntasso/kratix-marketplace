@@ -1,6 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: jenkins
   namespace: default
 spec:
@@ -3919,4 +3920,4 @@ spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/jenkins-request-pipeline:v0.1.0
             name: jenkins-request-pipeline
-
+status: {}

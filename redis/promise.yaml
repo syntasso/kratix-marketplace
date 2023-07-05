@@ -1,6 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: redis
   namespace: default
 spec:
@@ -3303,4 +3304,4 @@ spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/redis-request-pipeline:v0.1.0
             name: redis-request-pipeline
-
+status: {}

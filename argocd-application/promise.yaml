@@ -1,6 +1,7 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
+  creationTimestamp: null
   name: argocd-application
   namespace: default
 spec:
@@ -11270,4 +11271,4 @@ spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/argocd-application-request-pipeline:v0.1.0
             name: argocd-application-request-pipeline
-
+status: {}
