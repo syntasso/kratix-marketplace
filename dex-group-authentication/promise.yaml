@@ -1,10 +1,39 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: dex-group-authentication
 spec:
-  workerClusterResources:
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: dex-group-authentications.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: dex-group-authentication
+        plural: dex-group-authentications
+        singular: dex-group-authentication
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  clusterRole:
+                    default: view
+                    description: An existing ClusterRole to bind the group to.
+                    type: string
+                  userGroup:
+                    description: The user group to provide access to.
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  dependencies:
   - apiVersion: v1
     kind: Namespace
     metadata:
@@ -166,36 +195,16 @@ spec:
     - apiGroup: rbac.authorization.k8s.io
       kind: User
       name: https://localhost:32000#CgcxNTU3MzQ2EgZnaXRodWI
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: dex-group-authentications.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: dex-group-authentication
-        plural: dex-group-authentications
-        singular: dex-group-authentication
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  clusterRole:
-                    default: view
-                    description: An existing ClusterRole to bind the group to.
-                    type: string
-                  userGroup:
-                    description: The user group to provide access to.
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/dex-group-authentication-request-pipeline:v0.1.0
-status: {}
+  workflows:
+    grapefruit:
+      gummybear:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ghcr.io/syntasso/kratix-marketplace/dex-group-authentication-request-pipeline:v0.1.0
+            name: dex-group-authentication-request-pipeline
+

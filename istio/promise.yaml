@@ -1,11 +1,10 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: istio
   namespace: default
 spec:
-  workerClusterResources:
+  dependencies:
   - apiVersion: v1
     kind: ServiceAccount
     metadata:
@@ -11586,5 +11585,4 @@ spec:
             name: config-volume
           - emptyDir: {}
             name: storage-volume
-  xaasCrd: null
-status: {}
+

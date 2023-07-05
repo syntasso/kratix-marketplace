@@ -1,10 +1,9 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: cert-manager
 spec:
-  workerClusterResources:
+  dependencies:
   - apiVersion: v1
     kind: Namespace
     metadata:
@@ -10376,5 +10375,4 @@ spec:
         - '*/*'
       sideEffects: None
       timeoutSeconds: 10
-  xaasCrd: null
-status: {}
+

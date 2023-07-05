@@ -1,11 +1,58 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: Promise
 metadata:
-  creationTimestamp: null
   name: argocd-application
   namespace: default
 spec:
-  workerClusterResources:
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: argocd-applications.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: argocd-application
+        plural: argocd-applications
+        singular: argocd-application
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  source:
+                    description: Source is a reference to the location of the application's
+                      manifests or chart
+                    properties:
+                      path:
+                        default: .
+                        description: Path is a directory path within the Git repository,
+                          and is only valid for applications sourced from Git. The
+                          default path is the root directory.
+                        type: string
+                      repoURL:
+                        description: RepoURL is the URL to the repository (Git or
+                          Helm) that contains the application manifests. This URL
+                          must be public.
+                        type: string
+                      targetRevision:
+                        description: TargetRevision defines the revision of the source
+                          to sync the application to. In case of Git, this can be
+                          commit, tag, or branch. If omitted, will equal to HEAD.
+                        type: string
+                    required:
+                    - repoURL
+                    type: object
+                required:
+                - source
+                type: object
+            type: object
+        served: true
+        storage: true
+  dependencies:
   - apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
@@ -11211,54 +11258,16 @@ spec:
     kind: Namespace
     metadata:
       name: argocd
-  xaasCrd:
-    apiVersion: apiextensions.k8s.io/v1
-    kind: CustomResourceDefinition
-    metadata:
-      name: argocd-applications.marketplace.kratix.io
-    spec:
-      group: marketplace.kratix.io
-      names:
-        kind: argocd-application
-        plural: argocd-applications
-        singular: argocd-application
-      scope: Namespaced
-      versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  source:
-                    description: Source is a reference to the location of the application's
-                      manifests or chart
-                    properties:
-                      path:
-                        default: .
-                        description: Path is a directory path within the Git repository,
-                          and is only valid for applications sourced from Git. The
-                          default path is the root directory.
-                        type: string
-                      repoURL:
-                        description: RepoURL is the URL to the repository (Git or
-                          Helm) that contains the application manifests. This URL
-                          must be public.
-                        type: string
-                      targetRevision:
-                        description: TargetRevision defines the revision of the source
-                          to sync the application to. In case of Git, this can be
-                          commit, tag, or branch. If omitted, will equal to HEAD.
-                        type: string
-                    required:
-                    - repoURL
-                    type: object
-                required:
-                - source
-                type: object
-            type: object
-        served: true
-        storage: true
-  xaasRequestPipeline:
-  - ghcr.io/syntasso/kratix-marketplace/argocd-application-request-pipeline:v0.1.0
-status: {}
+  workflows:
+    grapefruit:
+      gummybear:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: instance-configure
+          namespace: default
+        spec:
+          containers:
+          - image: ghcr.io/syntasso/kratix-marketplace/argocd-application-request-pipeline:v0.1.0
+            name: argocd-application-request-pipeline
+
