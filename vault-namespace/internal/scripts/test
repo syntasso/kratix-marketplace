@@ -2,7 +2,7 @@
 set -e
 
 test_promise() {
-  # vault has no WCR
+  # vault has no dependencies
   exit 0
 }
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
 
-# There are no WCR for this promise
+# There are no dependencies for this promise
 exit 0
-

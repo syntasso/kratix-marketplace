@@ -63,8 +63,8 @@ jobs:
 
             if ! git diff --exit-code .; then
               echo ""
-              echo "Changes in the WCR were detected"
-              echo "Injection of WCR via CI is not supported. Please commit and push them manually."
+              echo "Changes in the dependencies were detected"
+              echo "Injection of dependencies via CI is not supported. Please commit and push them manually."
               exit 1
             fi
       - run:
@@ -86,7 +86,7 @@ jobs:
           no_output_timeout: 1m
           command: |
             if test -f "resource-request.yaml"; then
-              crd=$(yq e 'select(.kind == "Promise") | .spec.xaasCrd.metadata.name' promise.yaml)
+              crd=$(yq e 'select(.kind == "Promise") | .spec.api.metadata.name' promise.yaml)
 
               while ! kubectl get crd ${crd} 2>/dev/null; do
                 sleep 1
@@ -123,7 +123,7 @@ jobs:
                 working_directory: ~/repo/<< parameters.promise_dir >>
                 command: |
                   if test -f "internal/request-pipeline/Dockerfile"; then
-                    image_name=$(yq 'select(document_index == 0) | .spec.xaasRequestPipeline' promise.yaml | cut -d "/" -f 3,4 | cut -d ":" -f 1)
+                    image_name=$(yq 'select(document_index == 0) | .spec.workflows.grapefruit.gummybear[0].image' promise.yaml | cut -d "/" -f 3,4 | cut -d ":" -f 1)
                     visibility=$(curl -sL \
                       -H "Accept: application/vnd.github+json"\
                       -H "Authorization: Bearer $GITHUB_PACKAGES_TOKEN" \

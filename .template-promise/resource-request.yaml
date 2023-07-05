@@ -1,6 +1,6 @@
 # TODO: Provide an example resource request
 apiVersion: marketplace.kratix.io/v1alpha1
-kind: <TODO: xaasCrd Name>
+kind: <TODO: promise.spec.api.spec.names.kind>
 metadata:
   name: example
   namespace: default
