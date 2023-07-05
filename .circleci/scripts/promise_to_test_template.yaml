@@ -59,7 +59,7 @@ jobs:
           working_directory: ~/repo/<< parameters.promise_dir >>
           name: Validate no pending changes
           command: |
-            ./internal/scripts/inject-wcr
+            ./internal/scripts/inject-deps
 
             if ! git diff --exit-code .; then
               echo ""

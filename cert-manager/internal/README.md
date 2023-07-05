@@ -10,7 +10,7 @@ These resources were downloaded using `./scripts/fetch-crds`.
 To build run:
 
 ```
-./scripts/inject-wcr
+./scripts/inject-deps
 ```
 
 ## Testing
