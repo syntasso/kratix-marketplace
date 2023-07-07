@@ -17,32 +17,31 @@ spec:
         singular: namespace
       scope: Namespaced
       versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  namespaceName:
-                    description: |
-                      The name of the namespace to be created
-                    type: string
-                required:
-                - namespaceName
-                type: object
-            type: object
-        served: true
-        storage: true
+        - name: v1alpha1
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  properties:
+                    namespaceName:
+                      description: |
+                        The name of the namespace to be created
+                      type: string
+                  required:
+                    - namespaceName
+                  type: object
+              type: object
+          served: true
+          storage: true
   workflows:
-    grapefruit:
-      gummybear:
-      - apiVersion: platform.kratix.io/v1alpha1
-        kind: Pipeline
-        metadata:
-          name: instance-configure
-          namespace: default
-        spec:
-          containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/namespace-request-pipeline:v0.1.0
-            name: namespace-request-pipeline
-
+    resource:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: instance-configure
+            namespace: default
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/namespace-configure-pipeline:v0.1.0
+                name: namespace-configure-pipeline

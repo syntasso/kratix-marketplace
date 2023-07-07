@@ -21,7 +21,7 @@ To make a resource request, run the following command while targeting your Platf
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/knative/resource-request.yaml
 ```
 
-Once a Resource Request is made, you can see the controller is running by running the
+Once a request is made for a Resource, you can see the controller is running by running the
 following command while targeting a worker cluster:
 ```shell-session
 kubectl get --namespace knative-serving deployment/controller

@@ -18,7 +18,7 @@ kubectl get --namespace default deployment/nginx-nginx-ingress
 ```
 
 NGINX is not being provided as-a-Service with this Promise. Therefore, there's no
-Resource Request: installing the Promise will install NGINX.
+Resource definition: installing the Promise will install NGINX.
 
 ## Development
 

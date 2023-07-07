@@ -122,8 +122,8 @@ jobs:
                 name: Verify package is public
                 working_directory: ~/repo/<< parameters.promise_dir >>
                 command: |
-                  if test -f "internal/request-pipeline/Dockerfile"; then
-                    image_name=$(yq 'select(document_index == 0) | .spec.workflows.grapefruit.gummybear[0].image' promise.yaml | cut -d "/" -f 3,4 | cut -d ":" -f 1)
+                  if test -f "internal/configure-pipeline/Dockerfile"; then
+                    image_name=$(yq 'select(document_index == 0) | .spec.workflows.resource.configure[0].image' promise.yaml | cut -d "/" -f 3,4 | cut -d ":" -f 1)
                     visibility=$(curl -sL \
                       -H "Accept: application/vnd.github+json"\
                       -H "Authorization: Bearer $GITHUB_PACKAGES_TOKEN" \

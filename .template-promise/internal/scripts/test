@@ -7,7 +7,7 @@ test_promise() {
 }
 
 test_resource_request() {
-  # TODO: set reasonable test for Resource Request (RR) installation that can be run on the worker cluster
+  # TODO: set reasonable test for Resource installation that can be run on the worker cluster
   exit 1
 }
 

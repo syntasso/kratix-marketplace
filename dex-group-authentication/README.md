@@ -24,8 +24,8 @@ This Promise can be used to authenticate users to Kubernetes clusters. To do thi
         --from-literal=client-secret=<valid_github_oauth_client_secret>
     ```
 
-Once this is in place, you can use Resource Requests for this Promise to allocate permissions to the required groups.
-Users within these groups can then use [KubeLogin plugin](https://github.com/int128/kubelogin) to authenticate and use the `kubectl` commandline tool.
+Once this is in place, you can request a Resource for this Promise to allocate permissions to the required groups.
+Users within these groups can then use [KubeLogin plugin](https://github.com/int128/kubelogin) to authenticate and use the `kubectl` command line tool.
 
 Once you've setup the prerequisites above you can install the Promise by applying the following while targeting
 the Platform cluster:
@@ -47,7 +47,7 @@ Kubernetes environment. For example `userGroups: syntasso` would allow all users
 access to the cluster. `userGroups: syntasso:my-team` would limit it to only members of the `my-team` team
 in the `syntasso` org.
 
-To make a Resource Request modify the local `resource-request.yaml` with your desired group and run the following while targeting the platform cluster:
+To make a request for a Resource modify the local `resource-request.yaml` with your desired group and run the following while targeting the platform cluster:
 ```
 kubectl apply -f resource-request.yaml
 ```

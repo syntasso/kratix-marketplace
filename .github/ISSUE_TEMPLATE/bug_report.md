@@ -14,7 +14,7 @@ A clear and concise description of what the bug is.
 Steps to reproduce the behaviour:
 1. Install Kratix
 2. Install Postgres Promise
-3. Send a Resource Request
+3. Send a Resource request
 4. See error
 
 **Expected behaviour**

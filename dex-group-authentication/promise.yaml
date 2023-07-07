@@ -17,195 +17,195 @@ spec:
         singular: dex-group-authentication
       scope: Namespaced
       versions:
-      - name: v1alpha1
-        schema:
-          openAPIV3Schema:
-            properties:
-              spec:
-                properties:
-                  clusterRole:
-                    default: view
-                    description: An existing ClusterRole to bind the group to.
-                    type: string
-                  userGroup:
-                    description: The user group to provide access to.
-                    type: string
-                type: object
-            type: object
-        served: true
-        storage: true
+        - name: v1alpha1
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  properties:
+                    clusterRole:
+                      default: view
+                      description: An existing ClusterRole to bind the group to.
+                      type: string
+                    userGroup:
+                      description: The user group to provide access to.
+                      type: string
+                  type: object
+              type: object
+          served: true
+          storage: true
   dependencies:
-  - apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: dex
-  - apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      labels:
-        app: dex
-      name: dex
-      namespace: dex
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRole
-    metadata:
-      name: dex
-      namespace: default
-    rules:
-    - apiGroups:
-      - dex.coreos.com
-      resources:
-      - '*'
-      verbs:
-      - '*'
-    - apiGroups:
-      - apiextensions.k8s.io
-      resources:
-      - customresourcedefinitions
-      verbs:
-      - create
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRoleBinding
-    metadata:
-      name: dex
-      namespace: default
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
-      kind: ClusterRole
-      name: dex
-    subjects:
-    - kind: ServiceAccount
-      name: dex
-      namespace: dex
-  - apiVersion: v1
-    data:
-      config.yaml: |
-        issuer: https://localhost:32000
-        storage:
-          type: kubernetes
-          config:
-            inCluster: true
-        web:
-          https: 0.0.0.0:5556
-          tlsCert: /etc/dex/tls/tls.crt
-          tlsKey: /etc/dex/tls/tls.key
-        connectors:
-        - type: github
-          id: github
-          name: GitHub
-          config:
-            clientID: $GITHUB_CLIENT_ID
-            clientSecret: $GITHUB_CLIENT_SECRET
-            redirectURI: https://localhost:32000/callback
-            loadAllGroups: true
-        staticClients:
-        - id: kube
-          redirectURIs:
-          - http://localhost:8000
-          - http://localhost:18000
-          name: kubernetes
-          secret: ZXhhbXBsZS1hcHAtc2VjcmV0
-    kind: ConfigMap
-    metadata:
-      name: dex
-      namespace: dex
-  - apiVersion: v1
-    kind: Service
-    metadata:
-      name: dex
-      namespace: dex
-    spec:
-      ports:
-      - name: dex
-        nodePort: 32000
-        port: 5556
-        protocol: TCP
-        targetPort: 5556
-      selector:
-        app: dex
-      type: NodePort
-  - apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      labels:
-        app: dex
-      name: dex
-      namespace: dex
-    spec:
-      replicas: 2
-      selector:
-        matchLabels:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: dex
+    - apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        labels:
           app: dex
-      template:
-        metadata:
-          labels:
-            app: dex
-        spec:
-          containers:
-          - command:
-            - /usr/local/bin/dex
-            - serve
-            - /etc/dex/cfg/config.yaml
-            env:
-            - name: GITHUB_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  key: client-id
-                  name: github-client
-            - name: GITHUB_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  key: client-secret
-                  name: github-client
-            image: ghcr.io/dexidp/dex:v2.30.0
-            name: dex
-            ports:
-            - containerPort: 5556
-              name: https
-            readinessProbe:
-              httpGet:
-                path: /healthz
-                port: 5556
-                scheme: HTTPS
-            volumeMounts:
-            - mountPath: /etc/dex/cfg
-              name: config
-            - mountPath: /etc/dex/tls
-              name: tls
-          serviceAccountName: dex
-          volumes:
-          - configMap:
-              items:
-              - key: config.yaml
-                path: config.yaml
-              name: dex
-            name: config
-          - name: tls
-            secret:
-              secretName: dex.example.com.tls
-  - apiVersion: rbac.authorization.k8s.io/v1
-    kind: ClusterRoleBinding
-    metadata:
-      name: oidc-cluster-admin
-      namespace: default
-    roleRef:
-      apiGroup: rbac.authorization.k8s.io
+        name: dex
+        namespace: dex
+    - apiVersion: rbac.authorization.k8s.io/v1
       kind: ClusterRole
-      name: cluster-admin
-    subjects:
-    - apiGroup: rbac.authorization.k8s.io
-      kind: User
-      name: https://localhost:32000#CgcxNTU3MzQ2EgZnaXRodWI
+      metadata:
+        name: dex
+        namespace: default
+      rules:
+        - apiGroups:
+            - dex.coreos.com
+          resources:
+            - "*"
+          verbs:
+            - "*"
+        - apiGroups:
+            - apiextensions.k8s.io
+          resources:
+            - customresourcedefinitions
+          verbs:
+            - create
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: dex
+        namespace: default
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: dex
+      subjects:
+        - kind: ServiceAccount
+          name: dex
+          namespace: dex
+    - apiVersion: v1
+      data:
+        config.yaml: |
+          issuer: https://localhost:32000
+          storage:
+            type: kubernetes
+            config:
+              inCluster: true
+          web:
+            https: 0.0.0.0:5556
+            tlsCert: /etc/dex/tls/tls.crt
+            tlsKey: /etc/dex/tls/tls.key
+          connectors:
+          - type: github
+            id: github
+            name: GitHub
+            config:
+              clientID: $GITHUB_CLIENT_ID
+              clientSecret: $GITHUB_CLIENT_SECRET
+              redirectURI: https://localhost:32000/callback
+              loadAllGroups: true
+          staticClients:
+          - id: kube
+            redirectURIs:
+            - http://localhost:8000
+            - http://localhost:18000
+            name: kubernetes
+            secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      kind: ConfigMap
+      metadata:
+        name: dex
+        namespace: dex
+    - apiVersion: v1
+      kind: Service
+      metadata:
+        name: dex
+        namespace: dex
+      spec:
+        ports:
+          - name: dex
+            nodePort: 32000
+            port: 5556
+            protocol: TCP
+            targetPort: 5556
+        selector:
+          app: dex
+        type: NodePort
+    - apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        labels:
+          app: dex
+        name: dex
+        namespace: dex
+      spec:
+        replicas: 2
+        selector:
+          matchLabels:
+            app: dex
+        template:
+          metadata:
+            labels:
+              app: dex
+          spec:
+            containers:
+              - command:
+                  - /usr/local/bin/dex
+                  - serve
+                  - /etc/dex/cfg/config.yaml
+                env:
+                  - name: GITHUB_CLIENT_ID
+                    valueFrom:
+                      secretKeyRef:
+                        key: client-id
+                        name: github-client
+                  - name: GITHUB_CLIENT_SECRET
+                    valueFrom:
+                      secretKeyRef:
+                        key: client-secret
+                        name: github-client
+                image: ghcr.io/dexidp/dex:v2.30.0
+                name: dex
+                ports:
+                  - containerPort: 5556
+                    name: https
+                readinessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 5556
+                    scheme: HTTPS
+                volumeMounts:
+                  - mountPath: /etc/dex/cfg
+                    name: config
+                  - mountPath: /etc/dex/tls
+                    name: tls
+            serviceAccountName: dex
+            volumes:
+              - configMap:
+                  items:
+                    - key: config.yaml
+                      path: config.yaml
+                  name: dex
+                name: config
+              - name: tls
+                secret:
+                  secretName: dex.example.com.tls
+    - apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: oidc-cluster-admin
+        namespace: default
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: cluster-admin
+      subjects:
+        - apiGroup: rbac.authorization.k8s.io
+          kind: User
+          name: https://localhost:32000#CgcxNTU3MzQ2EgZnaXRodWI
   workflows:
-    grapefruit:
-      gummybear:
-      - apiVersion: platform.kratix.io/v1alpha1
-        kind: Pipeline
-        metadata:
-          name: instance-configure
-          namespace: default
-        spec:
-          containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/dex-group-authentication-request-pipeline:v0.1.0
-            name: dex-group-authentication-request-pipeline
+    resource:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: instance-configure
+            namespace: default
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/dex-group-authentication-configure-pipeline:v0.1.0
+                name: dex-group-authentication-configure-pipeline
 status: {}

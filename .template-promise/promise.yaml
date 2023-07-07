@@ -29,7 +29,7 @@ spec:
           served: true
           storage: true
   workflows:
-    grapefruit:
-      gummybear:
-        - name: <# TODO promise name>-request-pipeline
-          image: ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-request-pipeline:v0.1.0
+    resource:
+      configure:
+        - name: <# TODO promise name>-configure-pipeline
+          image: ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-configure-pipeline:v0.1.0

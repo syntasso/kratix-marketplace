@@ -1,8 +1,8 @@
 # ArgoCD Application
 
-This Promise provides [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) [Applications](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications)-as-a-Service. The Promise will install an ArgoCD Server and then on each Resource Request create a new ArgoCD Application within that server.
+This Promise provides [ArgoCD](https://argo-cd.readthedocs.io/en/stable/) [Applications](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications)-as-a-Service. The Promise will install an ArgoCD Server and then on each request for a Resource create a new ArgoCD Application within that server.
 
-The Resource Request can configure the following fields:
+The Resource definition can configure the following fields:
 
 - `source.repoURL` [required]: Must be a valid URL for a public git repository that contains Kubernetes resources.
 - `source.path` [optional]: Is the directory within the git repository for ArgoCD to sync. Defaults to root of repository.
@@ -27,7 +27,7 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 This example deploys the contents of the `guestbook` directory in the
 [argocd-example-app repository](https://github.com/argoproj/argocd-example-apps.git)
 
-To verify the Resource Request is applied, you can see the corresponding Application in the
+To verify the Resource is applied, you can see the corresponding Application in the
 ArgoCD UI or resources on the cluster by run the following command while targeting the worker cluster:
 ```
 kubectl get --namespace default deployment/guestbook-ui

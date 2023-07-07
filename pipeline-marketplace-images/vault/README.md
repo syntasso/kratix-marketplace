@@ -2,8 +2,8 @@
 
 ```yaml
   workflows:
-    grapefruit:
-      gummybear:
+    resource:
+      configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
@@ -164,4 +164,3 @@ fetch the Vault config the ConfigMap and store the Secrets in Vault.
   annotations. Please add an extra job in the pipeline to do that.
 * Only keys in the `data` and `stringData` part of the Secret will be parsed
   and stored in Vault.
-

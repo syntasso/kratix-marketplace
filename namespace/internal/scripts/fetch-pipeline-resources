@@ -2,7 +2,7 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-resources=$PWD/request-pipeline/resources
+resources=$PWD/configure-pipeline/resources
 mkdir -p ${resources}
 
 cat > $resources/namespace.yaml <<EOF

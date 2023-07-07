@@ -2,7 +2,7 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-mkdir -p $PWD/request-pipeline/resources
+mkdir -p $PWD/configure-pipeline/resources
 
 # Based on example from:
 #   https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications
@@ -23,4 +23,4 @@ spec:
     namespace: default
   syncPolicy:
     automated: {}
-""" > $PWD/request-pipeline/resources/application.yaml
+""" > $PWD/configure-pipeline/resources/application.yaml

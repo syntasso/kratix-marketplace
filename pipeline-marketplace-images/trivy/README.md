@@ -2,8 +2,8 @@
 
 ```yaml
   workflows:
-    grapefruit:
-      gummybear:
+    resource:
+      configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
@@ -31,4 +31,3 @@ of this image.
 * At this moment, there's no way to control `trivy` scanning options
 * This image was built with Trivy offline db. To update the database, the image
   needs to be rebuilt.
-

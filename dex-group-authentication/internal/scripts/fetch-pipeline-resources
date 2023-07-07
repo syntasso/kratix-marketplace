@@ -2,9 +2,9 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-mkdir -p $PWD/request-pipeline/resources
+mkdir -p $PWD/configure-pipeline/resources
 
-cat > $PWD/request-pipeline/resources/crb.yaml <<EOF
+cat > $PWD/configure-pipeline/resources/crb.yaml <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:

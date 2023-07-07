@@ -2,8 +2,8 @@
 
 ```yaml
   workflows:
-    grapefruit:
-      gummybear:
+    resource:
+      configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
@@ -65,4 +65,3 @@ equivalent.
 ## Limitations
 
 * This image won't parse `kind: List`, even if the list items are of `kind: Secret`.
-

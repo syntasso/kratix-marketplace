@@ -2,8 +2,8 @@
 
 ```yaml
   workflows:
-    grapefruit:
-      gummybear:
+    resource:
+      configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
@@ -64,4 +64,3 @@ notifications were successfully sent in a previous pipeline run. To ensure the
 image does not send a new notification with every run, ensure to store the
 initial `object.yaml` status in `/metadata/status.yaml` in a previous pipeline
 stage.
-

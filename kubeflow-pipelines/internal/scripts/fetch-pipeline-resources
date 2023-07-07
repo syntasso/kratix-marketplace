@@ -3,7 +3,7 @@ set -e
 
 ROOT="$( cd $(dirname $0)/.. && pwd)"
 
-resourcesdir=$ROOT/request-pipeline/resources/
+resourcesdir=$ROOT/configure-pipeline/resources/
 
 mkdir -p $resourcesdir
 rm -rf ${resourcesdir}/*

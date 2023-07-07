@@ -2,7 +2,7 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-resources_dir=$PWD/request-pipeline/resources
+resources_dir=$PWD/configure-pipeline/resources
 mkdir -p ${resources_dir}
 rm -rf ${resources_dir}/*
 

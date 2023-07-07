@@ -2,8 +2,8 @@
 
 ```yaml
   workflows:
-    grapefruit:
-      gummybear:
+    resource:
+      configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
