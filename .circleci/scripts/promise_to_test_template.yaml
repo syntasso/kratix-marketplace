@@ -39,8 +39,11 @@ commands:
             sleep 5
             kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
 
-            curl -sL https://raw.githubusercontent.com/syntasso/kratix/main/test/system/assets/platform_gitops-tk-resources.yaml | kubectl apply -f -
-            curl -sL https://raw.githubusercontent.com/syntasso/kratix/main/test/system/assets/platform_kratix_cluster.yaml | kubectl apply -f -
+            git clone https://github.com/syntasso/kratix /tmp/kratix
+            pushd kratix
+            ./scripts/register-worker --name platform-cluster --context kind-platform --state-store minio-store
+            popd
+
             sleep 5
       - attach_workspace:
           at: .
