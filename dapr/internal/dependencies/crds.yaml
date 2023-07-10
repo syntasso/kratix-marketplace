@@ -664,7 +664,7 @@ spec:
               bulkSubscribe:
                 description: Represents bulk subscribe properies
                 properties:
-                  enabled: 
+                  enabled:
                     type: boolean
                   maxMessagesCount:
                     type: integer
@@ -754,7 +754,7 @@ spec:
               bulkSubscribe:
                 description: Represents bulk subscribe properies
                 properties:
-                  enabled: 
+                  enabled:
                     type: boolean
                   maxMessagesCount:
                     type: integer
