@@ -40,7 +40,7 @@ commands:
             kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
 
             git clone https://github.com/syntasso/kratix /tmp/kratix
-            pushd kratix
+            pushd /tmp/kratix
             ./scripts/register-worker --name platform-cluster --context kind-platform --state-store minio-store
             popd
 
