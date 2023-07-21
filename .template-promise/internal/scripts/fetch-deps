@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
-resources_path=${PWD}/resources
+resources_path=${PWD}/dependencies
 mkdir -p ${resources_path}
 
 urls=(
