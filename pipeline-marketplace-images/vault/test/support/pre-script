@@ -17,14 +17,14 @@ vault status
 kubectl create secret generic supersecret \
     --from-literal=accesskey=superkey \
     --from-literal=secretkey=supersecret \
-    --dry-run=client -o yaml > /output/secrets.yaml
-echo -e "\n---\n" >> /output/secrets.yaml
+    --dry-run=client -o yaml > /kratix/output/secrets.yaml
+echo -e "\n---\n" >> /kratix/output/secrets.yaml
 kubectl create secret generic topsecret \
     --from-literal=private=value \
     --from-literal=password=secr3t \
-    --dry-run=client -o yaml >> /output/secrets.yaml
+    --dry-run=client -o yaml >> /kratix/output/secrets.yaml
 
-cat > /output/object.yaml <<EOF
+cat > /kratix/output/object.yaml <<EOF
 apiVersion: v1
 kind: ResourceRequest
 metadata:

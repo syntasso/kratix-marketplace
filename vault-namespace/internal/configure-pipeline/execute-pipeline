@@ -4,9 +4,9 @@ set -xeo pipefail
 
 
 function main() {
-    export TEAM="$(yq eval '.spec.team' /input/object.yaml)"
-    export K8S_ADDR="$(yq eval '.spec.kubernetes.host' /input/object.yaml)"
-    yq eval '.spec.kubernetes.caCert' /input/object.yaml > ca.cert
+    export TEAM="$(yq eval '.spec.team' /kratix/input/object.yaml)"
+    export K8S_ADDR="$(yq eval '.spec.kubernetes.host' /kratix/input/object.yaml)"
+    yq eval '.spec.kubernetes.caCert' /kratix/input/object.yaml > ca.cert
     export VAULT_NAMESPACE="$(kubectl get configmap vault -o jsonpath='{.data.parentNamespace}')"
     export VAULT_ADDR="$(kubectl get configmap vault -o jsonpath='{.data.url}')"
     export AUTHPATH="$(kubectl get configmap vault -o jsonpath='{.data.authpath}')"
@@ -68,7 +68,7 @@ function enable_kubernetes_auth() {
 }
 
 function update_status() {
-cat > /metadata/status.yaml <<EOF
+cat > /kratix/metadata/status.yaml <<EOF
 message: namespace ${VAULT_NAMESPACE} created. All service accounts in $TEAM k8s namespace have read access to the 'kv' engine. Ensure your service accounts have the system:auth-delegator clusterrole bound.
 EOF
 }

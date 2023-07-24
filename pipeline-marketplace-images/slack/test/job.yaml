@@ -4,15 +4,15 @@ kind: ClusterRole
 metadata:
   name: slack-cr
 rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - slack-channel-hook
-  - slack-channel-hook-2
-  resources:
-  - secrets
-  verbs:
-  - get
+  - apiGroups:
+      - ""
+    resourceNames:
+      - slack-channel-hook
+      - slack-channel-hook-2
+    resources:
+      - secrets
+    verbs:
+      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -23,9 +23,9 @@ roleRef:
   kind: ClusterRole
   name: slack-cr
 subjects:
-- kind: ServiceAccount
-  name: slack-sa
-  namespace: default
+  - kind: ServiceAccount
+    name: slack-sa
+    namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -62,7 +62,7 @@ spec:
             - name: metadata
               mountPath: /metadata
             - name: input
-              mountPath: /input
+              mountPath: /kratix/input
             - name: output
-              mountPath: /output
+              mountPath: /kratix/output
       restartPolicy: Never

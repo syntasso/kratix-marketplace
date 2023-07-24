@@ -4,14 +4,14 @@ kind: ClusterRole
 metadata:
   name: snyk-cr
 rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - snyk-token
-  resources:
-  - secrets
-  verbs:
-  - get
+  - apiGroups:
+      - ""
+    resourceNames:
+      - snyk-token
+    resources:
+      - secrets
+    verbs:
+      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -22,9 +22,9 @@ roleRef:
   kind: ClusterRole
   name: snyk-cr
 subjects:
-- kind: ServiceAccount
-  name: snyk-sa
-  namespace: default
+  - kind: ServiceAccount
+    name: snyk-sa
+    namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -51,7 +51,7 @@ spec:
           resources: {}
           volumeMounts:
             - name: images-to-scan
-              mountPath: /output
+              mountPath: /kratix/output
       containers:
         - image: ghcr.io/syntasso/kratix-marketplace/pipeline-snyk-image:v0.1.0
           name: snyk-scan
@@ -60,5 +60,5 @@ spec:
             - name: images-to-scan
               mountPath: input
             - name: results
-              mountPath: /output
+              mountPath: /kratix/output
       restartPolicy: Never

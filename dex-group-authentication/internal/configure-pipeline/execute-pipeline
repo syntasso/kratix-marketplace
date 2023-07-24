@@ -2,9 +2,9 @@
 
 set -x
 
-export name="$(yq eval '.metadata.name' /input/object.yaml)"
-export userGroup="$(yq eval '.spec.userGroup' /input/object.yaml)"
-export clusterRole="$(yq eval '.spec.clusterRole // "view"' /input/object.yaml)"
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export userGroup="$(yq eval '.spec.userGroup' /kratix/input/object.yaml)"
+export clusterRole="$(yq eval '.spec.clusterRole // "view"' /kratix/input/object.yaml)"
 
 if [[ "${userGroup}" != "null" ]]; then
     export subject="""- kind: Group
@@ -12,5 +12,5 @@ if [[ "${userGroup}" != "null" ]]; then
   apiGroup: rbac.authorization.k8s.io"""
     yq eval '.subjects = env(subject) |
         .roleRef.name = env(clusterRole) |
-        .metadata.name += env(clusterRole) + "-" + env(name)' /tmp/transfer/crb.yaml > /output/crb.yaml
+        .metadata.name += env(clusterRole) + "-" + env(name)' /tmp/transfer/crb.yaml > /kratix/output/crb.yaml
 fi

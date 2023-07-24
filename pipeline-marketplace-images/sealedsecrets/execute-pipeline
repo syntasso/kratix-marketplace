@@ -3,18 +3,18 @@
 set -e
 
 # copy everything thats not of `kind: Secret` to output
-cd /output
-yq 'select(.kind != "Secret")' --split-exp ".metadata.name" /input/*
+cd /kratix/output
+yq 'select(.kind != "Secret")' --split-exp ".metadata.name" /kratix/input/*
 cd ..
 
 # split the secrets into their own files
 mkdir secrets
 cd secrets
-yq 'select(.kind == "Secret")' --split-exp ".metadata.name" /input/*
+yq 'select(.kind == "Secret")' --split-exp ".metadata.name" /kratix/input/*
 cd ..
 
 kubectl get configmap sealed-secrets --namespace default -o=jsonpath='{.data.certificate}' > cert.pem
 
 for f in $(ls secrets/*); do
-  kubeseal --cert cert.pem --format yaml < $f > /output/$(basename $f).yaml
+  kubeseal --cert cert.pem --format yaml < $f > /kratix/output/$(basename $f).yaml
 done

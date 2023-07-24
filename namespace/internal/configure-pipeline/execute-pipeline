@@ -3,7 +3,7 @@
 set -xe
 
 # Read current values from the provided resource request
-export namespaceName="$(yq eval '.spec.namespaceName' /input/object.yaml)"
+export namespaceName="$(yq eval '.spec.namespaceName' /kratix/input/object.yaml)"
 
 # Replace defaults with user provided values
-sed "s/TBDNAMESPACE/${namespaceName}/g" /tmp/transfer/namespace.yaml > /output/namespace.yaml
+sed "s/TBDNAMESPACE/${namespaceName}/g" /tmp/transfer/namespace.yaml > /kratix/output/namespace.yaml

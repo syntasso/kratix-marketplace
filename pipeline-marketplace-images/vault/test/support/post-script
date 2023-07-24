@@ -2,19 +2,19 @@
 
 set -xe
 
-ls -l /input
+ls -l /kratix/input
 
-if yq --exit-status 'select(.kind == "Secret")' /input/* >/dev/null; then
+if yq --exit-status 'select(.kind == "Secret")' /kratix/input/* >/dev/null; then
     echo "found secrets input"
     exit 1
 fi
 
-if [ ! -f cat /metadata/status.yaml ]; then
+if [ ! -f cat /kratix/metadata/status.yaml ]; then
     echo "no status file found"
     exit 1
 fi
 
-cat /metadata/status.yaml
+cat /kratix/metadata/status.yaml
 
 export VAULT_ADDR="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.url}')"
 export AUTHPATH="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.authpath}')"

@@ -4,5 +4,5 @@ set -x
 
 # Add logic for pipeline here.
 # Example:
-# name="$(yq eval '.metadata.name' /input/object.yaml)"
-# sed "s/TBDNAME/${name}/g" /tmp/transfer/filename.yaml > /output/filename.yaml
+# name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+# sed "s/TBDNAME/${name}/g" /tmp/transfer/filename.yaml > /kratix/output/filename.yaml

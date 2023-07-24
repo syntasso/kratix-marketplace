@@ -3,8 +3,8 @@
 set -e
 
 touch /tmp/status.yaml
-if [ -f /metadata/status.yaml ]; then
-  mv /metadata/status.yaml /tmp/status.yaml
+if [ -f /kratix/metadata/status.yaml ]; then
+  mv /kratix/metadata/status.yaml /tmp/status.yaml
 fi
 
 notifications_status="$(yq '.conditions[] | select(.type == "NotificationsSent") | .status' /tmp/status.yaml)"
@@ -13,12 +13,12 @@ if [ "$notifications_status" = "True" ]; then
   exit 0
 fi
 
-if [ ! -d /metadata/notifications ]; then
+if [ ! -d /kratix/metadata/notifications ]; then
   echo "No notifications to send, skipping pipeline execution"
   exit 0
 fi
 
-for f in $(ls /metadata/notifications/*); do
+for f in $(ls /kratix/metadata/notifications/*); do
   message="$(yq '.message' $f)"
   url="$(yq '.slackHook.url // "null"' $f)"
 
@@ -44,6 +44,6 @@ for f in $(ls /metadata/notifications/*); do
     ${url}
 done
 
-yq '.conditions += [{"type": "NotificationsSent", "status": "True"}]' /tmp/status.yaml > /metadata/status.yaml
+yq '.conditions += [{"type": "NotificationsSent", "status": "True"}]' /tmp/status.yaml > /kratix/metadata/status.yaml
 
-cp /input/* /output/
+cp /kratix/input/* /kratix/output/

@@ -3,8 +3,8 @@
 set -x
 
 # Read current values from the provided resource request
-export name="$(yq eval '.metadata.name' /input/object.yaml)"
-export size="$(yq eval '.spec.size' /input/object.yaml)"
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
 
 export replicas=1
 
@@ -16,4 +16,4 @@ fi
 cat /tmp/transfer/kafka-instance.yaml |  \
   yq eval '.spec.kafka.replicas = env(replicas)' | \
   yq eval '.metadata.name = env(name)' - \
-  > /output/kafka-instance.yaml
+  > /kratix/output/kafka-instance.yaml

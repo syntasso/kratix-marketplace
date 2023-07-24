@@ -17,7 +17,7 @@ spec:
           resources: {}
           volumeMounts:
             - name: images-to-scan
-              mountPath: /output
+              mountPath: /kratix/output
       containers:
         - image: ghcr.io/syntasso/kratix-marketplace/pipeline-trivy-image:v0.1.0
           name: trivy-scan
@@ -26,5 +26,5 @@ spec:
             - name: images-to-scan
               mountPath: input
             - name: results
-              mountPath: /output
+              mountPath: /kratix/output
       restartPolicy: Never

@@ -1,9 +1,9 @@
 # Snyk
 
 ```yaml
-  workflows:
-    resource:
-      configure:
+workflows:
+  resource:
+    configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
@@ -11,15 +11,14 @@
           namespace: default
         spec:
           containers:
-          - image: ...
-            name: ...
-          - image: ghcr.io/syntasso/kratix-marketplace/pipeline-snyk-image:v0.1.0
-            name: snyk
+            - image: ...
+              name: ...
+            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-snyk-image:v0.1.0
+              name: snyk
 ```
 
-This image finds all container images in the documents in `/input` and run a
+This image finds all container images in the documents in `/kratix/input` and run a
 scan with snyk.
-
 
 ## Pre-requisites
 
@@ -39,9 +38,9 @@ for further details.
 ## Usage in the Pipeline
 
 Add the image to the workflow definition in your Promise and make
-sure the `/input` contains the document you want to scan prior to the execution
+sure the `/kratix/input` contains the document you want to scan prior to the execution
 of this image.
 
 ## Limitations
 
-* At this moment, there's no way to control `snyk` scanning options
+- At this moment, there's no way to control `snyk` scanning options
