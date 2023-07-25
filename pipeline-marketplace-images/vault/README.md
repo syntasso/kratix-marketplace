@@ -1,9 +1,9 @@
 # Vault
 
 ```yaml
-  workflows:
-    resource:
-      configure:
+workflows:
+  resource:
+    configure:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
@@ -11,22 +11,21 @@
           namespace: default
         spec:
           containers:
-          - image: ...
-            name: ...
-          - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
-            name: vault
+            - image: ...
+              name: ...
+            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
+              name: vault
 ```
 
-This image finds all `kind: Secret` documents in `/input` and store them in Vault. It then
-moves all documents (but the `kind: Secret`) to `/output`.
+This image finds all `kind: Secret` documents in `/kratix/input` and store them in Vault. It then
+moves all documents (but the `kind: Secret`) to `/kratix/output`.
 
-If the original resource request is available on `/input`, the secrets will be stored
+If the original resource request is available on `/kratix/input`, the secrets will be stored
 under `/secret/NAMESPACE/RESOURCE_NAME`. Otherwise, it will be stored under
 `/secret/default/request-RANDOM`.
 
 The path to the secrets will be available in the resource request status at the end of the
 pipeline.
-
 
 ## Pre-requisites
 
@@ -55,32 +54,32 @@ docs](https://developer.hashicorp.com/vault/docs/auth/kubernetes).
 
 For the JWT Token Reviewer, you can:
 
-* Create a ServiceAccount for this pipeline stage:
-    ```
-    kubectl create serviceaccount vault-auth-delegator
-    ```
-* Create a ClusterRoleBinding binding the `system:auth-deletagor` ClusterRole to the ServiceAccount
-    ```
-    kubectl create clusterrolebinding role-tokenreview-binding \
-        --clusterrole=system:auth-delegator \
-        --serviceaccount=default:vault-auth-delegator
-    ```
-* Create a Secret and attach it to the ServiceAccount:
-    ```
-    kubectl apply -f - <<EOF
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: vault-auth-token
-      annotations:
-        kubernetes.io/service-account.name: vault-auth-delegator
-    type: kubernetes.io/service-account-token
-    EOF
-    ```
-* Extract the JWT token:
-    ```
-    kubectl describe secrets/vault-auth-token
-    ```
+- Create a ServiceAccount for this pipeline stage:
+  ```
+  kubectl create serviceaccount vault-auth-delegator
+  ```
+- Create a ClusterRoleBinding binding the `system:auth-deletagor` ClusterRole to the ServiceAccount
+  ```
+  kubectl create clusterrolebinding role-tokenreview-binding \
+      --clusterrole=system:auth-delegator \
+      --serviceaccount=default:vault-auth-delegator
+  ```
+- Create a Secret and attach it to the ServiceAccount:
+  ```
+  kubectl apply -f - <<EOF
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: vault-auth-token
+    annotations:
+      kubernetes.io/service-account.name: vault-auth-delegator
+  type: kubernetes.io/service-account-token
+  EOF
+  ```
+- Extract the JWT token:
+  ```
+  kubectl describe secrets/vault-auth-token
+  ```
 
 For the Kubernetes Host, you can run:
 
@@ -135,7 +134,8 @@ kubectl create configmap vault-pipeline-image \
 ```
 
 Setting
-* `VAULT_ADDR` with your Vault instance URL. If you are running both Kratix on KinD and
+
+- `VAULT_ADDR` with your Vault instance URL. If you are running both Kratix on KinD and
   Vault locally, use `http://host.docker.internal:PORT'.
 
 Finally, give the Promise ServiceAccount access to the ConfigMap:
@@ -158,9 +158,9 @@ fetch the Vault config the ConfigMap and store the Secrets in Vault.
 
 ## Limitations
 
-* This image won't parse `kind: List`, even if the list items are of `kind: Secret`.
-* If any other document in `/input` refer to the Secret (like via a `volumeMount` in a
+- This image won't parse `kind: List`, even if the list items are of `kind: Secret`.
+- If any other document in `/kratix/input` refer to the Secret (like via a `volumeMount` in a
   `Pod`), this image won't remove those references, nor will it add any Vault-agent
   annotations. Please add an extra job in the pipeline to do that.
-* Only keys in the `data` and `stringData` part of the Secret will be parsed
+- Only keys in the `data` and `stringData` part of the Secret will be parsed
   and stored in Vault.

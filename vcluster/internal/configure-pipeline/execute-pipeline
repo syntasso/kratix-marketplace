@@ -3,24 +3,24 @@
 set -x
 #
 # Read current values from the provided resource request
-export name="$(yq eval '.metadata.name' /input/object.yaml)"
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
 
 helm template $name vcluster \
   --values /tmp/transfer/vcluster.yaml \
   --repo https://charts.loft.sh \
   --namespace $name \
-  --repository-config='' > /output/vcluster.yaml
+  --repository-config='' > /kratix/output/vcluster.yaml
 
-cat > /output/namespace.yaml <<EOF
+cat > /kratix/output/namespace.yaml <<EOF
 apiVersion: v1
 kind: Namespace
 metadata:
   name: $name
 EOF
 
-sed "s/CLUSTERNAME/${name}/g" /tmp/transfer/flux-push.yaml > /output/flux-push.yaml
+sed "s/CLUSTERNAME/${name}/g" /tmp/transfer/flux-push.yaml > /kratix/output/flux-push.yaml
 
-cat > /output/cluster.yaml <<EOF
+cat > /kratix/output/cluster.yaml <<EOF
 apiVersion: platform.kratix.io/v1alpha1
 kind: Cluster
 metadata:
@@ -37,7 +37,7 @@ EOF
 
 
 # Bootstrapper creates a valid kubeconfig for Flux to push down to the vcluster
-cat > /output/job.yaml <<EOF
+cat > /kratix/output/job.yaml <<EOF
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -59,7 +59,7 @@ spec:
 EOF
 
 
-cat > /output/sa.yaml <<EOF
+cat > /kratix/output/sa.yaml <<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -67,7 +67,7 @@ metadata:
   namespace: $name
 EOF
 
-cat > /output/role.yaml <<EOF
+cat > /kratix/output/role.yaml <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -84,7 +84,7 @@ rules:
   - list
 EOF
 
-cat > /output/rolebinding.yaml <<EOF
+cat > /kratix/output/rolebinding.yaml <<EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:

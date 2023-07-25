@@ -8,7 +8,7 @@ set -x
 
 to_scan=()
 IFS=$'\n'
-for f in $(cat /input/* | grep "image: "); do
+for f in $(cat /kratix/input/* | grep "image: "); do
   image="$(echo $f | sed -e 's/^[[:space:]]*//' | sed 's/^- //' | yq '.image')"
   to_scan+=( $image )
 done
@@ -29,4 +29,4 @@ if $found_vulns; then
 fi
 
 echo "No vulnerabilities found"
-cp /input/* /output
+cp /kratix/input/* /kratix/output

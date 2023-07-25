@@ -4,14 +4,14 @@ kind: ClusterRole
 metadata:
   name: sealed-secrets-cr
 rules:
-- apiGroups:
-  - ""
-  resourceNames:
-  - sealed-secrets
-  resources:
-  - configmaps
-  verbs:
-  - get
+  - apiGroups:
+      - ""
+    resourceNames:
+      - sealed-secrets
+    resources:
+      - configmaps
+    verbs:
+      - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -22,9 +22,9 @@ roleRef:
   kind: ClusterRole
   name: sealed-secrets-cr
 subjects:
-- kind: ServiceAccount
-  name: sealed-secrets-sa
-  namespace: default
+  - kind: ServiceAccount
+    name: sealed-secrets-sa
+    namespace: default
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -50,7 +50,7 @@ spec:
           resources: {}
           volumeMounts:
             - name: unsealed
-              mountPath: /output
+              mountPath: /kratix/output
         - image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
           name: seal-secrets
           resources: {}
@@ -58,12 +58,12 @@ spec:
             - name: unsealed
               mountPath: input
             - name: sealed
-              mountPath: /output
+              mountPath: /kratix/output
       containers:
         - image: syntasso/post-test-image:dev
           name: verify-seal
           resources: {}
           volumeMounts:
             - name: sealed
-              mountPath: /input
+              mountPath: /kratix/input
       restartPolicy: Never

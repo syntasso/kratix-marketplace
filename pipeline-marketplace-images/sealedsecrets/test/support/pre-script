@@ -4,12 +4,12 @@ set -xe
 
 kubectl create secret --namespace default generic supersecret \
     --from-literal=key=value \
-    --dry-run=client -o yaml > /output/supersecret.yaml
+    --dry-run=client -o yaml > /kratix/output/supersecret.yaml
 
 kubectl create secret --namespace default generic topsecret \
     --from-literal=key=value \
-    --dry-run=client -o yaml > /output/topsecret.yaml
+    --dry-run=client -o yaml > /kratix/output/topsecret.yaml
 
 kubectl create configmap --namespace default notasecret \
     --from-literal=key=value \
-    --dry-run=client -o yaml > /output/configmap.yaml
+    --dry-run=client -o yaml > /kratix/output/configmap.yaml

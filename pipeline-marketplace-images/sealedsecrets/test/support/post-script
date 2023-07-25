@@ -2,21 +2,21 @@
 
 set -xe
 
-ls -l /input
+ls -l /kratix/input
 
-cat /input/*
+cat /kratix/input/*
 
-if yq --exit-status 'select(.kind == "Secret")' /input/* >/dev/null; then
+if yq --exit-status 'select(.kind == "Secret")' /kratix/input/* >/dev/null; then
     echo "found secrets input"
     exit 1
 fi
 
-if ! yq --exit-status 'select(.kind == "ConfigMap")' /input/* >/dev/null; then
+if ! yq --exit-status 'select(.kind == "ConfigMap")' /kratix/input/* >/dev/null; then
     echo "didnt find the expected configmap in input"
     exit 1
 fi
 
-if ! yq --exit-status 'select(.kind == "SealedSecret")' /input/* >/dev/null; then
+if ! yq --exit-status 'select(.kind == "SealedSecret")' /kratix/input/* >/dev/null; then
     echo "didnt find the expected sealedsecret in input"
     exit 1
 fi

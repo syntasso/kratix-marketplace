@@ -2,9 +2,9 @@
 
 set -xe
 
-mkdir -p /metadata/notifications
+mkdir -p /kratix/metadata/notifications
 
-cat > /metadata/notifications/message.yml <<EOF
+cat > /kratix/metadata/notifications/message.yml <<EOF
 message: |
     :gem: :raised_hands: :rocket: :moon: :doge:
 slackHook:

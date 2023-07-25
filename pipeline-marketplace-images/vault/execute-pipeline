@@ -6,14 +6,14 @@ vault_cm="vault-pipeline-image"
 
 split_files() {
   # copy everything thats not of `kind: Secret` to output
-  cd /output
-  yq 'select(.kind != "Secret")' --split-exp '.metadata.name + $index' /input/*
+  cd /kratix/output
+  yq 'select(.kind != "Secret")' --split-exp '.metadata.name + $index' /kratix/input/*
   cd ..
 
   # split the secrets into their own files
   mkdir secrets
   cd secrets
-  yq 'select(.kind == "Secret")' --split-exp '.metadata.name + $index' /input/*
+  yq 'select(.kind == "Secret")' --split-exp '.metadata.name + $index' /kratix/input/*
   cd ..
 }
 
@@ -57,7 +57,7 @@ store_secrets() {
 
   done
   if $wrote_secrets; then
-    echo "vault-secrets: run 'vault kv list ${secret_path}' to see the secrets" > /metadata/status.yaml
+    echo "vault-secrets: run 'vault kv list ${secret_path}' to see the secrets" > /kratix/metadata/status.yaml
   fi
 }
 
@@ -68,9 +68,9 @@ main() {
   login_to_vault
   resource_name="request-$RANDOM"
   namespace="default"
-  if [ -f /input/object.yaml ]; then
-    resource_name=$(yq '.metadata.name' /input/object.yaml)
-    namespace=$(yq '.metadata.namespace // "default"' /input/object.yaml)
+  if [ -f /kratix/input/object.yaml ]; then
+    resource_name=$(yq '.metadata.name' /kratix/input/object.yaml)
+    namespace=$(yq '.metadata.namespace // "default"' /kratix/input/object.yaml)
   fi
   split_files
   store_secrets $namespace $resource_name

@@ -3,9 +3,8 @@
 set -x
 
 # Read current values from the provided resource request
-name="kf-$(yq eval '.metadata.name' /input/object.yaml)"
+name="kf-$(yq eval '.metadata.name' /kratix/input/object.yaml)"
 
 
-sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/manifest.yaml > /output/manifest.yaml
-sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/namespace.yaml > /output/namespace.yaml
-
+sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/manifest.yaml > /kratix/output/manifest.yaml
+sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/namespace.yaml > /kratix/output/namespace.yaml
