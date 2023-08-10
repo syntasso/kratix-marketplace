@@ -22,7 +22,7 @@ sed "s/CLUSTERNAME/${name}/g" /tmp/transfer/flux-push.yaml > /kratix/output/flux
 
 cat > /kratix/output/cluster.yaml <<EOF
 apiVersion: platform.kratix.io/v1alpha1
-kind: Cluster
+kind: Destination
 metadata:
   name: $name
   namespace: default
