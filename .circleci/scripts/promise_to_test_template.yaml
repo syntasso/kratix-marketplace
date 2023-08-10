@@ -41,7 +41,7 @@ commands:
 
             git clone https://github.com/syntasso/kratix /tmp/kratix
             pushd /tmp/kratix
-            ./scripts/register-worker --name platform-cluster --context kind-platform --state-store minio-store --with-label environment=platform
+            ./scripts/register-destination --name platform-cluster --context kind-platform --state-store minio-store --with-label environment=platform
             popd
 
             sleep 5
