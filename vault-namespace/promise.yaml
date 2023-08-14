@@ -81,10 +81,9 @@ spec:
         - kind: ServiceAccount
           name: vaultnamespace-default-promise-pipeline
           namespace: default
-  scheduling:
-    - target:
-        matchLabels:
-          environment: platform
+  destinationSelectors:
+  - matchLabels:
+      environment: platform
   workflows:
     resource:
       configure:

@@ -31,10 +31,9 @@ spec:
               type: object
           served: true
           storage: true
-  scheduling:
-    - target:
-        matchLabels:
-          environment: platform
+  destinationSelectors:
+  - matchLabels:
+      environment: platform
   workflows:
     resource:
       configure:
