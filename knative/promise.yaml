@@ -7296,9 +7296,6 @@ spec:
         app.kubernetes.io/version: 1.8.3
       name: webhook-certs
       namespace: knative-serving
-  destinationSelectors:
-  - matchLabels:
-      environment: dev
   workflows:
     resource:
       configure:
