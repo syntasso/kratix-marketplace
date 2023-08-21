@@ -4,7 +4,6 @@ metadata:
   labels:
     app: redisoperator
   name: redisoperator
-  namespace: default
 spec:
   replicas: 1
   selector:
@@ -19,7 +18,7 @@ spec:
     spec:
       serviceAccountName: redisoperator
       containers:
-        - image: quay.io/spotahome/redis-operator:v1.1.0
+        - image: quay.io/spotahome/redis-operator:v1.2.4
           imagePullPolicy: IfNotPresent
           name: app
           securityContext:
@@ -38,7 +37,6 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  namespace: default
   name: redisoperator
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -52,7 +50,6 @@ subjects:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  namespace: default
   name: redisoperator
 rules:
   - apiGroups:
@@ -99,9 +96,36 @@ rules:
       - poddisruptionbudgets
     verbs:
       - "*"
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - "*"
+      
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  namespace: default
   name: redisoperator
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: http
+    prometheus.io/scrape: "true"
+  name: redisoperator
+  labels:
+    app: redisoperator
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 9710
+    protocol: TCP
+    targetPort: metrics
+  selector:
+    app: redisoperator
