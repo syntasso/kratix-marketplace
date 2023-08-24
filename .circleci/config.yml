@@ -23,11 +23,5 @@ jobs:
 # our single workflow, that triggers the setup job defined above
 workflows:
   setup:
-    triggers:
-      - schedule:
-          cron: "0 0 * * 1-5"
-          filters:
-            branches:
-              only: [main]
     jobs:
       - setup
