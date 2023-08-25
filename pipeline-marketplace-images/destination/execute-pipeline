@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -exuo pipefail
+
+export destinationSelector="$(yq eval '.metadata.annotations.destinationSelector // ""' /kratix/input/object.yaml)"
+if [ -n "$destinationSelector" ]; then
+  echo "[matchLabels: { $(echo $destinationSelector | sed 's/=/: /g' ) } ]" >> /kratix/metadata/destination-selectors.yaml
+fi
+
+
+
