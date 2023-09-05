@@ -13,7 +13,7 @@ spec:
     kind: Bucket
     name: kratix-bucket
     namespace: flux-system
-  path: ./default/CLUSTERNAME/resources
+  path: ./CLUSTERNAME/resources
   validation: client
   kubeConfig:
     secretRef:
@@ -33,7 +33,7 @@ spec:
     name: kratix-bucket
     namespace: flux-system
   validation: client
-  path: ./default/CLUSTERNAME/dependencies
+  path: ./CLUSTERNAME/dependencies
   kubeConfig:
     secretRef:
       name: vc-CLUSTERNAME-flux
