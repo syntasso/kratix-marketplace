@@ -35,6 +35,13 @@ commands:
           name: Install Kratix
           command: |
             kind create cluster --name platform --image kindest/node:v1.27.3
+
+            kubectl apply --filename https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
+            kubectl wait --for condition=available -n cert-manager deployment/cert-manager --timeout 60s
+            kubectl wait --for condition=available -n cert-manager deployment/cert-manager-cainjector --timeout 60s
+            kubectl wait --for condition=available -n cert-manager deployment/cert-manager-webhook --timeout 60s
+
+
             curl -sL https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml | sed "s_syntasso/kratix_syntassodev/kratix_g" | kubectl apply -f -
             sleep 5
             kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
