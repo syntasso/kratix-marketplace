@@ -47,9 +47,10 @@ commands:
             kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
 
             kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 90s
+
             git clone https://github.com/syntasso/kratix /tmp/kratix
             pushd /tmp/kratix
-            ./scripts/register-destination --name platform-cluster --context kind-platform --state-store minio-store --with-label environment=platform
+            ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
             popd
 
             sleep 5
