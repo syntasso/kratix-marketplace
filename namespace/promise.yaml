@@ -23,6 +23,10 @@ spec:
               properties:
                 spec:
                   properties:
+                    clusterName:
+                      description: |
+                        The name of the cluster where the namespace should be created
+                      type: string
                     namespaceName:
                       description: |
                         The name of the namespace to be created

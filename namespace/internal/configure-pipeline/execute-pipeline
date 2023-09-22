@@ -4,6 +4,16 @@ set -xe
 
 # Read current values from the provided resource request
 export namespaceName="$(yq eval '.spec.namespaceName' /kratix/input/object.yaml)"
+export clusterName="$(yq eval '.spec.clusterName' /kratix/input/object.yaml)"
 
 # Replace defaults with user provided values
 sed "s/TBDNAMESPACE/${namespaceName}/g" /tmp/transfer/namespace.yaml > /kratix/output/namespace.yaml
+
+if [ ! "$clusterName" == "null" ]
+then
+  echo "hello world"
+  cat > /kratix/metadata/destination-selectors.yaml <<EOF
+- matchLabels:
+    clusterName: ${clusterName}
+EOF
+fi
