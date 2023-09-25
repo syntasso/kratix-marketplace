@@ -1,19 +1,31 @@
 #!/usr/bin/env sh
 
-set -x
+set -eux
 
-# Read current values from the provided resource request
-export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
-export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
+if [ "$KRATIX_TYPE" = "resource" ]; then
+  # Read current values from the provided resource request
+  export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+  export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
 
-export replicas=1
+  export replicas=1
 
-if [ $size = large ]; then
-  replicas=3
+  if [ $size = large ]; then
+    replicas=3
+  fi
+
+  # Replace defaults with user provided values
+  cat /tmp/transfer/kafka-instance.yaml |  \
+    yq eval '.spec.kafka.replicas = env(replicas)' | \
+    yq eval '.metadata.name = env(name)' - \
+    > /kratix/output/kafka-instance.yaml
+
+  exit 0
 fi
 
-# Replace defaults with user provided values
-cat /tmp/transfer/kafka-instance.yaml |  \
-  yq eval '.spec.kafka.replicas = env(replicas)' | \
-  yq eval '.metadata.name = env(name)' - \
-  > /kratix/output/kafka-instance.yaml
+if [ "$KRATIX_TYPE" = "promise" ]; then
+  cp -r /tmp/transfer/dependencies/* /kratix/output/
+  exit 0
+fi
+
+echo "unsupported KRATIX_TYPE: $KRATIX_TYPE"
+exit 1
