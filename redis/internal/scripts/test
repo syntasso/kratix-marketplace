@@ -2,6 +2,7 @@
 set -e
 
 test_promise() {
+  kubectl wait promise/redis --for=condition=PipelineCompleted --timeout=120s
   kubectl get crd redisfailovers.databases.spotahome.com
   kubectl wait --for=condition=Available --timeout=5s deployment/redisoperator
 }
