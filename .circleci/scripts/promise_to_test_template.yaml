@@ -89,8 +89,8 @@ jobs:
             fi
       - retry/run-with-retry:
           command: << parameters.promise_dir >>/internal/scripts/test promise
-          # 5 minutes total retry (3 sec * 100 times = 300 sec)
-          sleep: 3
+          # 5 minutes total retry (6 sec * 100 times = 600 sec)
+          sleep: 6
           retry-count: 100
       - run:
           name: Wait for CRDs
@@ -115,8 +115,8 @@ jobs:
             fi
       - retry/run-with-retry:
           command: << parameters.promise_dir >>/internal/scripts/test resource-request
-          # 5 minutes total retry (3 sec * 100 times = 300 sec)
-          sleep: 3
+          # 5 minutes total retry (6 sec * 100 times = 600 sec)
+          sleep: 6
           retry-count: 100
       - when:
           condition:
