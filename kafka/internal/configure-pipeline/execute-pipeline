@@ -2,7 +2,7 @@
 
 set -eux
 
-if [ "$KRATIX_TYPE" = "resource" ]; then
+if [ "$KRATIX_WORKFLOW_TYPE" = "resource" ]; then
   # Read current values from the provided resource request
   export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
   export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
@@ -22,10 +22,10 @@ if [ "$KRATIX_TYPE" = "resource" ]; then
   exit 0
 fi
 
-if [ "$KRATIX_TYPE" = "promise" ]; then
+if [ "$KRATIX_WORKFLOW_TYPE" = "promise" ]; then
   cp -r /tmp/transfer/dependencies/* /kratix/output/
   exit 0
 fi
 
-echo "unsupported KRATIX_TYPE: $KRATIX_TYPE"
+echo "unsupported KRATIX_WORKFLOW_TYPE: $KRATIX_WORKFLOW_TYPE"
 exit 1
