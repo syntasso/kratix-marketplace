@@ -1,0 +1,6 @@
+apiVersion: promise.kratix.io/v1alpha1
+kind: MongoDB
+metadata:
+  name: example
+spec:
+  majorVersion: "4"

@@ -1,0 +1,559 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  creationTimestamp:
+  name: mongodb
+spec:
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: mongodbs.promise.kratix.io
+    spec:
+      group: promise.kratix.io
+      names:
+        kind: MongoDB
+        listKind: MongoDBList
+        plural: mongodbs
+        singular: mongodb
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  majorVersion:
+                    default: '4'
+                    type: string
+                  version:
+                    type: string
+                type: object
+            type: object
+        served: true
+        storage: true
+  dependencies:
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: mongodb-database
+      namespace: default
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: mongodb-kubernetes-operator
+      namespace: default
+  - apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      annotations:
+        controller-gen.kubebuilder.io/version: v0.11.3
+        service.binding: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret
+        service.binding/connectionString: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret,sourceKey=connectionString.standardSrv
+        service.binding/password: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret,sourceKey=password
+        service.binding/provider: community
+        service.binding/type: mongodb
+        service.binding/username: path={.metadata.name}-{.spec.users[0].db}-{.spec.users[0].name},objectType=Secret,sourceKey=username
+      creationTimestamp:
+      name: mongodbcommunity.mongodbcommunity.mongodb.com
+      namespace: default
+    spec:
+      group: mongodbcommunity.mongodb.com
+      names:
+        kind: MongoDBCommunity
+        listKind: MongoDBCommunityList
+        plural: mongodbcommunity
+        shortNames:
+        - mdbc
+        singular: mongodbcommunity
+      scope: Namespaced
+      versions:
+      - additionalPrinterColumns:
+        - description: Current state of the MongoDB deployment
+          jsonPath: ".status.phase"
+          name: Phase
+          type: string
+        - description: Version of MongoDB server
+          jsonPath: ".status.version"
+          name: Version
+          type: string
+        name: v1
+        schema:
+          openAPIV3Schema:
+            properties:
+              apiVersion:
+                type: string
+              kind:
+                type: string
+              metadata:
+                type: object
+              spec:
+                properties:
+                  additionalConnectionStringConfig:
+                    nullable: true
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  additionalMongodConfig:
+                    nullable: true
+                    type: object
+                    x-kubernetes-preserve-unknown-fields: true
+                  agent:
+                    properties:
+                      logLevel:
+                        type: string
+                      maxLogFileDurationHours:
+                        type: integer
+                    type: object
+                  arbiters:
+                    type: integer
+                  automationConfig:
+                    properties:
+                      processes:
+                        items:
+                          properties:
+                            disabled:
+                              type: boolean
+                            name:
+                              type: string
+                          required:
+                          - disabled
+                          - name
+                          type: object
+                        type: array
+                    required:
+                    - processes
+                    type: object
+                  featureCompatibilityVersion:
+                    type: string
+                  members:
+                    type: integer
+                  prometheus:
+                    properties:
+                      metricsPath:
+                        pattern: "^\\/[a-z0-9]+$"
+                        type: string
+                      passwordSecretRef:
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      port:
+                        type: integer
+                      tlsSecretKeyRef:
+                        properties:
+                          key:
+                            type: string
+                          name:
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      username:
+                        type: string
+                    required:
+                    - passwordSecretRef
+                    - username
+                    type: object
+                  replicaSetHorizons:
+                    items:
+                      additionalProperties:
+                        type: string
+                      type: object
+                    type: array
+                  security:
+                    properties:
+                      authentication:
+                        properties:
+                          ignoreUnknownUsers:
+                            default: true
+                            nullable: true
+                            type: boolean
+                          modes:
+                            items:
+                              enum:
+                              - SCRAM
+                              - SCRAM-SHA-256
+                              - SCRAM-SHA-1
+                              type: string
+                            type: array
+                        required:
+                        - modes
+                        type: object
+                      roles:
+                        items:
+                          properties:
+                            authenticationRestrictions:
+                              items:
+                                properties:
+                                  clientSource:
+                                    items:
+                                      type: string
+                                    type: array
+                                  serverAddress:
+                                    items:
+                                      type: string
+                                    type: array
+                                required:
+                                - clientSource
+                                - serverAddress
+                                type: object
+                              type: array
+                            db:
+                              type: string
+                            privileges:
+                              items:
+                                properties:
+                                  actions:
+                                    items:
+                                      type: string
+                                    type: array
+                                  resource:
+                                    properties:
+                                      anyResource:
+                                        type: boolean
+                                      cluster:
+                                        type: boolean
+                                      collection:
+                                        type: string
+                                      db:
+                                        type: string
+                                    type: object
+                                required:
+                                - actions
+                                - resource
+                                type: object
+                              type: array
+                            role:
+                              type: string
+                            roles:
+                              items:
+                                properties:
+                                  db:
+                                    type: string
+                                  name:
+                                    type: string
+                                required:
+                                - db
+                                - name
+                                type: object
+                              type: array
+                          required:
+                          - db
+                          - privileges
+                          - role
+                          type: object
+                        type: array
+                      tls:
+                        properties:
+                          caCertificateSecretRef:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                          caConfigMapRef:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                          certificateKeySecretRef:
+                            properties:
+                              name:
+                                type: string
+                            type: object
+                            x-kubernetes-map-type: atomic
+                          enabled:
+                            type: boolean
+                          optional:
+                            type: boolean
+                        required:
+                        - enabled
+                        type: object
+                    type: object
+                  statefulSet:
+                    properties:
+                      metadata:
+                        properties:
+                          annotations:
+                            additionalProperties:
+                              type: string
+                            type: object
+                          labels:
+                            additionalProperties:
+                              type: string
+                            type: object
+                        type: object
+                      spec:
+                        type: object
+                        x-kubernetes-preserve-unknown-fields: true
+                    required:
+                    - spec
+                    type: object
+                  type:
+                    enum:
+                    - ReplicaSet
+                    type: string
+                  users:
+                    items:
+                      properties:
+                        additionalConnectionStringConfig:
+                          nullable: true
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                        connectionStringSecretName:
+                          type: string
+                        db:
+                          default: admin
+                          type: string
+                        name:
+                          type: string
+                        passwordSecretRef:
+                          properties:
+                            key:
+                              type: string
+                            name:
+                              type: string
+                          required:
+                          - name
+                          type: object
+                        roles:
+                          items:
+                            properties:
+                              db:
+                                type: string
+                              name:
+                                type: string
+                            required:
+                            - db
+                            - name
+                            type: object
+                          type: array
+                        scramCredentialsSecretName:
+                          pattern: "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"
+                          type: string
+                      required:
+                      - name
+                      - passwordSecretRef
+                      - roles
+                      - scramCredentialsSecretName
+                      type: object
+                    type: array
+                  version:
+                    type: string
+                required:
+                - security
+                - type
+                - users
+                type: object
+              status:
+                properties:
+                  currentMongoDBArbiters:
+                    type: integer
+                  currentMongoDBMembers:
+                    type: integer
+                  currentStatefulSetArbitersReplicas:
+                    type: integer
+                  currentStatefulSetReplicas:
+                    type: integer
+                  message:
+                    type: string
+                  mongoUri:
+                    type: string
+                  phase:
+                    type: string
+                  version:
+                    type: string
+                required:
+                - currentMongoDBMembers
+                - currentStatefulSetReplicas
+                - mongoUri
+                - phase
+                type: object
+            type: object
+        served: true
+        storage: true
+        subresources:
+          status: {}
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: mongodb-database
+      namespace: default
+    rules:
+    - apiGroups:
+      - ''
+      resources:
+      - secrets
+      verbs:
+      - get
+    - apiGroups:
+      - ''
+      resources:
+      - pods
+      verbs:
+      - patch
+      - delete
+      - get
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: mongodb-kubernetes-operator
+      namespace: default
+    rules:
+    - apiGroups:
+      - ''
+      resources:
+      - pods
+      - services
+      - configmaps
+      - secrets
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - apps
+      resources:
+      - statefulsets
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - mongodbcommunity.mongodb.com
+      resources:
+      - mongodbcommunity
+      - mongodbcommunity/status
+      - mongodbcommunity/spec
+      - mongodbcommunity/finalizers
+      verbs:
+      - get
+      - patch
+      - list
+      - update
+      - watch
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: mongodb-database
+      namespace: default
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: mongodb-database
+    subjects:
+    - kind: ServiceAccount
+      name: mongodb-database
+  - apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: mongodb-kubernetes-operator
+      namespace: default
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: mongodb-kubernetes-operator
+    subjects:
+    - kind: ServiceAccount
+      name: mongodb-kubernetes-operator
+      namespace: default
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      annotations:
+        email: support@mongodb.com
+      labels:
+        owner: mongodb
+      name: mongodb-kubernetes-operator
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          name: mongodb-kubernetes-operator
+      strategy:
+        rollingUpdate:
+          maxUnavailable: 1
+        type: RollingUpdate
+      template:
+        metadata:
+          labels:
+            name: mongodb-kubernetes-operator
+        spec:
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                  - key: name
+                    operator: In
+                    values:
+                    - mongodb-kubernetes-operator
+                topologyKey: kubernetes.io/hostname
+          containers:
+          - command:
+            - "/usr/local/bin/entrypoint"
+            env:
+            - name: WATCH_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OPERATOR_NAME
+              value: mongodb-kubernetes-operator
+            - name: AGENT_IMAGE
+              value: quay.io/mongodb/mongodb-agent:12.0.25.7724-1
+            - name: VERSION_UPGRADE_HOOK_IMAGE
+              value: quay.io/mongodb/mongodb-kubernetes-operator-version-upgrade-post-start-hook:1.0.7
+            - name: READINESS_PROBE_IMAGE
+              value: quay.io/mongodb/mongodb-kubernetes-readinessprobe:1.0.15
+            - name: MONGODB_IMAGE
+              value: mongo
+            - name: MONGODB_REPO_URL
+              value: docker.io
+            image: quay.io/mongodb/mongodb-kubernetes-operator:0.8.2
+            imagePullPolicy: Always
+            name: mongodb-kubernetes-operator
+            resources:
+              limits:
+                cpu: 1100m
+                memory: 1Gi
+              requests:
+                cpu: 500m
+                memory: 200Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 2000
+          serviceAccountName: mongodb-kubernetes-operator
+  destinationSelectors:
+    - matchLabels:
+        environment: dev
+  workflows:
+    resource:
+      configure:
+      - apiVersion: platform.kratix.io/v1alpha1
+        kind: Pipeline
+        metadata:
+          name: configure-workflow
+        spec:
+          containers:
+          - image: ghcr.io/syntasso/kratix-marketplace/mongodb-configure-pipeline:v0.1.0
+            name: create-instance
+status: {}

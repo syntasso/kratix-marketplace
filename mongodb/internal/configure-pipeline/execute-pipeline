@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+
+set -x
+
+# Read current values from the provided resource request
+export name="mongodb-$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export replicas=1
+export password="supersecret"
+
+majorVersion="$(yq eval '.spec.majorVersion' /kratix/input/object.yaml)"
+specVersion="$(yq eval '.spec.version // ""' /kratix/input/object.yaml)"
+
+if [ "$majorVersion" = "4" ]; then
+  export version="4.4.23"
+fi
+
+if [ "$majorVersion" = "5" ]; then
+  export version="5.0.14"
+fi
+
+if [ "$majorVersion" = "6" ]; then
+  export version="6.0.10"
+fi
+
+if [ -n "$specVersion" ]; then
+  export version="$specVersion"
+fi
+
+cat /tmp/transfer/mongodb-instance.yaml |  \
+  yq eval '.metadata.name = env(name)' | \
+  yq eval '.spec.version.members = env(replicas)' | \
+  yq eval '.spec.version = env(version)' - |
+  sed "s/TBDNAME/$name/g" \
+  > /kratix/output/mongodb-instance.yaml
+
+cat /tmp/transfer/secret.yaml |  \
+  yq eval '.stringData.password = env(password)' - | \
+  sed "s/TBDNAME/$name/g" \
+  > /kratix/output/secret.yaml
+
+echo "{message: 'mongodb version: $version'}" > /kratix/metadata/status.yaml

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crds mongodbcommunity.mongodbcommunity.mongodb.com
+  kubectl wait --for=condition=Available --timeout=5s deployment/mongodb-kubernetes-operator
+}
+
+test_resource_request() {
+  kubectl wait --for=condition=ready --timeout=5s pod/mongodb-example-0
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
