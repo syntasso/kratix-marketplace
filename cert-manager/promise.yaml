@@ -4,7 +4,6 @@ metadata:
   creationTimestamp: null
   name: cert-manager
 spec:
-  api: null
   dependencies:
   - apiVersion: v1
     kind: Namespace
@@ -10378,5 +10377,6 @@ spec:
       sideEffects: None
       timeoutSeconds: 10
   workflows:
+    promise: {}
     resource: {}
 status: {}

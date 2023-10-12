@@ -1371,6 +1371,7 @@ spec:
       name: kubeflow-pipelines-cache-deployer-sa
       namespace: kubeflow
   workflows:
+    promise: {}
     resource:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1

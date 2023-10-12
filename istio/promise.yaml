@@ -5,7 +5,6 @@ metadata:
   name: istio
   namespace: default
 spec:
-  api: null
   dependencies:
   - apiVersion: v1
     kind: ServiceAccount
@@ -11588,5 +11587,6 @@ spec:
           - emptyDir: {}
             name: storage-volume
   workflows:
+    promise: {}
     resource: {}
 status: {}

@@ -197,6 +197,7 @@ spec:
       kind: User
       name: https://localhost:32000#CgcxNTU3MzQ2EgZnaXRodWI
   workflows:
+    promise: {}
     resource:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1

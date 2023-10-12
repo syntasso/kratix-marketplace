@@ -698,6 +698,7 @@ spec:
   - matchLabels:
       environment: dev
   workflows:
+    promise: {}
     resource:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1
