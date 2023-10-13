@@ -17,7 +17,7 @@ workflows:
               name: sealed-secrets
 ```
 
-This image finds all `kind: Secret` documents in `/kratix/input`, encrypts them with
+This image finds all `kind: Secret` documents in `/kratix/output`, encrypts them with
 [kubeseal](https://github.com/bitnami-labs/sealed-secrets), and creates the sealed
 documents in `/kratix/output`. All non-secret documents are copied over.
 
