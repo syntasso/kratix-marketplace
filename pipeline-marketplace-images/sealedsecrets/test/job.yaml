@@ -23,7 +23,7 @@ roleRef:
   name: sealed-secrets-cr
 subjects:
   - kind: ServiceAccount
-    name: sealed-secrets-sa
+    name: sealed-secrets
     namespace: default
 ---
 apiVersion: v1
@@ -38,11 +38,9 @@ metadata:
 spec:
   template:
     spec:
-      serviceAccountName: sealed-secrets-sa
+      serviceAccountName: sealed-secrets
       volumes:
         - name: unsealed
-          emptyDir: {}
-        - name: sealed
           emptyDir: {}
       initContainers:
         - image: syntasso/pre-test-image:dev
@@ -56,14 +54,12 @@ spec:
           resources: {}
           volumeMounts:
             - name: unsealed
-              mountPath: input
-            - name: sealed
               mountPath: /kratix/output
       containers:
         - image: syntasso/post-test-image:dev
           name: verify-seal
           resources: {}
           volumeMounts:
-            - name: sealed
-              mountPath: /kratix/input
+            - name: unsealed
+              mountPath: /kratix/output
       restartPolicy: Never

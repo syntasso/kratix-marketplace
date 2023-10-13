@@ -1,23 +1,23 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-set -xe
+set -euo pipefail
 
-ls -l /kratix/input
+ls -l /kratix/output
 
-cat /kratix/input/*
+cat /kratix/output/*
 
-if yq --exit-status 'select(.kind == "Secret")' /kratix/input/* >/dev/null; then
-    echo "found secrets input"
+if yq --exit-status 'select(.kind == "Secret")' /kratix/output/* >/dev/null; then
+    echo "found secrets output"
     exit 1
 fi
 
-if ! yq --exit-status 'select(.kind == "ConfigMap")' /kratix/input/* >/dev/null; then
-    echo "didnt find the expected configmap in input"
+if ! yq --exit-status 'select(.kind == "ConfigMap")' /kratix/output/* >/dev/null; then
+    echo "didnt find the expected configmap in output"
     exit 1
 fi
 
-if ! yq --exit-status 'select(.kind == "SealedSecret")' /kratix/input/* >/dev/null; then
-    echo "didnt find the expected sealedsecret in input"
+if ! yq --exit-status 'select(.kind == "SealedSecret")' /kratix/output/* >/dev/null; then
+    echo "didnt find the expected sealedsecret in output"
     exit 1
 fi
 
