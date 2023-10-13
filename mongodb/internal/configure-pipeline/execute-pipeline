@@ -38,4 +38,10 @@ cat /tmp/transfer/secret.yaml |  \
   sed "s/TBDNAME/$name/g" \
   > /kratix/output/secret.yaml
 
-echo "{message: 'mongodb version: $version'}" > /kratix/metadata/status.yaml
+cat <<EOF > /kratix/metadata/status.yaml
+message: "mongodb version: $version"
+adminUserCredentials:
+  name: "$name-mongodb-admin-my-user"
+  namespace: $namespace
+EOF
+
