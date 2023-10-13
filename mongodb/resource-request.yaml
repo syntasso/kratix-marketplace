@@ -3,4 +3,4 @@ kind: MongoDB
 metadata:
   name: example
 spec:
-  majorVersion: "4"
+  majorVersion: 4
