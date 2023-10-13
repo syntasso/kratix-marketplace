@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.source https://github.com/syntasso/kratix-marketp
 
 ADD execute-pipeline execute-pipeline
 
-ENV KUBESEAL_VERSION 0.20.5
+ENV KUBESEAL_VERSION 0.24.1
 RUN curl -Lo kubeseal.tar.gz https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-linux-amd64.tar.gz
 RUN tar -xvzf kubeseal.tar.gz kubeseal && chmod u+x kubeseal && mv kubeseal /bin/kubeseal
 
