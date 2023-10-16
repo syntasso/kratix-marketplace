@@ -7,7 +7,7 @@ test_promise() {
 }
 
 test_resource_request() {
-  kubectl wait --for=condition=ready --timeout=5s pod/mongodb-example-0
+  kubectl wait --for=condition=ready --timeout=5s pod/example-0
 }
 
 if [ "$1" = "promise" ]; then
