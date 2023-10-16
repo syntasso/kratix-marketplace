@@ -43,4 +43,5 @@ message: "mongodb version: $version"
 adminUserCredentials:
   name: "$name-admin-my-user"
   namespace: $namespace
+version: $version
 EOF
