@@ -34,12 +34,6 @@ spec:
               type: object
           served: true
           storage: true
-  dependencies:
-    - apiVersion: v1
-      kind: ServiceAccount
-      metadata:
-        name: jake
-        namespace: default
   workflows:
     resource:
       configure:
