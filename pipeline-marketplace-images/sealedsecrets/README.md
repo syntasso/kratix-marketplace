@@ -53,7 +53,7 @@ kubectl create clusterrole sealed-secrets-reader \
 # Replace PROMISE with the name of your promise
 kubectl create clusterrolebinding PROMISE-sealed-secret \
     --clusterrole=sealed-secrets-reader \
-    --serviceaccount=default:PROMISE-default-resource-pipeline
+    --serviceaccount=default:PROMISE-resource-pipeline
 ```
 
 ## Usage in the Pipeline
