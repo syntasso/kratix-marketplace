@@ -24,13 +24,13 @@ platform cluster to have access to Vault using the [Kubernetes auth](https://dev
 Once auth is setup, create a Role within Vault for Kratix to use to provision the namespaces:
 ```
 vault write auth/kubernetes/role/kratix \
-    bound_service_account_names=vaultnamespace-default-resource-pipeline \
+    bound_service_account_names=vaultnamespace-resource-pipeline \
     bound_service_account_namespaces=default \
     policies=NAMESPACE_POLICY \
     ttl=1h
 ```
 
-The pipeline will use the `vaultnamespace-default-resource-pipeline` Service
+The pipeline will use the `vaultnamespace-resource-pipeline` Service
 Account to authenticate with vault. Replace `NAMESPACE_POLICY` with a policy that
 can create Vault Namespaces, KV and Auth engines.
 

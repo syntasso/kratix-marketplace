@@ -49,7 +49,7 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: slack-default-resource-pipeline-credentials
+  name: slack-resource-pipeline-credentials
 rules:
 - apiGroups:
   - ""
@@ -63,12 +63,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: slack-default-resource-pipeline-credentials
+  name: slack-resource-pipeline-credentials
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: slack-default-resource-pipeline-credentials
+  name: slack-resource-pipeline-credentials
 subjects:
 - kind: ServiceAccount
-  name: slack-default-resource-pipeline
+  name: slack-resource-pipeline
   namespace: default
