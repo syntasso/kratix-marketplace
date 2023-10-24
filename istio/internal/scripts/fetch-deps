@@ -11,12 +11,12 @@ base:
 """ > /tmp/values.yaml
 
 helm template istio-base istio/base \
-    -n istio-system --values /tmp/values.yaml > $PWD/resources/istio-base.yaml
+    -n istio-system --values /tmp/values.yaml > $PWD/configure-pipeline/dependencies/istio-base.yaml
 
 rm /tmp/values.yaml
 
 helm template istiod istio/istiod \
-    -n istio-system > $PWD/resources/istiod.yaml
+    -n istio-system > $PWD/configure-pipeline/dependencies/istiod.yaml
 
 
 echo """---
@@ -24,7 +24,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: istio-system
-""" > $PWD/resources/namespace.yaml
+""" > $PWD/configure-pipeline/dependencies/namespace.yaml
 
 urls=(
     "https://raw.githubusercontent.com/istio/istio/f0b008a933d4596afc38c57d7c41fee699387bd2/samples/addons/jaeger.yaml"
@@ -33,5 +33,5 @@ urls=(
 )
 
 for url in "${urls[@]}"; do
-    curl -sL -o $PWD/resources/$(basename $url) $url
+    curl -sL -o $PWD/configure-pipeline/dependencies/$(basename $url) $url
 done

@@ -4,7 +4,7 @@ This Promise installs [Istio](https://istio.io/) on your clusters.
 
 To install, run the following command while targeting your Platform cluster:
 ```
-kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/istio/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/istio/promise.yaml
 ```
 
 This will install Istio into your worker clusters. To verify Istio is installed,
