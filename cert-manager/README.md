@@ -7,7 +7,7 @@ the Promise is installed.
 
 To install, run the following command while targeting your Platform cluster:
 ```
-kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/cert-manager/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/cert-manager/promise.yaml
 ```
 
 To verify the Promise is installed, you can run the following command while
