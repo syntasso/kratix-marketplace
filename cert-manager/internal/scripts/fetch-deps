@@ -7,16 +7,13 @@ urls=(
     "https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml"
 )
 
-if [ ! -d ${repodir} ]; then
-    git clone git@github.com:kubeflow/pipelines.git ${repodir}
-fi
 
-resourcesdir=${ROOT}/resources
+depsdir=${ROOT}/configure-pipeline/dependencies/
 
-rm -rf ${resourcesdir}/*
-mkdir -p ${resourcesdir}
+rm -rf ${depsdir}/*
+mkdir -p ${depsdir}
 
 for url in ${urls[@]}; do
     filename=$(basename ${url})
-    curl -sL "${url}" -o ${resourcesdir}/${filename}
+    curl -sL "${url}" -o ${depsdir}/${filename}
 done
