@@ -1,0 +1,38 @@
+#!/usr/bin/env sh
+
+set -x
+
+name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+namespace="$(yq eval '.spec.namespace // "default"' /kratix/input/object.yaml)"
+export fullconfig="$(yq eval '.spec' /kratix/input/object.yaml)"
+export password="supersecret"
+export secretName="$name-secret"
+
+cat <<EOF | yq '.spec = env(fullconfig)' > mongodb-instance.yaml
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+metadata:
+  name: $name
+  namespace: $namespace
+EOF
+
+cat mongodb-instance.yaml | \
+  yq ".spec.users[].passwordSecretRef.name = env(secretName)" > /kratix/output/mongodb-instance.yaml
+
+cat <<EOF > /kratix/output/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: $secretName
+  namespace: $namespace
+type: Opaque
+stringData:
+  password: $password
+EOF
+
+cat <<EOF > /kratix/metadata/status.yaml
+message: "Instance requested"
+adminUserCredentials:
+  name: "$name-admin-my-user"
+  namespace: $namespace
+EOF

@@ -1,0 +1,69 @@
+apiVersion: promise.kratix.io/v1alpha1
+kind: MongoDB
+metadata:
+  name: example-mongodb
+  namespace: default
+spec:
+  members: 1
+  type: ReplicaSet
+  version: "6.0.5"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+    - name: my-user
+      db: admin
+      roles:
+        - name: root
+          db: admin
+        - name: dbAdminAnyDatabase
+          db: admin
+        - name: clusterAdmin
+          db: admin
+        - name: userAdminAnyDatabase
+          db: admin
+      scramCredentialsSecretName: my-scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+
+  # Extra configurable properties (uncomment sections below to configure):
+  # ======================================================================
+  # statefulSet:
+  #   spec:
+  #     selector:
+  #       matchLabels:
+  #         app: mongodb
+  #     template:
+  #       metadata:
+  #         labels:
+  #           app: mongodb
+  #       spec:
+  #         containers:
+  #           - name: mongod
+  #             resources:
+  #               limits:
+  #                 cpu: "0.2"
+  #                 memory: 250M
+  #               requests:
+  #                 cpu: "0.2"
+  #                 memory: 200M
+  #           - name: mongodb-agent
+  #             resources:
+  #               limits:
+  #                 cpu: "0.2"
+  #                 memory: 250M
+  #               requests:
+  #                 cpu: "0.2"
+  #                 memory: 200M
+  #         affinity:
+  #           podAntiAffinity:
+  #             preferredDuringSchedulingIgnoredDuringExecution:
+  #               - weight: 100
+  #                 podAffinityTerm:
+  #                   labelSelector:
+  #                     matchExpressions:
+  #                       - key: app
+  #                         operator: In
+  #                         values:
+  #                           - mongodb
+  #                   topologyKey: kubernetes.io/hostname
