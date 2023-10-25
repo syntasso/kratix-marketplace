@@ -3,11 +3,11 @@
 set -e
 
 promise_name="$(basename "$(dirname "${PWD}")")"
-if [ "${PROMISE_NAME}" != "" ]; then
+if [ "${PROMISE_NAME:-""}" != "" ]; then
   promise_name="${PROMISE_NAME}"
 fi
 pipeline_dir="configure-pipeline"
-if [ "${PIPELINE_DIR}" != "" ]; then
+if [ "${PIPELINE_DIR:-""}" != "" ]; then
   pipeline_dir="${PIPELINE_DIR}"
 fi
 pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-configure-pipeline:v0.1.0"
