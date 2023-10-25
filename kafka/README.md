@@ -5,7 +5,7 @@ which can be `small` or `large`.
 
 To install, run the following command while targeting your Platform cluster:
 ```
-kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kafka/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kafka/promise.yaml
 ```
 
 This will install the Kafka Operator into your clusters. To verify the Kafka Operator is
