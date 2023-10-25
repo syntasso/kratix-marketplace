@@ -3,6 +3,13 @@
 set -e
 
 promise_name="$(basename "$(dirname "${PWD}")")"
+if [ "${PROMISE_NAME}" != "" ]; then
+  promise_name="${PROMISE_NAME}"
+fi
+pipeline_dir="configure-pipeline"
+if [ "${PIPELINE_DIR}" != "" ]; then
+  pipeline_dir="${PIPELINE_DIR}"
+fi
 pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-configure-pipeline:v0.1.0"
 
 while [ $# -gt 0 ]; do
@@ -11,7 +18,7 @@ while [ $# -gt 0 ]; do
       docker build \
         --tag "${pipeline_image}" \
         --platform linux/amd64 \
-        "${PWD}/configure-pipeline" ;;
+        "${PWD}/${pipeline_dir}" ;;
 
     load)
       kind load docker-image "${pipeline_image}" --name platform ;;

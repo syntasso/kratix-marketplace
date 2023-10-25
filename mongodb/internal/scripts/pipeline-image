@@ -2,4 +2,8 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-source ${PWD}/../../scripts/pipeline-image
+source ${PWD}/../../scripts/pipeline-image $@
+
+export PROMISE_NAME="mongodb-deps"
+export PIPELINE_DIR="promise-pipeline"
+source ${PWD}/../../scripts/pipeline-image $@
