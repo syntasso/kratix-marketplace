@@ -4,7 +4,7 @@ This Promise will install global instance of Kubevela onto a Worker cluster.
 
 To install:
 ```
-kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/kubevela/promise.yaml
 ```
 
 You can deploy Kubevela applications directly to the Worker cluster. There is a sample app `application.yaml`:

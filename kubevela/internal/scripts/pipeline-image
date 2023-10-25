@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -eu
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-source ${PWD}/../../scripts/inject-deps
+source ${PWD}/../../scripts/pipeline-image
