@@ -5,7 +5,7 @@ This Promise installs [Crossplane](https://www.crossplane.io/) on your clusters.
 To install, run the following command while targeting your Platform cluster:
 
 ```
-kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/crossplane/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/crossplane/promise.yaml
 ```
 
 This will install Crossplane into your worker clusters. To verify Crossplane is installed,
