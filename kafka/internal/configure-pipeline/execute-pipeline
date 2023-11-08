@@ -24,8 +24,8 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: kafka-${name}
-  title: "kafka ${name}"
-  description: kafka created via the Promise
+  title: "Kafka ${name}"
+  description: Kafka created via the Promise
   annotations:
     backstage.io/kubernetes-label-selector: kafka=${name}
   links:
