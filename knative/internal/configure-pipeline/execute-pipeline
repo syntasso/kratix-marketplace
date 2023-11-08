@@ -1,16 +1,20 @@
 #!/usr/bin/env sh
 
-set -x
+set -eux
 
-# Read current values from the provided resource request
-env_type="$(yq eval '.spec.env // "dev"' /kratix/input/object.yaml)"
+if [ "$KRATIX_WORKFLOW_TYPE" = "resource" ]; then
+  # Read current values from the provided resource request
+  env_type="$(yq eval '.spec.env // "dev"' /kratix/input/object.yaml)"
 
-cp /tmp/transfer/*.yaml /kratix/output
+  cp /tmp/transfer/*.yaml /kratix/output
 
-# This statement is designed to represent a difference in deployment complexity
-# in a dev vs prod environment. In the case of Knative we switch autoscaling
-# on in production, we switch it off in dev.
-if [ "${env_type}" = "dev" ];
-then
-  rm /kratix/output/serving-hpa.yaml
+  # This statement is designed to represent a difference in deployment complexity
+  # in a dev vs prod environment. In the case of Knative we switch autoscaling
+  # on in production, we switch it off in dev.
+  if [ "${env_type}" = "dev" ];
+  then
+    rm /kratix/output/serving-hpa.yaml
+  fi
+else
+  cp -r /tmp/dependencies/* /kratix/output
 fi

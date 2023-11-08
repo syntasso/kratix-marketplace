@@ -6,12 +6,13 @@ urls=(
     "https://github.com/knative/serving/releases/download/knative-v1.8.3/serving-core.yaml"
 )
 
-rm -rf $PWD/resources/*
+rm -rf $PWD/configure-pipeline/dependencies/*
+mkdir -p $PWD/configure-pipeline/dependencies
 
 for url in "${urls[@]}"; do
     curl -sL $url \
         | yq '(select(.metadata.name == "config-domain") | .data ) = { "local.gd": "" }' \
         | yq '(select(.metadata.name == "config-network") | .data.ingress-class ) = "kourier.ingress.networking.knative.dev"' \
         | yq 'del(.data._example)' \
-        > $PWD/resources/$(basename $url)
+        > $PWD/configure-pipeline/dependencies/$(basename $url)
 done
