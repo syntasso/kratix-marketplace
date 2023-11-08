@@ -1,41 +1,46 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
-promise_name="$(basename "$(dirname "${PWD}")")"
-if [ "${PROMISE_NAME:-""}" != "" ]; then
-  promise_name="${PROMISE_NAME}"
-fi
-pipeline_dir="configure-pipeline"
-if [ "${PIPELINE_DIR:-""}" != "" ]; then
-  pipeline_dir="${PIPELINE_DIR}"
-fi
-pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-configure-pipeline:v0.1.0"
 
-while [ $# -gt 0 ]; do
-  case "$1" in
-    build)
-      docker build \
-        --tag "${pipeline_image}" \
-        --platform linux/amd64 \
-        "${PWD}/${pipeline_dir}" ;;
+declare -a args=( "$@" )
+for dir_name in configure-pipeline configure-promise-pipeline; do
+  promise_name="$(basename "$(dirname "${PWD}")")"
+  if [ "${PROMISE_NAME:-""}" != "" ]; then
+    promise_name="${PROMISE_NAME}"
+  fi
+  pipeline_dir=${dir_name}
+  if [ "${PIPELINE_DIR:-""}" != "" ]; then
+    pipeline_dir="${PIPELINE_DIR}"
+  fi
+  pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:v0.1.0"
 
-    load)
-      kind load docker-image "${pipeline_image}" --name platform ;;
+  set -- "${args[@]}"
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      build)
+        docker build \
+          --tag "${pipeline_image}" \
+          --platform linux/amd64 \
+          "${PWD}/${pipeline_dir}" ;;
 
-    push)
-      docker push "${pipeline_image}" ;;
+      load)
+        kind load docker-image "${pipeline_image}" --name platform ;;
 
-    rmi)
-      docker rmi --force "${pipeline_image}" ;;
+      push)
+        docker push "${pipeline_image}" ;;
 
-    pull)
-      docker pull "${pipeline_image}" ;;
+      rmi)
+        docker rmi --force "${pipeline_image}" ;;
 
-    *)
-      echo "unknown command $1"
-      exit 1
-      ;;
-  esac
-  shift
+      pull)
+        docker pull "${pipeline_image}" ;;
+
+      *)
+        echo "unknown command $1"
+        exit 1
+        ;;
+    esac
+    shift
+  done
 done

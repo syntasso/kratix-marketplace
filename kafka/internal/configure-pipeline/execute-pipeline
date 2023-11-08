@@ -2,30 +2,48 @@
 
 set -eux
 
-if [ "$KRATIX_WORKFLOW_TYPE" = "resource" ]; then
-  # Read current values from the provided resource request
-  export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
-  export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
+# Read current values from the provided resource request
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
 
-  export replicas=1
+export replicas=1
 
-  if [ $size = large ]; then
-    replicas=3
-  fi
-
-  # Replace defaults with user provided values
-  cat /tmp/transfer/kafka-instance.yaml |  \
-    yq eval '.spec.kafka.replicas = env(replicas)' | \
-    yq eval '.metadata.name = env(name)' - \
-    > /kratix/output/kafka-instance.yaml
-
-  exit 0
+if [ $size = large ]; then
+  replicas=3
 fi
 
-if [ "$KRATIX_WORKFLOW_TYPE" = "promise" ]; then
-  cp -r /tmp/transfer/dependencies/* /kratix/output/
-  exit 0
-fi
+# Replace defaults with user provided values
+cat /tmp/transfer/kafka-instance.yaml |  \
+  yq eval '.spec.kafka.replicas = env(replicas)' | \
+  yq eval '.metadata.name = env(name)' - \
+  > /kratix/output/kafka-instance.yaml
 
-echo "unsupported KRATIX_WORKFLOW_TYPE: $KRATIX_WORKFLOW_TYPE"
-exit 1
+mkdir -p /kratix/output/backstage/
+cat <<EOF > /kratix/output/backstage/component.yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-${name}
+  title: "kafka ${name}"
+  description: kafka created via the Promise
+  annotations:
+    backstage.io/kubernetes-label-selector: kafka=${name}
+  links:
+  - url: https://github.com/syntasso/kratix-marketplace
+    title: Support
+    icon: help
+spec:
+  type: service
+  lifecycle: production
+  owner: kratix-worker
+  dependsOn:
+    - component:default/kafka
+  providesApis:
+    - kafka-promise-api
+EOF
+
+echo """
+- directory: backstage
+  matchLabels:
+    environment: backstage
+""" >> /kratix/metadata/destination-selectors.yaml

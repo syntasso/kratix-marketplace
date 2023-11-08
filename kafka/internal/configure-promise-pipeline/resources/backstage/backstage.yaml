@@ -1,0 +1,64 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka
+  title: "kafka Promise"
+  description: "Create kafka Promises on-demand"
+  links:
+  - url: https://github.com/syntasso/kratix-marketplace
+    title: Support
+    icon: help
+  annotations:
+    backstage.io/kubernetes-id: kafka
+spec:
+  type: promise
+  lifecycle: production
+  owner: kratix-platform
+  dependsOn:
+    - component:default/kratix
+  providesApis:
+    - kafka-promise-api
+---
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: kafka-promise-template
+  title: kafka
+  description: kafka as a Service
+  tags:
+    - syntasso
+    - kratix
+spec:
+  type: service
+  lifecycle: experimental
+  owner: kratix-platform
+  parameters:
+    - title: kafka as a Service
+      required:
+        - name
+        - size
+      properties:
+        name:
+          title: kafka name
+          type: string
+          description: Identifier for kafka
+          ui:autofocus: true
+        size:
+          title: Size
+          type: string
+          description: Size, small or large
+  steps:
+  - id: k-apply
+    name: Create a kafka
+    action: kubernetes:apply
+    input:
+      namespaced: true
+      manifest: |
+        apiVersion: marketplace.kratix.io/v1alpha1
+        kind: kafka
+        metadata:
+          name: ${{ parameters.name }}
+          namespace: default
+        spec:
+          size: ${{ parameters.size }}

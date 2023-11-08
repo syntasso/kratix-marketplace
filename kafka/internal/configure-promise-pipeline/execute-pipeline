@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+set -x
+
+
+cp -r /tmp/transfer/dependencies/* /kratix/output/
+cp -r /tmp/transfer/backstage /kratix/output
+
+echo """
+- directory: backstage
+  matchLabels:
+    environment: backstage
+""" >> /kratix/metadata/destination-selectors.yaml

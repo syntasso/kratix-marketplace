@@ -9,12 +9,12 @@ spec:
     apiVersion: apiextensions.k8s.io/v1
     kind: CustomResourceDefinition
     metadata:
-      name: kafka.marketplace.kratix.io
+      name: kafkas.marketplace.kratix.io
     spec:
       group: marketplace.kratix.io
       names:
         kind: kafka
-        plural: kafka
+        plural: kafkas
         singular: kafka
       scope: Namespaced
       versions:
@@ -34,6 +34,9 @@ spec:
             type: object
         served: true
         storage: true
+  destinationSelectors:
+  - matchLabels:
+      environment: dev
   workflows:
     resource:
       configure:
@@ -45,7 +48,7 @@ spec:
         spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/kafka-configure-pipeline:v0.1.0
-            name: kafka-configure-pipeline
+            name: configure
     promise:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1
@@ -55,6 +58,6 @@ spec:
           namespace: default
         spec:
           containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/kafka-configure-pipeline:v0.1.0
-            name: kafka-configure-pipeline
+          - image: ghcr.io/syntasso/kratix-marketplace/kafka-configure-promise-pipeline:v0.1.0
+            name: configure
 status: {}
