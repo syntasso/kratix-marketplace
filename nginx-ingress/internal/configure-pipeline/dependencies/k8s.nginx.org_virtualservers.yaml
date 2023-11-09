@@ -2,22 +2,21 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.10.0
-  creationTimestamp: null
-  name: virtualserverroutes.k8s.nginx.org
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: virtualservers.k8s.nginx.org
 spec:
   group: k8s.nginx.org
   names:
-    kind: VirtualServerRoute
-    listKind: VirtualServerRouteList
-    plural: virtualserverroutes
+    kind: VirtualServer
+    listKind: VirtualServerList
+    plural: virtualservers
     shortNames:
-      - vsr
-    singular: virtualserverroute
+      - vs
+    singular: virtualserver
   scope: Namespaced
   versions:
     - additionalPrinterColumns:
-        - description: Current state of the VirtualServerRoute. If the resource has a valid status, it means it has been validated and accepted by the Ingress Controller.
+        - description: Current state of the VirtualServer. If the resource has a valid status, it means it has been validated and accepted by the Ingress Controller.
           jsonPath: .status.state
           name: State
           type: string
@@ -40,7 +39,7 @@ spec:
       name: v1
       schema:
         openAPIV3Schema:
-          description: VirtualServerRoute defines the VirtualServerRoute resource.
+          description: VirtualServer defines the VirtualServer resource.
           type: object
           properties:
             apiVersion:
@@ -52,14 +51,71 @@ spec:
             metadata:
               type: object
             spec:
-              description: VirtualServerRouteSpec is the spec of the VirtualServerRoute resource.
+              description: VirtualServerSpec is the spec of the VirtualServer resource.
               type: object
               properties:
+                dos:
+                  type: string
+                externalDNS:
+                  description: ExternalDNS defines externaldns sub-resource of a virtual server.
+                  type: object
+                  properties:
+                    enable:
+                      type: boolean
+                    labels:
+                      description: Labels stores labels defined for the Endpoint
+                      type: object
+                      additionalProperties:
+                        type: string
+                    providerSpecific:
+                      description: ProviderSpecific stores provider specific config
+                      type: array
+                      items:
+                        description: ProviderSpecificProperty defines specific property for using with ExternalDNS sub-resource.
+                        type: object
+                        properties:
+                          name:
+                            description: Name of the property
+                            type: string
+                          value:
+                            description: Value of the property
+                            type: string
+                    recordTTL:
+                      description: TTL for the record
+                      type: integer
+                      format: int64
+                    recordType:
+                      type: string
+                gunzip:
+                  type: boolean
                 host:
+                  type: string
+                http-snippets:
                   type: string
                 ingressClassName:
                   type: string
-                subroutes:
+                internalRoute:
+                  description: InternalRoute allows for the configuration of internal routing.
+                  type: boolean
+                listener:
+                  description: Listener references a custom http and/or https listener defined in GlobalConfiguration.
+                  type: object
+                  properties:
+                    http:
+                      type: string
+                    https:
+                      type: string
+                policies:
+                  type: array
+                  items:
+                    description: PolicyReference references a policy by name and an optional namespace.
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      namespace:
+                        type: string
+                routes:
                   type: array
                   items:
                     description: Route defines a route.
@@ -463,6 +519,44 @@ spec:
                                       type: string
                             weight:
                               type: integer
+                server-snippets:
+                  type: string
+                tls:
+                  description: TLS defines TLS configuration for a VirtualServer.
+                  type: object
+                  properties:
+                    cert-manager:
+                      description: CertManager defines a cert manager config for a TLS.
+                      type: object
+                      properties:
+                        cluster-issuer:
+                          type: string
+                        common-name:
+                          type: string
+                        duration:
+                          type: string
+                        issuer:
+                          type: string
+                        issuer-group:
+                          type: string
+                        issuer-kind:
+                          type: string
+                        renew-before:
+                          type: string
+                        usages:
+                          type: string
+                    redirect:
+                      description: TLSRedirect defines a redirect for a TLS.
+                      type: object
+                      properties:
+                        basedOn:
+                          type: string
+                        code:
+                          type: integer
+                        enable:
+                          type: boolean
+                    secret:
+                      type: string
                 upstreams:
                   type: array
                   items:
@@ -514,6 +608,8 @@ spec:
                           interval:
                             type: string
                           jitter:
+                            type: string
+                          keepalive-time:
                             type: string
                           mandatory:
                             type: boolean
@@ -587,6 +683,8 @@ spec:
                             type: string
                           path:
                             type: string
+                          samesite:
+                            type: string
                           secure:
                             type: boolean
                       slow-start:
@@ -606,7 +704,7 @@ spec:
                       use-cluster-ip:
                         type: boolean
             status:
-              description: VirtualServerRouteStatus defines the status for the VirtualServerRoute resource.
+              description: VirtualServerStatus defines the status for the VirtualServer resource.
               type: object
               properties:
                 externalEndpoints:
@@ -624,8 +722,6 @@ spec:
                 message:
                   type: string
                 reason:
-                  type: string
-                referencedBy:
                   type: string
                 state:
                   type: string
