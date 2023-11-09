@@ -2,7 +2,7 @@
 set -e
 
 test_promise() {
-  kubectl wait --for=condition=Available --timeout=5s --namespace default deployment/nginx-nginx-ingress
+  kubectl wait --for=condition=Available --timeout=5s --namespace default deployment/nginx-nginx-ingress-controller
 }
 
 test_resource_request() {
