@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
-mkdir -p ${PWD}/resources
+mkdir -p ${PWD}/configure-pipeline/dependencies
 
 urls=(
   'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/605669de0df749d38636fb3aaee7059b532837eb/config/crd/bases/jenkins.io_jenkins.yaml'
 )
 
 for url in "${urls[@]}"; do
-    curl -sL -o ${PWD}/resources/$(basename $url) $url
+    curl -sL -o ${PWD}/configure-pipeline/dependencies/$(basename $url) $url
 done
 
 DIR=$(mktemp -d)
@@ -34,4 +34,4 @@ patchesJson6902:
       value: 'virtuslab/jenkins-operator:60b8ee5'
 """ > $DIR/kustomization.yaml
 
-kubectl kustomize $DIR --output $PWD/resources/all-in-one-v1alpha2.yaml
+kubectl kustomize $DIR --output $PWD/configure-pipeline/dependencies/all-in-one-v1alpha2.yaml
