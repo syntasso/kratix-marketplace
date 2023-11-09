@@ -1,14 +1,19 @@
 #!/bin/sh
 
-set -x
+set -eux
 
-# Read current values from the provided resource request
-export NAME=$(yq eval '.metadata.name' /kratix/input/object.yaml)
-export REPO_URL=$(yq eval '.spec.source.repoURL' /kratix/input/object.yaml)
-export REVISION=$(yq eval '.spec.source.revision // "HEAD"' /kratix/input/object.yaml)
-export REPO_PATH=$(yq eval '.spec.source.path // "."' /kratix/input/object.yaml)
+if [ "$KRATIX_WORKFLOW_TYPE" = "resource" ]; then
+    # Read current values from the provided resource request
+    export NAME=$(yq eval '.metadata.name' /kratix/input/object.yaml)
+    export REPO_URL=$(yq eval '.spec.source.repoURL' /kratix/input/object.yaml)
+    export REVISION=$(yq eval '.spec.source.revision // "HEAD"' /kratix/input/object.yaml)
+    export REPO_PATH=$(yq eval '.spec.source.path // "."' /kratix/input/object.yaml)
 
-yq eval '.metadata.name = env(NAME) |
-          .spec.source.repoURL = env(REPO_URL) |
-          .spec.source.targetRevision = env(REVISION) |
-          .spec.source.path = env(REPO_PATH)' /tmp/transfer/application.yaml  > /kratix/output/application.yaml
+    yq eval '.metadata.name = env(NAME) |
+        .spec.source.repoURL = env(REPO_URL) |
+        .spec.source.targetRevision = env(REVISION) |
+        .spec.source.path = env(REPO_PATH)' /tmp/transfer/application.yaml  > /kratix/output/application.yaml
+else
+    cp /tmp/dependencies/* /kratix/output/
+fi
+
