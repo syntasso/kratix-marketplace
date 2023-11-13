@@ -1,10 +1,12 @@
 #!/usr/bin/env sh
 
-set -x
+set -eux
 
-# Read current values from the provided resource request
-name="kf-$(yq eval '.metadata.name' /kratix/input/object.yaml)"
-
-
-sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/manifest.yaml > /kratix/output/manifest.yaml
-sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/namespace.yaml > /kratix/output/namespace.yaml
+if [ "$KRATIX_WORKFLOW_TYPE" = "resource" ]; then
+    # Read current values from the provided resource request
+    name="kf-$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+    sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/manifest.yaml > /kratix/output/manifest.yaml
+    sed "s/TBDNAMESPACE/${name}/g" /tmp/transfer/namespace.yaml > /kratix/output/namespace.yaml
+else
+    cp /tmp/dependencies/* /kratix/output/
+fi

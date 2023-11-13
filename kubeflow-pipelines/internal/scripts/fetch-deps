@@ -9,15 +9,15 @@ if [ ! -d ${repodir} ]; then
     git clone git@github.com:kubeflow/pipelines.git ${repodir}
 fi
 
-resourcesdir=${ROOT}/resources
+depsdir=${ROOT}/configure-pipeline/dependencies
 
-rm -rf ${resourcesdir}/*
-mkdir -p ${resourcesdir}
+rm -rf ${depsdir}/*
+mkdir -p ${depsdir}
 
 pushd ${repodir}
-    git checkout v2.0.0.0b2
+    git checkout 2.0.3
 
-    kustomize build manifests/kustomize/cluster-scoped-resources/ > ${resourcesdir}/kubeflow.yaml
+    kustomize build manifests/kustomize/cluster-scoped-resources/ > ${depsdir}/kubeflow.yaml
 
     git reset --hard origin/HEAD
 popd

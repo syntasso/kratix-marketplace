@@ -538,6 +538,8 @@ status:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|clusterworkflowtemplates.argoproj.io
   name: clusterworkflowtemplates.argoproj.io
 spec:
   group: argoproj.io
@@ -575,6 +577,8 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|cronworkflows.argoproj.io
   name: cronworkflows.argoproj.io
 spec:
   group: argoproj.io
@@ -691,6 +695,8 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|workfloweventbindings.argoproj.io
   name: workfloweventbindings.argoproj.io
 spec:
   group: argoproj.io
@@ -727,6 +733,8 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|workflows.argoproj.io
   name: workflows.argoproj.io
 spec:
   group: argoproj.io
@@ -778,6 +786,8 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|workflowtaskresults.argoproj.io
   name: workflowtaskresults.argoproj.io
 spec:
   group: argoproj.io
@@ -1204,6 +1214,8 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|workflowtasksets.argoproj.io
   name: workflowtasksets.argoproj.io
 spec:
   group: argoproj.io
@@ -1246,6 +1258,8 @@ spec:
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    internal.kpt.dev/upstream-identifier: apiextensions.k8s.io|CustomResourceDefinition|default|workflowtemplates.argoproj.io
   name: workflowtemplates.argoproj.io
 spec:
   group: argoproj.io
