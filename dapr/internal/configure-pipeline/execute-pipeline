@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+set -eux
+
+if [ "$KRATIX_WORKFLOW_TYPE" = "promise" ]; then
+  cp -r /tmp/dependencies/* /kratix/output/
+  exit 0
+fi
+
+echo "unsupported KRATIX_WORKFLOW_TYPE: $KRATIX_WORKFLOW_TYPE"
+exit 1

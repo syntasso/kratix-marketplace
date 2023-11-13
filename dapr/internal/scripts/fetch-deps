@@ -8,7 +8,8 @@ helm repo update
 
 # helm template dapr dapr/dapr -n dapr-system --create-namespace --version 1.9.6 > $PWD/resources/helm.yaml
 
-helm show crds dapr/dapr --version 1.10.7 > $PWD/dependencies/crds.yaml
+mkdir -p $PWD/configure-pipeline/dependencies
+helm show crds dapr/dapr --version 1.10.7 > $PWD/configure-pipeline/dependencies/crds.yaml
 DIR=$(mktemp -d)
 helm template dapr/dapr --version 1.10.7 > $DIR/resources.yaml
 
@@ -22,7 +23,7 @@ resources:
   - resources.yaml
 """ > $DIR/kustomization.yaml
 
-kubectl kustomize $DIR --output $PWD/dependencies/dapr.yaml
+kubectl kustomize $DIR --output $PWD/configure-pipeline/dependencies/dapr.yaml
 
 echo "This is nearly complete. Final step is to add --- to seperate crds in the internal/dependencies/crd.yaml file"
 exit 1
