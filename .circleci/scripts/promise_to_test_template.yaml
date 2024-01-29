@@ -42,9 +42,9 @@ commands:
             kubectl wait --for condition=available -n cert-manager deployment/cert-manager-webhook --timeout 60s
 
 
-            curl -sL https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/install-all-in-one.yaml | sed "s_syntasso/kratix_syntassodev/kratix_g" | kubectl apply -f -
+            curl -sL https://github.com/syntasso/kratix/releases/latest/download/install-all-in-one.yaml | sed "s_syntasso/kratix_syntassodev/kratix_g" | kubectl apply -f -
             sleep 5
-            kubectl apply --filename https://raw.githubusercontent.com/syntasso/kratix/main/distribution/single-cluster/config-all-in-one.yaml
+            kubectl apply --filename https://github.com/syntasso/kratix/releases/latest/download/config-all-in-one.yaml
 
             kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 90s
 
