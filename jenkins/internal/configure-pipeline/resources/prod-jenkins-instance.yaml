@@ -70,7 +70,7 @@ spec:
       - name: job-dsl
         version: 1.78.3
       - name: configuration-as-code
-        version: 1647.ve39ca_b_829b_42
+        version: 1670.v564dc8b_982d0
       - name: kubernetes-credentials-provider
         version: 1.208.v128ee9800c04
       - name: pipeline-model-definition
