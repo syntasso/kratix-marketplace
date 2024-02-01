@@ -5,7 +5,7 @@ This promise allows users to launch job templates on an existing AWX Tower via r
 ## Setup
 
 It is common for users to have a Tower already running and this Promise is easily adaptable for use with any existing Tower. For testing, you can begin by creating a local cluster with both Kratix and an AWX instance using Helm:
-1. Start a cluster with Kratix:
+1. Start a cluster from the root of the [kratix repo](https://github.com/syntasso/kratix):
     ```
     ./scripts/quick-start.sh --git --single-cluster --recreate
     ```
@@ -36,7 +36,7 @@ It is common for users to have a Tower already running and this Promise is easil
 Password:
     * Password:
         ```
-        kubectl get secrets -n awx awx-demo-admin-password -ogo-template='{{.data.password|base64decode}}' | pbcopy
+        kubectl get secrets -n awx awx-demo-admin-password -ogo-template='{{.data.password|base64decode}}'
         ```
 
 ## Using the Promise
@@ -44,12 +44,12 @@ Password:
 > Warning
 > The Promise is set to work with the AWX instance installed in the setup commands by default. Changing this to another AWX instance is as easy as editing the environment variables set in the `./internal/configure-pipeline/execute-pipeline` script and rebuilding the pipeline images.
 
-To install:
+From this current directory, to install:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/ansible-job-launcher/promise.yaml
 ```
 
-To make a resource request (small by default):
+From this current directory, to make a resource request:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/ansible-job-launcher/resource-request.yaml
 ```
