@@ -1,0 +1,8 @@
+---
+apiVersion: marketplace.kratix.io/v1
+kind: ansibleJobLauncher
+metadata:
+  name: example
+  namespace: default
+spec:
+  job-template-name: Demo Job Template

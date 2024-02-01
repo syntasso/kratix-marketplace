@@ -1,0 +1,40 @@
+#!/bin/sh
+
+set -x
+
+# Check in resource status for if job has been run, exit if so
+export resource_name=$(yq eval '.metadata.name' /kratix/input/object.yaml)
+if [[ $(kubectl get ansiblejoblaunchers.marketplace.kratix.io ${resource_name} -ojsonpath="{.status.conditions[?(.type=='PipelineCompleted')].status}") ]]; then
+  echo "Job has already been run, exiting..."
+  exit 0
+fi
+
+# Set up connection to AWX
+export TOWER_HOST="http://awx-demo-service.awx.svc.cluster.local"
+export TOWER_USERNAME="admin"
+export TOWER_PASSWORD="$(kubectl get -n awx secrets awx-demo-admin-password -ogo-template='{{.data.password|base64decode}}')"
+export TOWER_VERIFY_SSL="false"
+
+echo "Requesting job template name from user request..."
+export name=$(yq eval '.spec.job-template-name' /kratix/input/object.yaml)
+
+echo "Looking up job template ID for name: ${name}..."
+id=$(awx job_templates list -f jq --filter '.results[] | select(.name == ${TEMPLATE_NAME}) | .id')
+
+echo "Launching job template for ID ${id}..."
+awx job_template launch 7 | tee /tmp/resp.json
+job_id=$(jq .job /tmp/resp.json)
+
+echo "Waiting for job to complete..."
+while [[ -z $(awx jobs get ${job_id} -f jq --filter .finished) ]]; do
+  echo "Waiting for finished timestamp..."
+  sleep 2
+done
+
+echo "Storing result from launch command in the request status..."
+awx jobs get ${job_id} > /tmp/job_details.json
+job_status=$(jq .status /tmp/job_details.json)
+
+message="Job ${id} has finished with status ${job_status}"
+echo "message: ${message}" >> /kratix/metadata/status.yaml
+yq eval --prettyPrint --output-format=yaml /tmp/job_details.json >> /kratix/metadata/status.yaml

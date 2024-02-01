@@ -1,0 +1,74 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  name: ansible-job-launcher
+  namespace: default
+spec:
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: ansiblejoblaunchers.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: ansibleJobLauncher
+        plural: ansiblejoblaunchers
+        singular: ansiblejoblauncher
+      scope: Namespaced
+      versions:
+        - name: v1
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  properties:
+                    job-template-name:
+                      description: The name of the job template that will be launched
+                      type: string
+                  type: object
+                  required:
+                    - job-template-name
+              type: object
+          served: true
+          storage: true
+  workflows:
+    promise: {}
+    resource:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: instance-configure
+            namespace: default
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/ansible-job-launcher-configure-pipeline:v0.1.0
+                name: ansible-job-launcher-resource
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ansible-job-launcher-resource-pipeline-credentials
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+    verbs:
+      - get
+    resourceNames:
+      - awx-demo-admin-password
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ansible-job-launcher-resource-pipeline-credentials
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ansible-job-launcher-resource-pipeline-credentials
+subjects:
+  - kind: ServiceAccount
+    name: ansible-job-launcher-resource-pipeline
+    namespace: default
