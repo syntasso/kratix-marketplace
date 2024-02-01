@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  echo "Nothing to test here"
+  exit 0
+}
+
+test_resource_request() {
+  echo "Can not test as requires AWX installation"
+  exit 0
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
