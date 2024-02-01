@@ -4,7 +4,8 @@ set -x
 
 # Check in resource status for if job has been run, exit if so
 export resource_name=$(yq eval '.metadata.name' /kratix/input/object.yaml)
-if [[ $(kubectl get ansiblejoblaunchers.marketplace.kratix.io ${resource_name} -ojsonpath="{.status.conditions[?(.type=='PipelineCompleted')].status}") ]]; then
+launch_status=$(kubectl get ansiblejoblaunchers.marketplace.kratix.io ${resource_name} -ojsonpath="{.status.launched_by}")
+if [[ -n "${launch_status}" ]]; then
   echo "Job has already been run, exiting..."
   exit 0
 fi
@@ -19,10 +20,16 @@ echo "Requesting job template name from user request..."
 export name=$(yq eval '.spec.job-template-name' /kratix/input/object.yaml)
 
 echo "Looking up job template ID for name: ${name}..."
-id=$(awx job_templates list -f jq --filter '.results[] | select(.name == ${TEMPLATE_NAME}) | .id')
+id=$(awx job_templates list -f jq --filter ".results[] | select(.name == \"${name}\") | .id")
+
+if [[ -z "${id}" ]]; then
+  echo "No job template found with name ${name}, exiting..."
+  echo "message: No job template found with name ${name}" >> /kratix/metadata/status.yaml
+  exit 0
+fi
 
 echo "Launching job template for ID ${id}..."
-awx job_template launch 7 | tee /tmp/resp.json
+awx job_template launch ${id} | tee /tmp/resp.json
 job_id=$(jq .job /tmp/resp.json)
 
 echo "Waiting for job to complete..."

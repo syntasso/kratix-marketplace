@@ -17,8 +17,7 @@ It is common for users to have a Tower already running and this Promise is easil
     ```
 1. Create an instance of AWX using the operator:
     ```
-    cat <<EOF | kubectl apply -
-    ---
+    kubectl apply -f - <<EOF
     apiVersion: awx.ansible.com/v1beta1
     kind: AWX
     metadata:
@@ -30,7 +29,9 @@ It is common for users to have a Tower already running and this Promise is easil
     EOF
     ```
 1. Login to verify AWX instance is healthy:
-    The instance may take up to 5 minutes to become ready for use. If you used the quick start script to start your cluster the url localhost:31340 should be directly accessible without port-forwarding.
+    The instance may take 5-10 minutes to become ready for use while showing an "upgrading" or "migration failed" page. This is normal startup process for AWX.
+    
+    If you used the quick start script to start your cluster the url localhost:31340 should be directly accessible without port-forwarding.
     * URL: http://localhost:31340/
     * Username: admin
 Password:

@@ -10,7 +10,6 @@ RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/s
 RUN [ "mkdir", "/tmp/transfer" ]
 
 ADD execute-pipeline execute-pipeline
-ADD resources/ /tmp/transfer
 
 CMD [ "sh", "-c", "./execute-pipeline"]
 ENTRYPOINT []
