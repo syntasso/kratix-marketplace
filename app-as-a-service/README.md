@@ -9,11 +9,19 @@ as a Destination with the label `environment=platform`**
 guide](https://kratix.io/docs/main/guides/compound-promises) on the Kratix
 documentation for details on how to setup your platform.
 
-This Promise provides Compound App-as-a-Service promise with two `requiredPromises`. This is a compound Promise that installs the following Promises:
+This Promise provides Compound App-as-a-Service promise with two `requiredPromises`. This is a compound Promise that installs the following `Deployment` Promise.
+
+This Promise has two `requiredPromise` that must be installed to fulfil App-As-A-Service resource requests:
 
 - [Nginx-ingress](https://github.com/syntasso/kratix-marketplace/tree/main/nginx-ingress)
 - [Postgres](https://github.com/syntasso/kratix-marketplace/tree/main/postgresql)
-- [Deployment](../deployment/) (which deploys the sample application to the Destination with the configured ingress)
+
+These prerequisite promises can be installed via the `PromiseRelease`s in this repo:
+
+```
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/promises/nginx-promise-release.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/promises/postgresql-promise-release.yaml
+```
 
 The following fields are configurable:
 
@@ -23,21 +31,17 @@ The following fields are configurable:
 
 To install:
 ```
-kubectl create -f https://raw.githubusercontent.com/syntasso/kratix/main/samples/paved-path-nginx/promise.yaml
+kubectl create -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/promise.yaml
 ```
 
 To make a resource request:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix/main/samples/paved-path-nginx/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/resource-request.yaml
 ```
 
-This resource request deploys the Kratix [sample Golang app](https://github.com/syntasso/sample-golang-app).
+This resource request deploys the Kratix [sample Golang app](https://github.com/syntasso/sample-todo-list-app).
 
-To test the sample app once it is successfully deployed, port forward with command
-below and access at `http://localhost:8080`, ensure you have the
-`Host: todo.example.com` set in your browser:
-```
-kubectl --context kind-worker port-forward svc/nginx-nginx-ingress 8080:80
+To test the sample app once it is successfully deployed, access it at `http://todo.local.gd:31338`.
 ```
 
 ## Development
