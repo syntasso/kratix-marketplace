@@ -2,7 +2,7 @@
 set -e
 
 test_promise() {
-  kubectl get crd app.marketplace.kratix.io
+  kubectl get crd apps.marketplace.kratix.io
   kubectl wait --for=condition=Available --namespace default deployment/postgres-operator
 }
 
