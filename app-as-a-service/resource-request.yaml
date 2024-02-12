@@ -1,0 +1,12 @@
+---
+apiVersion: marketplace.kratix.io/v1
+kind: app
+metadata:
+  name: todoer
+  namespace: default
+spec:
+  name: todoer
+  image: syntasso/sample-todo:v0.1.0
+  dbDriver: postgresql
+  service:
+    port: 9000

@@ -1,0 +1,9 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: PromiseRelease
+metadata:
+  name: nginx-ingress
+spec:
+  version: v1.0.0-beta.1
+  sourceRef:
+    type: http
+    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/ae9422946a20ab6ae49276b731c3c0da76bcab1a/nginx-ingress/promise.yaml

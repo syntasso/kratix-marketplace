@@ -1,0 +1,76 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  creationTimestamp: null
+  name: app
+  namespace: default
+spec:
+  destinationSelectors:
+  - matchLabels:
+      environment: platform
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: apps.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: app
+        plural: apps
+        singular: app
+      scope: Namespaced
+      versions:
+      - name: v1
+        schema:
+          openAPIV3Schema:
+            properties:
+              spec:
+                properties:
+                  dbDriver:
+                    default: none
+                    description: database deployed with application
+                    enum:
+                    - postgresql
+                    - none
+                    type: string
+                  image:
+                    description: container image for application that will be deployed
+                    example: gcr.io/syntasso/great-app
+                    type: string
+                  name:
+                    type: string
+                  service:
+                    type: object
+                    properties:
+                      port:
+                        type: integer
+
+                required:
+                - name
+                - image
+                type: object
+            type: object
+        served: true
+        storage: true
+  requiredPromises:
+    - name: postgresql
+      version: v1.0.0-beta.1
+    - name: nginx-ingress
+      version: v1.0.0-beta.1
+  workflows:
+    resource:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: resource-configure
+          spec:
+            containers:
+              - name: create-resources
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                command: [ resource-configure ]
+              - name: database-configure
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                command: [ database-configure ]
+status: {}
