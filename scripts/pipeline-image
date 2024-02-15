@@ -22,14 +22,22 @@ for dir_name in configure-pipeline configure-promise-pipeline; do
         build)
           docker build \
             --tag "${pipeline_image}" \
-            --platform linux/amd64 \
+            --platform linux/$(uname -m) \
             "${PWD}/${pipeline_dir}" ;;
 
         load)
           kind load docker-image "${pipeline_image}" --name platform ;;
 
         push)
-          docker push "${pipeline_image}" ;;
+          if ! docker buildx ls | grep -q "kratix-image-builder"; then \
+          	docker buildx create --name kratix-image-builder; \
+          fi;
+          docker buildx build \
+            --builder kratix-image-builder \
+            --tag "${pipeline_image}" \
+            --platform linux/arm64,linux/amd64 \
+            --push \
+            "${PWD}/${pipeline_dir}" ;;
 
         rmi)
           docker rmi --force "${pipeline_image}" ;;
