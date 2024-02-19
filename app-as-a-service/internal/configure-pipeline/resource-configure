@@ -21,7 +21,7 @@ kubectl create deployment ${name} \
 # Create a service
 kubectl create service nodeport ${name} \
     --namespace=${namespace} \
-    --tcp=${service_port}\
+    --tcp=${service_port}:8080\
     --dry-run=client \
     --output yaml > /kratix/output/service.yaml
 

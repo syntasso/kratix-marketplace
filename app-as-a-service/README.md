@@ -41,7 +41,7 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 
 This resource request deploys the Kratix [sample Golang app](https://github.com/syntasso/sample-todo-list-app).
 
-To test the sample app once it is successfully deployed, access it at `http://todo.local.gd:31338`.
+To test the sample app once it is successfully deployed, access it at `http://todoer.local.gd:31338`.
 ```
 
 ## Development
