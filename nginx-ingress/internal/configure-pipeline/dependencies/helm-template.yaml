@@ -196,9 +196,10 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 spec:
   externalTrafficPolicy: Local
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 80
+    nodePort: 31338
     targetPort: 80
     protocol: TCP
     name: http

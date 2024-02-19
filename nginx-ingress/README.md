@@ -6,6 +6,9 @@ single instance per cluster, there is no need to request individual resources on
 the Promise is installed. For more details about the difference, see the NGINX
 documents [here](https://docs.nginx.com/nginx-ingress-controller/installation/running-multiple-ingress-controllers/).
 
+For testing purposes, this cluster exposes the NGINX Ingress Controller as a
+NodePort service on `31338`. This is not recommended for production use.
+
 To install, run the following command while targeting your Platform cluster:
 ```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/nginx-ingress/promise.yaml
