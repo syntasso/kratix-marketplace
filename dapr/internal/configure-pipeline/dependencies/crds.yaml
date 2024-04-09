@@ -1,3 +1,5 @@
+
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
@@ -10,7 +12,7 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Component describes an Dapr component type
+        description: Component describes an Dapr component type.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -18,7 +20,7 @@ spec:
               internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
             type: string
           auth:
-            description: Auth represents authentication details for the component
+            description: Auth represents authentication details for the component.
             properties:
               secretStore:
                 type: string
@@ -37,32 +39,38 @@ spec:
               type: string
             type: array
           spec:
-            description: ComponentSpec is the spec for a component
+            description: ComponentSpec is the spec for a component.
             properties:
-              initTimeout:
-                type: string
               ignoreErrors:
                 type: boolean
+              initTimeout:
+                type: string
               metadata:
                 items:
-                  description: MetadataItem is a name/value pair for a metadata
+                  description: NameValuePair is a name/value pair.
                   properties:
+                    envRef:
+                      description: EnvRef is the name of an environmental variable
+                        to read the value from.
+                      type: string
                     name:
+                      description: Name of the property.
                       type: string
                     secretKeyRef:
-                      description: SecretKeyRef is a reference to a secret holding
-                        the value for the metadata item. Name is the secret name,
-                        and key is the field in the secret.
+                      description: SecretKeyRef is the reference of a value in a secret
+                        store component.
                       properties:
                         key:
+                          description: Field in the secret.
                           type: string
                         name:
+                          description: Secret name.
                           type: string
                       required:
-                      - key
                       - name
                       type: object
                     value:
+                      description: Value of the property, in plaintext.
                       x-kubernetes-preserve-unknown-fields: true
                   required:
                   - name
@@ -88,12 +96,14 @@ spec:
     - all
     - dapr
   scope: Namespaced
+
+
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.9.2
+    controller-gen.kubebuilder.io/version: v0.11.3
   creationTimestamp: null
   name: configurations.dapr.io
   labels:
@@ -174,9 +184,25 @@ spec:
                 description: APISpec describes the configuration for Dapr APIs.
                 properties:
                   allowed:
+                    description: List of allowed APIs. Can be used in conjunction with denied.
                     items:
-                      description: APIAccessRule describes an access rule for allowing
-                        a Dapr API to be enabled and accessible by an app.
+                      description: APIAccessRule describes an access rule for allowing or denying a Dapr API.
+                      properties:
+                        name:
+                          type: string
+                        protocol:
+                          type: string
+                        version:
+                          type: string
+                      required:
+                      - name
+                      - version
+                      type: object
+                    type: array
+                  denied:
+                    description: List of denied APIs. Can be used in conjunction with allowed.
+                    items:
+                      description: APIAccessRule describes an access rule for allowing or denying a Dapr API.
                       properties:
                         name:
                           type: string
@@ -297,13 +323,20 @@ spec:
                     description: Configure API logging.
                     properties:
                       enabled:
-                        description: Default value for enabling API logging. Sidecars can always override this by setting `--enable-api-logging` to true or false explicitly. The default value is false.
+                        description: Default value for enabling API logging. Sidecars
+                          can always override this by setting `--enable-api-logging`
+                          to true or false explicitly. The default value is false.
                         type: boolean
                       obfuscateURLs:
-                        description: 'When enabled, obfuscates the values of URLs in HTTP API logs, logging the route name rather than the full path being invoked, which could contain PII. Default: false. This option has no effect if API logging is disabled.'
+                        description: 'When enabled, obfuscates the values of URLs
+                          in HTTP API logs, logging the route name rather than the
+                          full path being invoked, which could contain PII. Default:
+                          false. This option has no effect if API logging is disabled.'
                         type: boolean
                       omitHealthChecks:
-                        description: 'If true, health checks are not reported in API logs. Default: false. This option has no effect if API logging is disabled.'
+                        description: 'If true, health checks are not reported in API
+                          logs. Default: false. This option has no effect if API logging
+                          is disabled.'
                         type: boolean
                     type: object
                 type: object
@@ -314,6 +347,16 @@ spec:
                 properties:
                   enabled:
                     type: boolean
+                  http:
+                    description: MetricHTTP defines configuration for metrics for
+                      the HTTP server
+                    properties:
+                      increasedCardinality:
+                        description: 'If true, metrics for the HTTP server are collected
+                          with increased cardinality. The default is true in Dapr 1.13,
+                          but will be changed to false in 1.14+'
+                        type: boolean
+                    type: object
                   rules:
                     items:
                       description: MetricsRule defines configuration options for a
@@ -352,6 +395,16 @@ spec:
                 properties:
                   enabled:
                     type: boolean
+                  http:
+                    description: MetricHTTP defines configuration for metrics for
+                      the HTTP server
+                    properties:
+                      increasedCardinality:
+                        description: 'If true, metrics for the HTTP server are collected
+                          with increased cardinality. The default is true in Dapr 1.13,
+                          but will be changed to false in 1.14+'
+                        type: boolean
+                    type: object
                   rules:
                     items:
                       description: MetricsRule defines configuration options for a
@@ -388,8 +441,34 @@ spec:
                 properties:
                   allowedClockSkew:
                     type: string
+                  controlPlaneTrustDomain:
+                    type: string
                   enabled:
                     type: boolean
+                  sentryAddress:
+                    type: string
+                  tokenValidators:
+                    description: Additional token validators to use. When Dapr is
+                      running in Kubernetes mode, this is in addition to the built-in
+                      "kubernetes" validator. In self-hosted mode, enabling a custom
+                      validator will disable the built-in "insecure" validator.
+                    items:
+                      description: ValidatorSpec contains additional token validators
+                        to use.
+                      properties:
+                        name:
+                          description: Name of the validator
+                          enum:
+                          - jwks
+                          type: string
+                        options:
+                          description: Options for the validator, if any
+                          type: object
+                          x-kubernetes-preserve-unknown-fields: true
+                      required:
+                      - name
+                      type: object
+                    type: array
                   workloadCertTTL:
                     type: string
                 required:
@@ -470,10 +549,191 @@ spec:
                 required:
                 - samplingRate
                 type: object
+              wasm:
+                description: WasmSpec describes the security profile for all Dapr Wasm components.
+                properties:
+                  strictSandbox:
+                    type: boolean
+                type: object
             type: object
         type: object
     served: true
     storage: true
+
+
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: httpendpoints.dapr.io
+  labels:
+    app.kubernetes.io/part-of: "dapr"
+spec:
+  group: dapr.io
+  names:
+    kind: HTTPEndpoint
+    listKind: HTTPEndpointList
+    plural: httpendpoints
+    singular: httpendpoint
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: HTTPEndpoint describes a Dapr HTTPEndpoint type for external
+          service invocation. This endpoint can be external to Dapr, or external to
+          the environment.
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          auth:
+            description: Auth represents authentication details for the component.
+            properties:
+              secretStore:
+                type: string
+            required:
+            - secretStore
+            type: object
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          scopes:
+            items:
+              type: string
+            type: array
+          spec:
+            description: HTTPEndpointSpec describes an access specification for allowing
+              external service invocations.
+            properties:
+              baseUrl:
+                type: string
+              clientTLS:
+                description: TLS describes how to build client or server TLS configurations.
+                properties:
+                  certificate:
+                    description: TLSDocument describes and in-line or pointer to a
+                      document to build a TLS configuration.
+                    properties:
+                      secretKeyRef:
+                        description: SecretKeyRef is the reference of a value in a
+                          secret store component.
+                        properties:
+                          key:
+                            description: Field in the secret.
+                            type: string
+                          name:
+                            description: Secret name.
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      value:
+                        description: Value of the property, in plaintext.
+                        x-kubernetes-preserve-unknown-fields: true
+                    type: object
+                  privateKey:
+                    description: TLSDocument describes and in-line or pointer to a
+                      document to build a TLS configuration.
+                    properties:
+                      secretKeyRef:
+                        description: SecretKeyRef is the reference of a value in a
+                          secret store component.
+                        properties:
+                          key:
+                            description: Field in the secret.
+                            type: string
+                          name:
+                            description: Secret name.
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      value:
+                        description: Value of the property, in plaintext.
+                        x-kubernetes-preserve-unknown-fields: true
+                    type: object
+                  renegotiation:
+                    default: Never
+                    description: Renegotiation sets the underlying tls negotiation
+                      strategy for an http channel.
+                    enum:
+                    - Never
+                    - OnceAsClient
+                    - FreelyAsClient
+                    type: string
+                  rootCA:
+                    description: TLSDocument describes and in-line or pointer to a
+                      document to build a TLS configuration.
+                    properties:
+                      secretKeyRef:
+                        description: SecretKeyRef is the reference of a value in a
+                          secret store component.
+                        properties:
+                          key:
+                            description: Field in the secret.
+                            type: string
+                          name:
+                            description: Secret name.
+                            type: string
+                        required:
+                        - name
+                        type: object
+                      value:
+                        description: Value of the property, in plaintext.
+                        x-kubernetes-preserve-unknown-fields: true
+                    type: object
+                type: object
+              headers:
+                items:
+                  description: NameValuePair is a name/value pair.
+                  properties:
+                    envRef:
+                      description: EnvRef is the name of an environmental variable
+                        to read the value from.
+                      type: string
+                    name:
+                      description: Name of the property.
+                      type: string
+                    secretKeyRef:
+                      description: SecretKeyRef is the reference of a value in a secret
+                        store component.
+                      properties:
+                        key:
+                          description: Field in the secret.
+                          type: string
+                        name:
+                          description: Secret name.
+                          type: string
+                      required:
+                      - name
+                      type: object
+                    value:
+                      description: Value of the property, in plaintext.
+                      x-kubernetes-preserve-unknown-fields: true
+                  required:
+                  - name
+                  type: object
+                type: array
+            required:
+            - baseUrl
+            type: object
+        type: object
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []
+
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -607,6 +867,9 @@ spec:
         type: object
     served: true
     storage: true
+
+
+
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -662,7 +925,7 @@ spec:
               deadLetterTopic:
                 type: string
               bulkSubscribe:
-                description: Represents bulk subscribe properies
+                description: Represents bulk subscribe properties
                 properties:
                   enabled:
                     type: boolean
@@ -752,7 +1015,7 @@ spec:
                 description: The optional dead letter queue for this topic to send events to.
                 type: string
               bulkSubscribe:
-                description: Represents bulk subscribe properies
+                description: Represents bulk subscribe properties
                 properties:
                   enabled:
                     type: boolean
