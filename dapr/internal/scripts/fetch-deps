@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
+DEPENDENCIES_DIR=${PWD}/configure-pipeline/dependencies
 
 
 helm repo add dapr https://dapr.github.io/helm-charts/
 helm repo update
 
-# helm template dapr dapr/dapr -n dapr-system --create-namespace --version 1.9.6 > $PWD/resources/helm.yaml
+# helm template dapr dapr/dapr -n dapr-system --create-namespace --version 1.13.2 > $PWD/resources/helm.yaml
 
-mkdir -p $PWD/configure-pipeline/dependencies
-helm show crds dapr/dapr --version 1.10.7 > $PWD/configure-pipeline/dependencies/crds.yaml
+mkdir -p ${DEPENDENCIES_DIR}
+helm show crds dapr/dapr --version 1.13.2 > ${DEPENDENCIES_DIR}/crds.yaml
 DIR=$(mktemp -d)
-helm template dapr/dapr --version 1.10.7 > $DIR/resources.yaml
+helm template dapr/dapr --version 1.13.2 > $DIR/resources.yaml
 
 echo """---
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -23,8 +24,7 @@ resources:
   - resources.yaml
 """ > $DIR/kustomization.yaml
 
-kubectl kustomize $DIR --output $PWD/configure-pipeline/dependencies/dapr.yaml
+kubectl kustomize $DIR --output ${DEPENDENCIES_DIR}/dapr.yaml
 
-echo "This is nearly complete. Final step is to add --- to seperate crds in the internal/dependencies/crd.yaml file"
+echo "This is nearly complete. Final step is to add --- to seperate crds in the ${DEPENDENCIES_DIR}/crds.yaml file"
 exit 1
-
