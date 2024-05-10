@@ -7,6 +7,11 @@ setup: true
 orbs:
   continuation: circleci/continuation@0.1.2
 
+parameters:
+  force-build:
+    type: boolean
+    default: false
+
 # our defined job, and its steps
 jobs:
   setup:
@@ -28,16 +33,5 @@ jobs:
 workflows:
   setup:
     jobs:
-      - setup
-
-  scheduled:
-    triggers:
-      - schedule:
-          cron: "0 0 * * 2"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
       - setup:
-          force-build: TRUE
+          force-build: << pipeline.parameters.force-build >>
