@@ -41,6 +41,7 @@ test_all=false
 
 for dir in ".circleci scripts"; do
     if untested_changes $dir; then
+        echo "Changes in $dir detected, testing all promises"
         test_all=true
     fi
 done
@@ -53,16 +54,15 @@ for promise in $(promises); do
         if [ "${name:0:1}" = "." ]; then
             continue
         fi
+        echo "Adding $name to test list"
         yq ".workflows.promises.jobs[0].test-and-push.matrix.parameters.promise_dir += [\"$name\"]" $template > $template.upd
         mv $template.upd $template
     fi
 done
 
-if [[ -z "${FORCE_BUILD:-}" ]]; then
-    FORCE_BUILD=false
-fi
-
-if $something_changed || ${FORCE_BUILD}; then
+if ${something_changed} || ${FORCE_BUILD}; then
+    echo "Something changed: ${something_changed}"
+    echo "FORCE_BUILD: ${FORCE_BUILD}"
     cat ${template} >&3
 else
     cat .circleci/scripts/empty.yaml >&3
