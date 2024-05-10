@@ -30,5 +30,12 @@ spec:
   workflows:
     resource:
       configure:
-        - name: <# TODO promise name>-configure-pipeline
-          image: ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-configure-pipeline:v0.1.0
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: resource-configure
+            namespace: default
+          spec:
+            containers:
+              - name: <# TODO promise name>-configure-pipeline
+                image: ghcr.io/syntasso/kratix-marketplace/<# TODO promise name>-configure-pipeline:v0.1.0
