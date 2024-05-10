@@ -58,7 +58,11 @@ for promise in $(promises); do
     fi
 done
 
-if $something_changed; then
+if [[ -z "${FORCE_BUILD:-}" ]]; then
+    FORCE_BUILD=false
+fi
+
+if $something_changed || ${FORCE_BUILD}; then
     cat ${template} >&3
 else
     cat .circleci/scripts/empty.yaml >&3

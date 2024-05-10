@@ -11,12 +11,16 @@ orbs:
 jobs:
   setup:
     executor: continuation/default
+    parameters:
+      force-build:
+        type: boolean
+        default: false
     steps:
       - checkout # checkout code
       - run: # run a command
           name: Generate config
           command: |
-            ./.circleci/scripts/generate-config | tee generated_config.yml
+            FORCE_BUILD=<< parameters.force-build >> ./.circleci/scripts/generate-config | tee generated_config.yml
       - continuation/continue:
           configuration_path: generated_config.yml # use newly generated config to continue
 
@@ -25,3 +29,15 @@ workflows:
   setup:
     jobs:
       - setup
+
+  scheduled:
+    triggers:
+      - schedule:
+          cron: "0 0 * * 2"
+          filters:
+            branches:
+              only:
+                - main
+    jobs:
+      - setup:
+          force-build: TRUE
