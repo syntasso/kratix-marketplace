@@ -17,7 +17,7 @@ workflows:
           containers:
             - image: ...
               name: ...
-            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
+            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.2.0
               name: vault
               volumeMounts:
                 - name: vault-config
