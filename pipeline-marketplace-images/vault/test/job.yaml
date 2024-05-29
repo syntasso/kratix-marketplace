@@ -14,6 +14,9 @@ spec:
           emptyDir: {}
         - name: input
           emptyDir: {}
+        - name: vault-config
+          configMap:
+            name: vault-pipeline-image
       initContainers:
         - image: syntasso/pre-test-image:dev
           name: generate-secrets
@@ -33,6 +36,8 @@ spec:
               mountPath: /kratix/metadata
             - name: input
               mountPath: /kratix/input
+            - name: vault-config
+              mountPath: /vault/config
       containers:
         - image: syntasso/post-test-image:dev
           name: check-vault

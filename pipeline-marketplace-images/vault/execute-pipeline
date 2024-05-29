@@ -22,7 +22,7 @@ split_files() {
 
 login_to_vault() {
     echo "logging into vault"
-    role="$(kubectl get configmap ${vault_cm} -o jsonpath='{.data.role}')"
+    role="$(cat /vault/config/role)"
     jwt=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 
     vault login $(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token) >/dev/null
@@ -65,8 +65,12 @@ store_secrets() {
 }
 
 main() {
-   export VAULT_ADDR="$(kubectl get configmap ${vault_cm} -o jsonpath='{.data.url}')"
-   export AUTHPATH="$(kubectl get configmap ${vault_cm} -o jsonpath='{.data.authpath}')"
+  if [ ! -d /vault/config ]; then
+    echo "no vault config found"
+    exit 1
+  fi
+  export VAULT_ADDR="$(cat /vault/config/url)"
+  export AUTHPATH="$(cat /vault/config/authpath)"
 
   login_to_vault
   resource_name="request-$RANDOM"

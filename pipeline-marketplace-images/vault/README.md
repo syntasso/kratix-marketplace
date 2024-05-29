@@ -10,11 +10,18 @@ workflows:
           name: instance-configure
           namespace: default
         spec:
+          volumes:
+            - name: vault-config
+              configMap:
+                name: vault-pipeline-image
           containers:
             - image: ...
               name: ...
             - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
               name: vault
+              volumeMounts:
+                - name: vault-config
+                  mountPath: /vault/config
 ```
 
 This image finds all `kind: Secret` documents in `/kratix/output`, stores them
@@ -126,7 +133,7 @@ vault write auth/kubernetes/role/vault-pipeline-image \
 
 Next, create a ConfigMap to inform the container of where is your Vault instance running:
 
-```
+```bash
 VAULT_ADDR=<Your Vault address>
 kubectl create configmap vault-pipeline-image \
     --from-literal=url=$VAULT_ADDR \
@@ -137,20 +144,10 @@ kubectl create configmap vault-pipeline-image \
 Setting
 
 - `VAULT_ADDR` with your Vault instance URL. If you are running both Kratix on KinD and
-  Vault locally, use `http://host.docker.internal:PORT'.
+  Vault locally, use `http://host.docker.internal:PORT`.
 
-Finally, give the Promise ServiceAccount access to the ConfigMap:
-
-```bash
-kubectl create clusterrole vault-pipeline-image \
-    --verb=get \
-    --resource=configmaps \
-    --resource-name=vault-pipeline-image
-
-kubectl create clusterrolebinding vault-pipeline-image \
-    --clusterrole=vault-pipeline-image \
-    --serviceaccount=default:${PROMISE_SA}
-```
+The ConfigMap must be mounted on the container at `/vault/config`. See the
+example on the top of this README as a reference.
 
 ## Usage in the Pipeline
 
