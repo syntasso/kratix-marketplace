@@ -45,5 +45,3 @@ for f in $(ls /kratix/metadata/notifications/*); do
 done
 
 yq '.conditions += [{"type": "NotificationsSent", "status": "True"}]' /tmp/status.yaml > /kratix/metadata/status.yaml
-
-cp /kratix/input/* /kratix/output/

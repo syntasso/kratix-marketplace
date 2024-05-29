@@ -24,7 +24,5 @@ spec:
           resources: {}
           volumeMounts:
             - name: images-to-scan
-              mountPath: input
-            - name: results
               mountPath: /kratix/output
       restartPolicy: Never
