@@ -5,16 +5,19 @@ set -eo pipefail
 vault_cm="vault-pipeline-image"
 
 split_files() {
+  mkdir -p /tmp/alldocs
+
+  # remove all docs from /kratix/output
+  mv /kratix/output/* /tmp/alldocs
+
   # copy everything thats not of `kind: Secret` to output
   cd /kratix/output
-  yq 'select(.kind != "Secret")' --split-exp '.metadata.name + $index' /kratix/input/*
-  cd ..
+  yq 'select(.kind != "Secret")' --split-exp '.metadata.name + $index' /tmp/alldocs/*
 
   # split the secrets into their own files
-  mkdir secrets
-  cd secrets
-  yq 'select(.kind == "Secret")' --split-exp '.metadata.name + $index' /kratix/input/*
-  cd ..
+  mkdir -p /tmp/secrets
+  cd /tmp/secrets
+  yq 'select(.kind == "Secret")' --split-exp '.metadata.name + $index' /tmp/alldocs/*
 }
 
 login_to_vault() {
@@ -31,7 +34,7 @@ store_secrets() {
 
   secret_path="secret/${namespace}/${resource_name}/"
 
-  for f in secrets/*; do
+  for f in /tmp/secrets/*; do
     [ -e "$f" ] || continue
     secret_name=$(yq -r '.metadata.name' $f)
     secrets=""

@@ -10,54 +10,71 @@ kind load docker-image syntasso/post-test-image:dev --name platform
 
 ../../scripts/image vault build load
 
-if [ -z "${VAULT_PORT}" ]; then
-    echo "VAULT_PORT is not set"
-    exit 1
-fi
-export VAULT_ADDR="http://127.0.0.1:${VAULT_PORT}"
+export VAULT_ADDR="http://127.0.0.1:8200"
+vault auth enable kubernetes 2>/dev/null || true
 
-pipeline_sa="vault-pipeline-image"
-vault_role="vault-writer"
-k8surl=$(TERM=dumb kubectl cluster-info | grep "control plane" | awk '{print $7}')
+kubectl delete serviceaccount vault-auth-delegator || true
+kubectl create serviceaccount vault-auth-delegator
 
-kubectl config view --raw -o go-template='{{index ((index (index .clusters 0) "cluster")) "certificate-authority-data" | base64decode}}' > ca.crt
-kubectl create serviceaccount ${pipeline_sa} -n default || true
-
-kubectl create serviceaccount vault-auth -n default || true
+kubectl delete clusterrolebinding role-tokenreview-binding || true
 kubectl create clusterrolebinding role-tokenreview-binding \
     --clusterrole=system:auth-delegator \
-    --serviceaccount=default:vault-auth || true
+    --serviceaccount=default:vault-auth-delegator
 
+k delete secret vault-auth-token || true
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Secret
 metadata:
   name: vault-auth-token
   annotations:
-    kubernetes.io/service-account.name: vault-auth
+    kubernetes.io/service-account.name: vault-auth-delegator
 type: kubernetes.io/service-account-token
 EOF
-jwt=$(kubectl describe secrets/vault-auth-token | tail -1 | yq '.token')
 
-vault auth enable kubernetes 2>/dev/null || true
+TOKEN=$(kubectl describe secrets/vault-auth-token | tail -1 | yq '.token')
+K8S_HOST=$(TERM=dumb kubectl cluster-info | grep "control plane" | awk '{print $7}')
+kubectl config view --raw --minify --flatten -o jsonpath='{.clusters[].cluster}' | yq '."certificate-authority-data"' | base64 -d > ca.crt
+
 vault write auth/kubernetes/config \
-    token_reviewer_jwt="${jwt}" \
-    kubernetes_host="${k8surl}" \
+    token_reviewer_jwt="${TOKEN}" \
+    kubernetes_host="${K8S_HOST}" \
     kubernetes_ca_cert=@ca.crt
+rm ca.crt
 
+cat > policy.hcl <<EOF
+path "secret/*" {
+  capabilities = ["create", "read", "update", "patch", "delete", "list"]
+}
+EOF
 vault policy write secret-writer policy.hcl
-vault write auth/kubernetes/role/${vault_role} \
-    bound_service_account_names=${pipeline_sa} \
+rm policy.hcl
+
+kubectl delete serviceaccount vault-pipeline-image || true
+kubectl create serviceaccount vault-pipeline-image
+
+vault write auth/kubernetes/role/vault-pipeline-image \
+    bound_service_account_names=vault-pipeline-image \
     bound_service_account_namespaces=default \
     policies=secret-writer \
     ttl=1h
 
-
 kubectl delete configmap vault-pipeline-image || true
 kubectl create configmap vault-pipeline-image \
-    --from-literal=url=http://host.docker.internal:${VAULT_PORT} \
-    --from-literal=role=${vault_role} \
+    --from-literal=url="http://host.docker.internal:8200" \
+    --from-literal=role=vault-pipeline-image \
     --from-literal=authpath=kubernetes
 
-kubectl delete -f job.yaml
+kubectl delete clusterrole vault-pipeline-image || true
+kubectl create clusterrole vault-pipeline-image \
+    --verb=get \
+    --resource=configmaps \
+    --resource-name=vault-pipeline-image
+
+kubectl delete clusterrolebinding vault-pipeline-image || true
+kubectl create clusterrolebinding vault-pipeline-image \
+    --clusterrole=vault-pipeline-image \
+    --serviceaccount=default:vault-pipeline-image
+
+kubectl delete -f job.yaml || true
 kubectl apply -f job.yaml

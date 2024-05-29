@@ -17,8 +17,9 @@ workflows:
               name: vault
 ```
 
-This image finds all `kind: Secret` documents in `/kratix/input` and store them in Vault. It then
-moves all documents (but the `kind: Secret`) to `/kratix/output`.
+This image finds all `kind: Secret` documents in `/kratix/output`, stores them
+in Vault, and remove the secrets from the output directory. All other documents
+are left untouched.
 
 If the original resource request is available on `/kratix/input`, the secrets will be stored
 under `/secret/NAMESPACE/RESOURCE_NAME`. Otherwise, it will be stored under
@@ -159,7 +160,7 @@ fetch the Vault config the ConfigMap and store the Secrets in Vault.
 ## Limitations
 
 - This image won't parse `kind: List`, even if the list items are of `kind: Secret`.
-- If any other document in `/kratix/input` refer to the Secret (like via a `volumeMount` in a
+- If any other document in `/kratix/output` refer to the Secret (like via a `volumeMount` in a
   `Pod`), this image won't remove those references, nor will it add any Vault-agent
   annotations. Please add an extra job in the pipeline to do that.
 - Only keys in the `data` and `stringData` part of the Secret will be parsed
