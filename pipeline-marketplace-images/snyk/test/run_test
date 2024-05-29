@@ -3,7 +3,7 @@
 set -e
 
 if [ -z "${SNYK_TOKEN}" ]; then
-    echo "please set SLACK_HOOK_URL"
+    echo "please set SNYK_TOKEN"
     exit 1
 fi
 
