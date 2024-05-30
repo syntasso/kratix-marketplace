@@ -5,7 +5,14 @@ set -e
 root=$(cd $(dirname $0)/..; pwd)
 image_name="$1"
 shift
-pipeline_image="ghcr.io/syntasso/kratix-marketplace/pipeline-${image_name}-image:v0.1.0"
+
+VERSION="v0.1.0"
+if [ -f ${root}/${image_name}/VERSION ]; then
+  VERSION=$(cat ${root}/${image_name}/VERSION)
+fi
+
+
+pipeline_image="ghcr.io/syntasso/kratix-marketplace/pipeline-${image_name}-image:${VERSION}"
 
 if [ ! -d "${root}/${image_name}" ]; then
   echo "Directory ${image_name} does not exist"

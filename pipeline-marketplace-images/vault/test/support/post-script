@@ -2,14 +2,14 @@
 
 set -xe
 
-ls -l /kratix/input
+ls -l /kratix/output
 
-if yq --exit-status 'select(.kind == "Secret")' /kratix/input/* >/dev/null; then
-    echo "found secrets input"
+if yq --exit-status 'select(.kind == "Secret")' /kratix/output/* >/dev/null; then
+    echo "found secrets in output"
     exit 1
 fi
 
-if [ ! -f cat /kratix/metadata/status.yaml ]; then
+if [ ! -f /kratix/metadata/status.yaml ]; then
     echo "no status file found"
     exit 1
 fi

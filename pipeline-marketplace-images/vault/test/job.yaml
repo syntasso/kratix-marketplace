@@ -1,31 +1,3 @@
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: vault-cr
-rules:
-  - apiGroups:
-      - ""
-    resourceNames:
-      - vault-pipeline-image
-    resources:
-      - configmaps
-    verbs:
-      - get
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: vault-crb
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: vault-cr
-subjects:
-  - kind: ServiceAccount
-    name: vault-pipeline-image
-    namespace: default
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -36,36 +8,43 @@ spec:
     spec:
       serviceAccountName: vault-pipeline-image
       volumes:
-        - name: secrets
-          emptyDir: {}
-        - name: results
+        - name: output
           emptyDir: {}
         - name: metadata
           emptyDir: {}
+        - name: input
+          emptyDir: {}
+        - name: vault-config
+          configMap:
+            name: vault-pipeline-image
       initContainers:
         - image: syntasso/pre-test-image:dev
           name: generate-secrets
           resources: {}
           volumeMounts:
-            - name: secrets
+            - name: output
               mountPath: /kratix/output
+            - name: input
+              mountPath: /kratix/input
         - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
           name: store-secrets
           resources: {}
           volumeMounts:
-            - name: secrets
-              mountPath: input
-            - name: results
+            - name: output
               mountPath: /kratix/output
             - name: metadata
-              mountPath: /metadata
+              mountPath: /kratix/metadata
+            - name: input
+              mountPath: /kratix/input
+            - name: vault-config
+              mountPath: /vault/config
       containers:
         - image: syntasso/post-test-image:dev
           name: check-vault
           resources: {}
           volumeMounts:
-            - name: results
-              mountPath: /kratix/input
+            - name: output
+              mountPath: /kratix/output
             - name: metadata
-              mountPath: /metadata
+              mountPath: /kratix/metadata
       restartPolicy: Never

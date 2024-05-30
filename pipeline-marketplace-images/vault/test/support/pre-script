@@ -8,8 +8,9 @@ export AUTHPATH="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.dat
 echo "logging into vault"
 role="$(kubectl get configmap vault-pipeline-image -o jsonpath='{.data.role}')"
 jwt=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+token=$(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token)
 
-vault login $(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token) >/dev/null
+vault login ${token} >/dev/null
 
 echo "verifying vault is accessible"
 vault status
@@ -24,7 +25,9 @@ kubectl create secret generic topsecret \
     --from-literal=password=secr3t \
     --dry-run=client -o yaml >> /kratix/output/secrets.yaml
 
-cat > /kratix/output/object.yaml <<EOF
+kubectl create deployment nginx --image=nginx --dry-run=client -o yaml > /kratix/output/deployment.yaml
+
+cat > /kratix/input/object.yaml <<EOF
 apiVersion: v1
 kind: ResourceRequest
 metadata:

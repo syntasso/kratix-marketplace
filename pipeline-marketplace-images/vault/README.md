@@ -10,15 +10,23 @@ workflows:
           name: instance-configure
           namespace: default
         spec:
+          volumes:
+            - name: vault-config
+              configMap:
+                name: vault-pipeline-image
           containers:
             - image: ...
               name: ...
-            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.1.0
+            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-vault-image:v0.2.0
               name: vault
+              volumeMounts:
+                - name: vault-config
+                  mountPath: /vault/config
 ```
 
-This image finds all `kind: Secret` documents in `/kratix/input` and store them in Vault. It then
-moves all documents (but the `kind: Secret`) to `/kratix/output`.
+This image finds all `kind: Secret` documents in `/kratix/output`, stores them
+in Vault, and remove the secrets from the output directory. All other documents
+are left untouched.
 
 If the original resource request is available on `/kratix/input`, the secrets will be stored
 under `/secret/NAMESPACE/RESOURCE_NAME`. Otherwise, it will be stored under
@@ -125,7 +133,7 @@ vault write auth/kubernetes/role/vault-pipeline-image \
 
 Next, create a ConfigMap to inform the container of where is your Vault instance running:
 
-```
+```bash
 VAULT_ADDR=<Your Vault address>
 kubectl create configmap vault-pipeline-image \
     --from-literal=url=$VAULT_ADDR \
@@ -136,20 +144,10 @@ kubectl create configmap vault-pipeline-image \
 Setting
 
 - `VAULT_ADDR` with your Vault instance URL. If you are running both Kratix on KinD and
-  Vault locally, use `http://host.docker.internal:PORT'.
+  Vault locally, use `http://host.docker.internal:PORT`.
 
-Finally, give the Promise ServiceAccount access to the ConfigMap:
-
-```bash
-kubectl create clusterrole vault-pipeline-image \
-    --verb=get \
-    --resource=configmaps \
-    --resource-name=vault-pipeline-image
-
-kubectl create clusterrolebinding vault-pipeline-image \
-    --clusterrole=vault-pipeline-image \
-    --serviceaccount=default:${PROMISE_SA}
-```
+The ConfigMap must be mounted on the container at `/vault/config`. See the
+example on the top of this README as a reference.
 
 ## Usage in the Pipeline
 
@@ -159,7 +157,7 @@ fetch the Vault config the ConfigMap and store the Secrets in Vault.
 ## Limitations
 
 - This image won't parse `kind: List`, even if the list items are of `kind: Secret`.
-- If any other document in `/kratix/input` refer to the Secret (like via a `volumeMount` in a
+- If any other document in `/kratix/output` refer to the Secret (like via a `volumeMount` in a
   `Pod`), this image won't remove those references, nor will it add any Vault-agent
   annotations. Please add an extra job in the pipeline to do that.
 - Only keys in the `data` and `stringData` part of the Secret will be parsed

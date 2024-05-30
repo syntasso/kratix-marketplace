@@ -4,8 +4,8 @@ LABEL org.opencontainers.image.authors "kratix@syntasso.io"
 LABEL org.opencontainers.image.source https://github.com/syntasso/kratix-marketplace
 
 ADD post-script execute-pipeline
-RUN apk update && apk add --no-cache vault libcap
-RUN setcap -r /usr/sbin/vault
+RUN curl https://releases.hashicorp.com/vault/1.16.2/vault_1.16.2_linux_amd64.zip -o vault.zip && unzip vault.zip && mv vault /usr/sbin/vault && rm vault.zip
+
 
 CMD [ "sh", "-c", "./execute-pipeline" ]
 ENTRYPOINT []
