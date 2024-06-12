@@ -4,4 +4,6 @@ set -e
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
+export BUILD_PLATFORM=linux/amd64
+
 source ${PWD}/../../scripts/pipeline-image

@@ -32,10 +32,11 @@ for dir_name in configure-pipeline configure-promise-pipeline; do
           if ! docker buildx ls | grep -q "kratix-image-builder"; then \
           	docker buildx create --name kratix-image-builder; \
           fi;
+          platform="${BUILD_PLATFORM:-linux/arm64,linux/amd64}"
           docker buildx build \
             --builder kratix-image-builder \
             --tag "${pipeline_image}" \
-            --platform linux/arm64,linux/amd64 \
+            --platform $platform \
             --push \
             "${PWD}/${pipeline_dir}" ;;
 
