@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
+
+# default small size
+export tier="db-f1-micro"
+
+if [ $size = large ]; then
+  tier="db-n1-standard-8"
+fi
+
+kubectl get secret gcp-credentials -n default -o json | jq -r '.data.credentialsjson' | base64 -d > credentials.json
+export PROJECT_ID=$(kubectl get secret gcp-credentials -n default -o json | jq -r '.data."project_id"' | base64 -d)
+
+gcloud auth activate-service-account --key-file=credentials.json
+gcloud config set project $PROJECT_ID
+
+if [ "$KRATIX_WORKFLOW_ACTION" = "delete" ]; then
+  gcloud sql instances delete $name --quiet
+  exit 0
+fi
+
+gcloud sql instances create $name --database-version=MYSQL_8_0 --region=us-central --tier=db-f1-micro
+
