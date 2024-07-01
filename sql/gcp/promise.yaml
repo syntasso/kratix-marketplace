@@ -13,7 +13,7 @@ spec:
     spec:
       group: marketplace.kratix.io
       names:
-        kind: sql
+        kind: SQL
         plural: sql
         singular: sql
       scope: Namespaced
@@ -43,9 +43,22 @@ spec:
             name: instance-configure
             namespace: default
           spec:
+            volumes:
+            - name: creds
+              secret:
+                secretName: gcp-credentials
+                items:
+                - key: project_id
+                  path: project_id
+                - key: credentialsjson
+                  path: credentials.json
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/sql-configure-pipeline:v0.1.0
-                name: sql-configure-pipeline
+              - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
+                name: gcp-onfigure-pipeline
+                volumeMounts:
+                - name: creds
+                  readOnly: true
+                  mountPath: "/creds"
       delete:
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
@@ -53,34 +66,20 @@ spec:
             name: instance-delete
             namespace: default
           spec:
+            volumes:
+            - name: creds
+              secret:
+                secretName: gcp-credentials
+                items:
+                - key: project_id
+                  path: project_id
+                - key: credentialsjson
+                  path: credentials.json
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/sql-configure-pipeline:v0.1.0
-                name: sql-delete-pipeline
+              - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
+                name: gcp-delete-pipeline
+                volumeMounts:
+                - name: creds
+                  readOnly: true
+                  mountPath: "/creds"
 status: {}
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: sql-resource-pipeline-credentials
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - secrets
-  verbs:
-  - get
-  resourceNames:
-  - gcp-credentials
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: sql-resource-pipeline-credentials
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: sql-resource-pipeline-credentials
-subjects:
-- kind: ServiceAccount
-  name: sql-resource-pipeline
-  namespace: default

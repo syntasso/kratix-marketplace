@@ -12,10 +12,8 @@ if [ $size = large ]; then
   tier="db-n1-standard-8"
 fi
 
-kubectl get secret gcp-credentials -n default -o json | jq -r '.data.credentialsjson' | base64 -d > credentials.json
-export PROJECT_ID=$(kubectl get secret gcp-credentials -n default -o json | jq -r '.data."project_id"' | base64 -d)
-
-gcloud auth activate-service-account --key-file=credentials.json
+export PROJECT_ID=$(cat /creds/project_id)
+gcloud auth activate-service-account --key-file=/creds/credentials.json
 gcloud config set project $PROJECT_ID
 
 if [ "$KRATIX_WORKFLOW_ACTION" = "delete" ]; then
