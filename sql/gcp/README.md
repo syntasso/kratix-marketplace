@@ -1,16 +1,22 @@
 # sql
 
+Requires a secret for connecting to GCP
+
+```
+kubectl create secret generic gcp-credentials --from-file=credentialsjson=serviceaccount.json --from-literal=project_id=<project-name>
+```
+
 This Promise provides sql-as-a-Service. The Promise has 1 field `.spec.size`
 which can be `small` or `large`.
 
 To install:
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/sql/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/sql/gcp/promise.yaml
 ```
 
 To make a resource request (small by default):
 ```
-kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/sql/resource-request.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/sql/gcp/resource-request.yaml
 ```
 
 ## Development
