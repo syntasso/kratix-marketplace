@@ -2,11 +2,11 @@
 set -e
 
 test_promise() {
-  exit 0
+  kubectl get crd sql.marketplace.kratix.io
 }
 
 test_resource_request() {
-  exit 0
+  kubectl wait sql.marketplace.kratix.io example --for=jsonpath='{.status.instanceStatus}'=available
 }
 
 if [ "$1" = "promise" ]; then

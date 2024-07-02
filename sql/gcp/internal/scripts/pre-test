@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+echo ${GCP_SERVICE_ACCOUNT} > serviceaccount.json
+
+kubectl create secret generic gcp-credentials \
+  --from-file=credentialsjson=serviceaccount.json \
+  --from-literal=project_id=${GCP_PROJECT_ID}
+
+rm serviceaccount.json
