@@ -89,4 +89,4 @@ creating the resource you want to create. It must check the
 fail the pipeline on rejections, to not deploy anything but surface the
 rejection to the resource status, or to ignore and create the resources.
 
-For an example promise, see the `promise.yaml` file in this repository.
+For an example promise, see the `example-promise.yaml` file in this repository.
