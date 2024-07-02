@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+kubectl create secret generic aws-rds \
+  --namespace default \
+  --from-literal=accessKeyID="${AWS_ACCESS_KEY_ID_FOR_RDS}" \
+  --from-literal=secretAccessKey="${AWS_SECRET_ACCESS_KEY_FOR_RDS}
