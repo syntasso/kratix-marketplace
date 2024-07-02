@@ -142,10 +142,29 @@ jobs:
           working_directory: ~/repo/<< parameters.promise_dir >>
           command: |
             if test -f "resource-request.yaml"; then
+              if test -f "internal/scripts/pre-test"; then
+                ./internal/scripts/pre-test
+              fi
               kubectl apply --filename resource-request.yaml
             fi
       - retry/run-with-retry:
           command: << parameters.promise_dir >>/internal/scripts/test resource-request
+          # 5 minutes total retry (6 sec * 100 times = 600 sec)
+          sleep: 6
+          retry-count: 100
+      - run:
+          name: Delete resource request
+          working_directory: ~/repo/<< parameters.promise_dir >>
+          command: |
+            if test -f "resource-request.yaml"; then
+              kubectl delete --filename resource-request.yaml
+            fi
+      - retry/run-with-retry:
+          command: |
+            cd << parameters.promise_dir >>
+            if test -f "internal/scripts/test-delete"; then
+              ./internal/scripts/test-delete
+            fi
           # 5 minutes total retry (6 sec * 100 times = 600 sec)
           sleep: 6
           retry-count: 100

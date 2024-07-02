@@ -12,7 +12,7 @@ export LAST_GREEN_SHA=$(curl -sL https://circleci.com/api/v2/pipeline/$pipeline 
 export UNTESTED_SHAS=$(git log --format=format:%H $LAST_GREEN_SHA~0..HEAD --full-diff)
 
 promises() {
-    local all_dirs=$(find $ROOT -maxdepth 1 -type d)
+    local all_dirs=$(find $ROOT -maxdepth 2 -type d)
 
     declare -a arr
     for dir in $all_dirs; do
@@ -50,7 +50,7 @@ something_changed=false
 for promise in $(promises); do
     if  $test_all || untested_changes $promise ; then
         something_changed=true
-        name="$(basename $promise)"
+        name="${promise#"$ROOT/"}"
         if [ "${name:0:1}" = "." ]; then
             continue
         fi
