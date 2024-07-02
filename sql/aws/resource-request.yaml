@@ -1,0 +1,9 @@
+apiVersion: aws.marketplace.kratix.io/v1alpha1
+kind: RDS
+metadata:
+  name: derik
+  namespace: default
+spec:
+  size: micro
+  dbName: superdb
+  engine: mysql

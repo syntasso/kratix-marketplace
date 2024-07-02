@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# read metadata from the input object
+name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+namespace="$(yq eval '.metadata.namespace' /kratix/input/object.yaml)"
+
+# read the provided configuration
+db_name="$(yq eval '.spec.dbName' /kratix/input/object.yaml)"
+engine="$(yq eval '.spec.engine' /kratix/input/object.yaml)"
+size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
+
+# map the provided `size` to the aws resource instance class.
+# https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.DBInstanceClass.html
+# since `size` is one of "micro/small/medium/large", we can just use it directly
+instance_class="db.t3.${size}"
+
+region="eu-west-1"
+db_identifier="${name}-${namespace}-${engine}"
+
+if [ "$KRATIX_WORKFLOW_ACTION" = "delete" ]; then
+  echo "running delete workflow..."
+  db_identifier=$(yq eval '.status.instanceIdentifier' /kratix/input/object.yaml)
+  aws rds delete-db-instance --db-instance-identifier ${db_identifier} --skip-final-snapshot --region ${region}
+  exit 0
+fi
+
+# try to fetch the instance
+if ! aws rds describe-db-instances --db-instance-identifier ${db_identifier} --region ${region} > instance-output.json; then
+  #instance does not exist, creating...
+  echo "creating a new instance..."
+  echo "db_identifier: ${db_identifier}"
+  echo "instance_class: ${instance_class}"
+  echo "engine: ${engine}"
+  echo "db_name: ${db_name}"
+
+  aws rds create-db-instance \
+    --db-instance-identifier ${db_identifier} \
+    --db-instance-class ${instance_class} \
+    --engine ${engine} \
+    --db-name ${db_name} \
+    --master-username admin \
+    --master-user-password changeMePlease \
+    --backup-retention-period 0 \
+    --allocated-storage 20 \
+    --region ${region} > instance-output.json
+  instance_status=$(jq -r '.DBInstance.DBInstanceStatus' instance-output.json)
+else
+  echo "Instance already exists; updates to an existing instance are not yet supported..."
+  instance_status=$(jq -r '.DBInstances[0].DBInstanceStatus' instance-output.json)
+fi
+
+cat <<EOF > /kratix/metadata/status.yaml
+instanceStatus: ${instance_status}
+instanceIdentifier: ${db_identifier}
+EOF

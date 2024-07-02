@@ -2,15 +2,17 @@
 
 set -e
 
-
 declare -a args=( "$@" )
-for dir_name in configure-pipeline configure-promise-pipeline; do
+
+dirs=${PIPELINE_DIR:-"configure-pipeline configure-promise-pipeline"}
+
+for dir_name in $dirs; do
   promise_name="$(basename "$(dirname "${PWD}")")"
-  if [ "${PROMISE_NAME:-""}" != "" ]; then
+  if [ -n "${PROMISE_NAME:-""}" ]; then
     promise_name="${PROMISE_NAME}"
   fi
   pipeline_dir=${dir_name}
-  if [ "${PIPELINE_DIR:-""}" != "" ]; then
+  if [ -n "${PIPELINE_DIR:-""}" ]; then
     pipeline_dir="${PIPELINE_DIR}"
   fi
   pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:v0.1.0"
