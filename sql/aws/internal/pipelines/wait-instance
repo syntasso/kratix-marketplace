@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# read metadata from the input object
+db_identifier=$(yq eval '.status.instanceIdentifier' /kratix/input/object.yaml)
+instance_status=$(yq eval '.status.instanceStatus' /kratix/input/object.yaml)
+
+echo "Waiting for RDS instance to be available"
+
+while
+  echo "current status: ${instance_status}"
+  sleep 5
+  aws rds describe-db-instances \
+    --region "eu-west-1" \
+    --db-instance-identifier ${db_identifier} > describe-instance-output.json
+
+  instance_status=$(jq -r '.DBInstances[0].DBInstanceStatus' describe-instance-output.json)
+  [ "${instance_status}" = "creating" ]
+do true; done
+
+instance_status=$(jq -r '.DBInstances[0].DBInstanceStatus' describe-instance-output.json)
+endpoint=$(jq -r '.DBInstances[0].Endpoint.Address' describe-instance-output.json)
+
+cat <<EOF > /kratix/metadata/status.yaml
+instanceStatus: ${instance_status}
+endpoint: ${endpoint}
+EOF

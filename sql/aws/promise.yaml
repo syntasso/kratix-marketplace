@@ -1,0 +1,103 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  name: aws-rds
+  namespace: default
+spec:
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: rds.aws.marketplace.kratix.io
+    spec:
+      group: aws.marketplace.kratix.io
+      names:
+        kind: RDS
+        plural: rds
+        singular: rds
+      scope: Namespaced
+      versions:
+        - name: v1alpha1
+          additionalPrinterColumns:
+            - JSONPath: .spec.size
+              name: Size
+              type: string
+            - JSONPath: .status.instanceStatus
+              name: Status
+              type: string
+            - JSONPath: .status.endpoint
+              name: Endpoint
+              type: string
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  properties:
+                    dbName:
+                      type: string
+                      default: mydb
+                      description: |
+                        The name of the database to create when the DB instance
+                        is created. Defaults to the mydb.
+                    engine:
+                      type: string
+                      description: |
+                        The database enginre to use for this DB Instance.
+                        Defaults to mysql.
+                      default: mysql
+                      enum:
+                        - mysql
+                        - postgres
+                        - mariadb
+                    size:
+                      default: micro
+                      description: |
+                        Size of this SQL deployment. Defaults to micro.
+                      pattern: ^(micro|small|medium|large)$
+                      type: string
+                  type: object
+              type: object
+          served: true
+          storage: true
+  workflows:
+    resource:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: rds-configure
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/aws-rds-pipelines:v0.1.0
+                name: configure-rds-instance
+                env: &envVars
+                  - name: AWS_ACCESS_KEY_ID
+                    valueFrom:
+                      secretKeyRef:
+                        name: aws-rds
+                        key: accessKeyID
+                  - name: AWS_SECRET_ACCESS_KEY
+                    valueFrom:
+                      secretKeyRef:
+                        name: aws-rds
+                        key: secretAccessKey
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: rds-wait
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/aws-rds-pipelines:v0.1.0
+                command: ["wait-instance"]
+                name: wait-instance
+                env: *envVars
+      delete:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: rds-delete
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/aws-rds-pipelines:v0.1.0
+                name: delete-rds-instance
+                env: *envVars

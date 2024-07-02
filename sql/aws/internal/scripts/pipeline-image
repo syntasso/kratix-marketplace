@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+export PIPELINE_DIR="pipelines"
+export PROMISE_NAME="aws-rds"
+source ${PWD}/../../../scripts/pipeline-image
