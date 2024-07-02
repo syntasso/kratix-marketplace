@@ -50,7 +50,7 @@ something_changed=false
 for promise in $(promises); do
     if  $test_all || untested_changes $promise ; then
         something_changed=true
-        name="$(basename $promise)"
+        name="${promise#"$ROOT/"}"
         if [ "${name:0:1}" = "." ]; then
             continue
         fi
