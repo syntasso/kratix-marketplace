@@ -1,7 +1,7 @@
 apiVersion: aws.marketplace.kratix.io/v1alpha1
 kind: RDS
 metadata:
-  name: derik
+  name: example
   namespace: default
 spec:
   size: micro
