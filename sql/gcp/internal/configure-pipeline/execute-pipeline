@@ -17,7 +17,25 @@ gcloud auth activate-service-account --key-file=/creds/credentials.json
 gcloud config set project $PROJECT_ID
 
 if [ "$KRATIX_WORKFLOW_ACTION" = "delete" ]; then
+  set +e
+  gcloud sql instances describe $name
+  exitCode=$?
+  set -e
+  if [ $exitCode -ne 0 ]; then
+    echo "Instance $name does not exist"
+    exit 0
+  fi
   gcloud sql instances delete $name --quiet
+  exit 0
+fi
+
+
+set +e
+gcloud sql instances describe $name
+exitCode=$?
+set -e
+if [ $exitCode -e 0 ]; then
+  echo "Instance $name already exists"
   exit 0
 fi
 

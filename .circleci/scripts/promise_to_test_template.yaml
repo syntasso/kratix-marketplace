@@ -150,7 +150,7 @@ jobs:
       - retry/run-with-retry:
           command: << parameters.promise_dir >>/internal/scripts/test resource-request
           # 5 minutes total retry (6 sec * 100 times = 600 sec)
-          sleep: 6
+          sleep: 10
           retry-count: 100
       - run:
           name: Delete resource request
