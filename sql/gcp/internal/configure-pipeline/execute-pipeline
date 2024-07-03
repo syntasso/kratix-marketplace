@@ -43,5 +43,5 @@ gcloud sql instances create $name --database-version=MYSQL_8_0 --region=us-centr
 
 
 cat <<EOF > /kratix/metadata/status.yaml
-instanceStatus: ${instance_status}
+instanceStatus: available
 EOF
