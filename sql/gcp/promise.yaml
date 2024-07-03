@@ -54,7 +54,7 @@ spec:
                   path: credentials.json
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/gcp-configure-pipeline:v0.1.0
-                name: gcp-onfigure-pipeline
+                name: gcp-configure-pipeline
                 volumeMounts:
                 - name: creds
                   readOnly: true

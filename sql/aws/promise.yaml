@@ -42,7 +42,7 @@ spec:
                     engine:
                       type: string
                       description: |
-                        The database enginre to use for this DB Instance.
+                        The database engine to use for this DB Instance.
                         Defaults to mysql.
                       default: mysql
                       enum:
