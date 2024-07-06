@@ -3,6 +3,8 @@ kind: Promise
 metadata:
   creationTimestamp: null
   name: cert-manager
+  labels:
+    kratix.io/promise-version: v1.0.0-beta.1
 spec:
   workflows:
     promise:
