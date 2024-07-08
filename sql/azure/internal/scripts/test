@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crd sql.marketplace.kratix.io
+}
+
+test_resource_request() {
+  kubectl wait sql.marketplace.kratix.io example --for=jsonpath='{.status.instanceStatus}'=available
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi

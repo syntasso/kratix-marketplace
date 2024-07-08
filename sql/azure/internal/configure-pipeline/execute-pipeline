@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+
+set -euxo pipefail
+
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export size="$(yq eval '.spec.size' /kratix/input/object.yaml)"
+
+export location="UK South"
+export resourceGroup="kratix"
+export server="msdocs-azuresql-server-kratix-sql-$name"
+export database="msdocsazuresqldbkratix-sql-$name"
+
+export capacity="2"
+if [ $size = large ]; then
+  capacity="3"
+fi
+
+az login --service-principal -u $(cat /creds/service-principal-id) \
+  -p /creds/key.pem \
+  --tenant $(cat /creds/tenant-id)
+
+if [ "$KRATIX_WORKFLOW_ACTION" = "delete" ]; then
+  set +e
+  az sql db show --name $database --resource-group $resourceGroup --server $server
+  exitCode=$?
+  set -e
+  if [ $exitCode -ne 0 ]; then
+    echo "Instance $name does not exist"
+    exit 0
+  fi
+  az sql db delete --name $database --resource-group $resourceGroup --server $server -y
+  az sql server delete --name $server --resource-group $resourceGroup -y
+  exit 0
+fi
+
+
+set +e
+az sql db show --name $database --resource-group $resourceGroup --server $server
+exitCode=$?
+set -e
+if [ $exitCode -eq 0 ]; then
+  echo "Instance $name already exists"
+  exit 0
+fi
+
+login="kratix"
+password=$(uuidgen)
+
+echo "Creating $server in $location..."
+az sql server create --name $server --resource-group $resourceGroup --location "$location" --admin-user $login --admin-password $password
+echo "Creating $database on $server..."
+az sql db create --resource-group $resourceGroup --server $server --name $database --sample-name AdventureWorksLT --edition GeneralPurpose --family Gen5 --capacity $capacity --zone-redundant true
+
+cat <<EOF > /kratix/metadata/status.yaml
+instanceStatus: available
+EOF

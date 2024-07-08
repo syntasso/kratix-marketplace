@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -e
+
+echo ${AZURE_SERVICE_PRINCIPAL_KEY} > serviceaccount.json
+
+kubectl create secret generic azure-credentials --from-file=key=key.pem \
+    --from-literal=servicePrincipalID=${AZURE_SERVICE_PRINCIPAL_ID} \
+    --from-literal=tenantID=${AZURE_TENANT_ID}
+
+rm key.pem
