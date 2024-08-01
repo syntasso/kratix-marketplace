@@ -42,45 +42,6 @@ spec:
               type: object
           served: true
           storage: true
-  dependencies:
-    - apiVersion: rbac.authorization.k8s.io/v1
-      kind: Role
-      metadata:
-        name: vault-promise
-        namespace: default
-      rules:
-        - apiGroups:
-            - ""
-          resourceNames:
-            - vault
-          resources:
-            - configmaps
-          verbs:
-            - get
-    - apiVersion: rbac.authorization.k8s.io/v1
-      kind: RoleBinding
-      metadata:
-        name: vault-promise
-        namespace: default
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: Role
-        name: vault-promise
-      subjects:
-        - kind: ServiceAccount
-          name: vaultnamespace-resource-pipeline
-    - apiVersion: rbac.authorization.k8s.io/v1
-      kind: ClusterRoleBinding
-      metadata:
-        name: vault-client-auth-delegator
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: ClusterRole
-        name: system:auth-delegator
-      subjects:
-        - kind: ServiceAccount
-          name: vaultnamespace-resource-pipeline
-          namespace: default
   destinationSelectors:
   - matchLabels:
       environment: platform
@@ -93,6 +54,17 @@ spec:
             name: instance-configure
             namespace: default
           spec:
+            rbac:
+              permissions:
+              - apiGroups:
+                  - ""
+                resourceNames:
+                  - vault
+                resourceNamespace: default
+                resources:
+                  - configmaps
+                verbs:
+                  - get
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/vault-namespace-configure-pipeline:v0.1.0
                 name: vault-namespace-configure-pipeline

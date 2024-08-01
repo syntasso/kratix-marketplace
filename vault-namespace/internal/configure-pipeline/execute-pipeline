@@ -7,9 +7,9 @@ function main() {
     export TEAM="$(yq eval '.spec.team' /kratix/input/object.yaml)"
     export K8S_ADDR="$(yq eval '.spec.kubernetes.host' /kratix/input/object.yaml)"
     yq eval '.spec.kubernetes.caCert' /kratix/input/object.yaml > ca.cert
-    export VAULT_NAMESPACE="$(kubectl get configmap vault -o jsonpath='{.data.parentNamespace}')"
-    export VAULT_ADDR="$(kubectl get configmap vault -o jsonpath='{.data.url}')"
-    export AUTHPATH="$(kubectl get configmap vault -o jsonpath='{.data.authpath}')"
+    export VAULT_NAMESPACE="$(kubectl -n default get configmap vault -o jsonpath='{.data.parentNamespace}')"
+    export VAULT_ADDR="$(kubectl -n default get configmap vault -o jsonpath='{.data.url}')"
+    export AUTHPATH="$(kubectl -n default get configmap vault -o jsonpath='{.data.authpath}')"
 
     verify_vault_connection
 
@@ -30,7 +30,7 @@ function verify_vault_connection() {
 
 function login_to_vault() {
     echo "logging into vault"
-    role="$(kubectl get configmap vault -o jsonpath='{.data.role}')"
+    role="$(kubectl -n default get configmap vault -o jsonpath='{.data.role}')"
     jwt=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 
     vault login $(vault write --format=yaml auth/${AUTHPATH}/login role=${role} jwt="${jwt}" | yq .auth.client_token) >/dev/null
