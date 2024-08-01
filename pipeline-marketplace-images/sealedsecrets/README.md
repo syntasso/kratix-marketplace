@@ -10,6 +10,17 @@ workflows:
           name: instance-configure
           namespace: default
         spec:
+          rbac:
+            permissions:
+            - apiGroups:
+              - ""
+              resources:
+              - configmaps
+              verbs:
+              - get
+              resourceNames:
+              - sealed-secrets
+              resourceNamespace: default
           containers:
             - image: ...
               name: ...
@@ -33,8 +44,6 @@ image in your pipeline, you must ensure that:
   for details.
 - On the Platform Cluster, there's a `sealed-secrets` ConfigMap on the `default`
   namespace with a key `certificate` containing the public part of the certificate.
-- The ServiceAccount for the Promise that will include this image has access to the
-  `sealed-secrets` ConfigMap.
 
 The commands below are similar to what you'll need to run:
 
@@ -44,16 +53,6 @@ The commands below are similar to what you'll need to run:
 # On the platform cluster
 kubectl --namespace default create configmap sealed-secrets \
     --from-literal=certificate="$(cat mytls.crt)"
-
-kubectl create clusterrole sealed-secrets-reader \
-    --verb=get \
-    --resource=configmap \
-    --resource-name=sealed-secrets
-
-# Replace PROMISE with the name of your promise
-kubectl create clusterrolebinding PROMISE-sealed-secret \
-    --clusterrole=sealed-secrets-reader \
-    --serviceaccount=default:PROMISE-resource-pipeline
 ```
 
 ## Usage in the Pipeline
