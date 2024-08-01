@@ -10,6 +10,17 @@ workflows:
           name: instance-configure
           namespace: default
         spec:
+          rbac:
+            permissions:
+            - apiGroups:
+              - ""
+              resources:
+              - secrets
+              verbs:
+              - get
+              resourceNames:
+              - slack-channel-hook # change this to the secret name if different
+              resourceNamespace: default
           containers:
             - image: ...
               name: ...
@@ -27,7 +38,7 @@ webhook](https://api.slack.com/messaging/webhooks) and store the URL in a
 Kubernetes Secret in your platform cluster:
 
 ```shell
-kubectl --namespace <NAMESPACE> create secret generic \
+kubectl --namespace default create secret generic \
   slack-channel-hook --from-literal=url=<SLACK HOOK URL>
 ```
 
@@ -51,11 +62,7 @@ slackHook:
 If `slackHook.url` is provided, the pipeline image will send the `message` to that URL.
 
 If `slackHook.secretName` is provided, the pipeline image will first fetch the URL from
-the Kubernetes Secret in the specified namespace. You must ensure the Service
-Account associated with the Promise that includes this image has _read_ access
-to the Secret. Check [Passing secrets to the
-Pipeline](https://kratix.io/docs/main/reference/resource-requests/pipelines#passing-secrets-to-the-pipeline)
-for further details.
+the Kubernetes Secret in the specified namespace.
 
 ### Avoiding multiple notifications
 
