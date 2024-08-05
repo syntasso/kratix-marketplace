@@ -13,7 +13,7 @@ It is common for users to have a Tower already running and this Promise is easil
     ```
     helm repo add awx-operator https://ansible.github.io/awx-operator/
     helm repo update
-    helm install --version 2.10.0 -n awx --create-namespace my-awx-operator awx-operator/awx-operator
+    helm install --version 2.19.1 -n awx --create-namespace my-awx-operator awx-operator/awx-operator
     ```
 1. Create an instance of AWX using the operator:
     ```
