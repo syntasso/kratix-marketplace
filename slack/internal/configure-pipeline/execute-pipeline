@@ -2,7 +2,7 @@
 
 set -xe
 
-slack_hook="$(kubectl get secret slack-channel-hook -o=jsonpath='{.data.url}' | base64 -d)"
+slack_hook="$(kubectl -n default get secret slack-channel-hook -o=jsonpath='{.data.url}' | base64 -d)"
 # Read current values from the provided resource request
 message="$(yq eval '.spec.message' /kratix/input/object.yaml)"
 

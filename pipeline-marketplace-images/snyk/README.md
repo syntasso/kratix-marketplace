@@ -10,6 +10,17 @@ workflows:
           name: instance-configure
           namespace: default
         spec:
+          rbac:
+            permissions:
+            - apiGroups:
+              - ""
+              resources:
+              - secrets
+              verbs:
+              - get
+              resourceNames:
+              - snyk-token # change this to the secret name if different
+              resourceNamespace: default
           containers:
             - image: ...
               name: ...
@@ -29,11 +40,6 @@ The pipeline requires a Snyk token token to authenticate with. Create a secret c
 kubectl --namespace default create secret generic \
   snyk-token --from-literal=token=${SNYK_TOKEN}
 ```
-
-You must ensure the Service Account associated with the Promise that includes this image has _read_ access
-to the Secret. Check [Passing secrets to the
-Pipeline](https://kratix.io/docs/main/reference/resource-requests/pipelines#passing-secrets-to-the-pipeline)
-for further details.
 
 ## Usage in the Pipeline
 
