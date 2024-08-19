@@ -25,6 +25,3 @@ resources:
 """ > $DIR/kustomization.yaml
 
 kubectl kustomize $DIR --output ${DEPENDENCIES_DIR}/dapr.yaml
-
-echo "This is nearly complete. Final step is to add --- to seperate crds in the ${DEPENDENCIES_DIR}/crds.yaml file"
-exit 1
