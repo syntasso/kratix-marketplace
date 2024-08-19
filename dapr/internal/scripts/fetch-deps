@@ -12,7 +12,7 @@ helm repo update
 mkdir -p ${DEPENDENCIES_DIR}
 helm show crds dapr/dapr --version 1.14.1 > ${DEPENDENCIES_DIR}/crds.yaml
 DIR=$(mktemp -d)
-helm template dapr/dapr --version 1.14.1 > $DIR/resources.yaml
+helm template dapr dapr/dapr --version 1.14.1 > $DIR/resources.yaml
 
 echo """---
 apiVersion: kustomize.config.k8s.io/v1beta1
