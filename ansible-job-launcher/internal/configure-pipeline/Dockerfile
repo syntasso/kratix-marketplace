@@ -1,6 +1,6 @@
 FROM t42x/awxkit_base:23.5.1
-LABEL org.opencontainers.image.authors "kratix@syntasso.io"
-LABEL org.opencontainers.image.source https://github.com/syntasso/kratix-marketplace
+LABEL org.opencontainers.image.authors="kratix@syntasso.io"
+LABEL org.opencontainers.image.source=https://github.com/syntasso/kratix-marketplace
 
 USER root
 RUN apk add curl jq yq

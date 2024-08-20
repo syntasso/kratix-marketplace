@@ -3,8 +3,8 @@ FROM alpine
 
 COPY --from=vault /bin/vault /usr/bin/vault
 
-LABEL org.opencontainers.image.authors "kratix@syntasso.io"
-LABEL org.opencontainers.image.source https://github.com/syntasso/kratix-marketplace
+LABEL org.opencontainers.image.authors="kratix@syntasso.io"
+LABEL org.opencontainers.image.source=https://github.com/syntasso/kratix-marketplace
 
 RUN [ "mkdir", "/tmp/transfer" ]
 RUN apk update && apk add --no-cache yq curl libcap
