@@ -7,21 +7,7 @@ DEPENDENCIES_DIR=${PWD}/configure-pipeline/dependencies
 helm repo add dapr https://dapr.github.io/helm-charts/
 helm repo update
 
-# helm template dapr dapr/dapr -n dapr-system --create-namespace --version 1.13.2 > $PWD/resources/helm.yaml
-
+VERSION=1.14.1
 mkdir -p ${DEPENDENCIES_DIR}
-helm show crds dapr/dapr --version 1.14.1 > ${DEPENDENCIES_DIR}/crds.yaml
-DIR=$(mktemp -d)
-helm template dapr dapr/dapr --version 1.14.1 > $DIR/resources.yaml
-
-echo """---
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-
-namespace: dapr-system
-
-resources:
-  - resources.yaml
-""" > $DIR/kustomization.yaml
-
-kubectl kustomize $DIR --output ${DEPENDENCIES_DIR}/dapr.yaml
+helm show crds dapr/dapr --version ${VERSION} > ${DEPENDENCIES_DIR}/crds.yaml
+helm template dapr dapr/dapr --version ${VERSION} --namespace dapr-system > ${DEPENDENCIES_DIR}/dapr.yaml
