@@ -10,4 +10,17 @@ helm repo update
 VERSION=1.14.1
 mkdir -p ${DEPENDENCIES_DIR}
 helm show crds dapr/dapr --version ${VERSION} > ${DEPENDENCIES_DIR}/crds.yaml
-helm template dapr dapr/dapr --version ${VERSION} --namespace dapr-system > ${DEPENDENCIES_DIR}/dapr.yaml
+DIR=$(mktemp -d)
+helm template dapr dapr/dapr --version ${VERSION} --namespace dapr-system > $DIR/resources.yaml
+
+echo """---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dapr-system
+
+resources:
+  - resources.yaml
+""" > $DIR/kustomization.yaml
+
+kubectl kustomize $DIR --output ${DEPENDENCIES_DIR}/dapr.yaml
