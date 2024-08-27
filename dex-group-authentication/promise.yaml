@@ -203,10 +203,10 @@ spec:
       - apiVersion: platform.kratix.io/v1alpha1
         kind: Pipeline
         metadata:
-          name: instance-configure
+          name: instance-config
           namespace: default
         spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/dex-group-authentication-configure-pipeline:v0.1.0
-            name: dex-group-authentication-configure-pipeline
+            name: dex-group-auth-config-pipeline
 status: {}
