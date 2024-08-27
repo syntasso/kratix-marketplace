@@ -114,10 +114,10 @@ jobs:
           name: Install Promise
           working_directory: ~/repo/<< parameters.promise_dir >>
           command: |
-            kubectl create --filename promise.yaml
             if test -f ./internal/scripts/pipeline-image; then
               ./internal/scripts/pipeline-image build load
             fi
+            kubectl create --filename promise.yaml
       - retry/run-with-retry:
           command: << parameters.promise_dir >>/internal/scripts/test promise
           # 5 minutes total retry (6 sec * 100 times = 600 sec)
