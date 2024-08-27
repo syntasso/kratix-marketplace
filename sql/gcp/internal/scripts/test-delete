@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-! kubectl get rds.aws.marketplace.kratix.io example
+! kubectl get sql.marketplace.kratix.io example
