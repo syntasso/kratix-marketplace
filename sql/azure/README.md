@@ -1,6 +1,6 @@
 # sql
 
-Requires a secret for connecting to azure
+Requires a secret for connecting to azure:
 
 ```
 kubectl create secret generic azure-credentials --from-file=key=key.pem \

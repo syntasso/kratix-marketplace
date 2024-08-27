@@ -1,6 +1,6 @@
 # sql
 
-Requires a secret for connecting to GCP
+Requires a secret for connecting to GCP:
 
 ```
 kubectl create secret generic gcp-credentials --from-file=credentialsjson=serviceaccount.json --from-literal=project_id=<project-name>
