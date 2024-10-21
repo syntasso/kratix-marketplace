@@ -2,7 +2,7 @@
 set -e
 
 test_promise() {
-  kubectl wait promise/kafka --for=condition=PipelineCompleted --timeout=120s
+  kubectl wait promise/kafka --for=condition=ConfigureWorkflowCompleted --timeout=120s
   kubectl get crd kafkas.kafka.strimzi.io 
   kubectl -n kafka wait --for=condition=Available --timeout=5s deployment/strimzi-cluster-operator
 }
