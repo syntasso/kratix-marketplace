@@ -22,7 +22,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.401.3-jdk17
+        image: jenkins/jenkins:2.414.3-jdk17
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 12
@@ -60,11 +60,11 @@ spec:
       - name: kubernetes
         version: 3802.vb_b_600831fcb_3
       - name: workflow-job
-        version: 1308.v58d48a_763b_31
+        version: 1385.vb_58b_86ea_fff1
       - name: workflow-cps
-        version: 3691.v28b_14c465a_b_b_
+        version: 3889.v937e0b_3412d3
       - name: workflow-multibranch
-        version: 756.v891d88f2cd46
+        version: 773.vc4fe1378f1d5
       - name: workflow-aggregator
         version: "2.6"
       - name: git
