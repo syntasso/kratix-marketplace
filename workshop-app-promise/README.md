@@ -1,6 +1,6 @@
 # App Promise
 
-This Promise is the results of following [Kratix
+This Promise is the result of following [Kratix
 Workshop](https://docs.kratix.io/workshop/part-ii/intro) on Promise writting.
 
 ## Setup
