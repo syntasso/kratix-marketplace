@@ -26,6 +26,16 @@ Workshop](https://docs.kratix.io/workshop/part-ii/intro) on Promise writting.
   worker-1           10m     environment=dev
   ```
 
+* Build and Load the Aspects into your KinD cluster
+
+  ```
+  docker build --tag kratix-workshop/app-promise-pipeline:v0.1.0 workflows/promise/configure/dependencies/configure-deps
+  docker build --tag kratix-workshop/app-pipeline-image:v1.0.0 workflows/resource/configure/mypipeline/kratix-workshop-app-pipeline-image
+
+  kind load docker-image kratix-workshop/app-promise-pipeline:v0.1.0 --name platform
+  kind load docker-image kratix-workshop/app-pipeline-image:v1.0.0 --name platform
+  ```
+
 For detailed instructions on environment setup, see the [Kratix
 Workshop](https://docs.kratix.io/workshop/intro).
 
