@@ -1,0 +1,9 @@
+---
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: postgresql
+metadata:
+  name: my-appdb
+  namespace: default
+spec:
+  teamId: my-appteam
+  dbName: my-appdb

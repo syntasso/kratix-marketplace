@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+scriptsdir=$(cd "$(dirname "$0")"; pwd)
+testdir=$(cd "$(dirname "$0")"/../test; pwd)
+inputDir="$testdir/input"
+outputDir="$testdir/output"
+metadataDir="$testdir/metadata"
+
+$scriptsdir/build-pipeline
+rm -rf $outputDir/*
+
+command=${1:-"resource-configure"}
+
+docker run \
+    --rm \
+    --volume ~/.kube:/root/.kube \
+    --network=host \
+    --volume ${outputDir}:/kratix/output \
+    --volume ${inputDir}:/kratix/input \
+    --volume ${metadataDir}:/kratix/metadata \
+    --env MINIO_USER=minioadmin \
+    --env MINIO_PASSWORD=minioadmin \
+    --env MINIO_ENDPOINT=localhost:31337 \
+    kratix-workshop/app-pipeline-image:v1.0.0 sh -c "$command"

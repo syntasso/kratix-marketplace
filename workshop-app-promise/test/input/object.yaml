@@ -1,0 +1,10 @@
+apiVersion: workshop.kratix.io/v1
+kind: App
+metadata:
+  name: my-app
+  namespace: default
+spec:
+  image: example/image:v1.0.0
+  service:
+    port: 9000
+  dbDriver: postgresql

@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp:
+  labels:
+    app: my-app
+  name: my-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - image: example/image:v1.0.0
+        name: image
+        resources: {}
+        env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: my-appteam.my-appteam-my-appdb-postgresql.credentials.postgresql.acid.zalan.do
+              key: password
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: my-appteam.my-appteam-my-appdb-postgresql.credentials.postgresql.acid.zalan.do
+              key: username
+        - name: PGHOST
+          value: my-appteam-my-appdb-postgresql.default.svc.cluster.local
+        - name: DBNAME
+          value: my-appdb
+status: {}

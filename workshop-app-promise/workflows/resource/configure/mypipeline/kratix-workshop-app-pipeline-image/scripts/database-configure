@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+
+puts "Checking for database driver..."
+
+resource_request = YAML.load_file('/kratix/input/object.yaml')
+
+dbDriver = resource_request.dig('spec', 'dbDriver')
+
+if dbDriver.nil?
+  puts "No database driver specified, skipping"
+  exit 0
+end
+
+if dbDriver != 'postgresql' then
+  puts "Unsupported db driver: #{dbDriver}"
+  puts "Supported drivers: postgresql"
+  exit 1
+end
+
+puts "Postgresql database driver detected, including database resources"
+
+name = resource_request.dig('metadata', 'name')
+namespace = resource_request.dig('metadata', 'namespace')
+
+teamId = "#{name}team"
+dbName = "#{name}db"
+
+# Create a directory
+Dir.mkdir('/kratix/output/platform') unless File.exist?('/kratix/output/platform')
+
+# This is creating a resource request, to be sent to the Platform, for a new
+# Postgresql database.
+postgresqlRequest = {
+  'apiVersion' => "marketplace.kratix.io/v1alpha1",
+  'kind' => 'postgresql',
+  'metadata' => {
+    'name' => "#{dbName}",
+    'namespace' => "#{namespace}"
+  },
+  'spec' => {
+    'teamId' => "#{teamId}",
+    'dbName' => "#{dbName}"
+  }
+}
+
+# This is telling Kratix that the contents of `/kratix/output/platform` should
+# be sent to the Platform.
+destinationSelectorsRequest = [{
+  'directory' => 'platform',
+  'matchLabels' => {
+    'environment' => 'platform'
+  }
+}]
+
+secretRef="#{teamId}.#{teamId}-#{dbName}-postgresql.credentials.postgresql.acid.zalan.do"
+env = [{
+  'name' => 'PGPASSWORD',
+  'valueFrom' => {
+    'secretKeyRef' => {
+      'name' => "#{secretRef}",
+      'key' => 'password'
+      },
+    }
+  }, {
+    'name' => 'PGUSER',
+    'valueFrom' => {
+      'secretKeyRef' => {
+        'name' => "#{secretRef}",
+        'key' => 'username'
+      },
+    }
+  }, {
+    'name' => 'PGHOST',
+    'value' => "#{teamId}-#{dbName}-postgresql.default.svc.cluster.local"
+  }, {
+    'name' => 'DBNAME',
+    'value' => "#{dbName}"
+  }
+]
+
+# Injecting the database credentials into the app deployment
+existingDeployment = YAML.load_file('/kratix/output/deployment.yaml')
+existingDeployment['spec']['template']['spec']['containers'][0]['env'] = env
+
+# Writing the files
+File.write('/kratix/output/deployment.yaml', existingDeployment.to_yaml)
+File.write('/kratix/output/platform/postgresql.yaml', postgresqlRequest.to_yaml)
+File.write('/kratix/metadata/destination-selectors.yaml', destinationSelectorsRequest.to_yaml)

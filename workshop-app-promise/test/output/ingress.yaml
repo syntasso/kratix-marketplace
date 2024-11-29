@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  creationTimestamp: null
+  name: my-app
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: my-app.local.gd
+    http:
+      paths:
+      - backend:
+          service:
+            name: my-app
+            port:
+              number: 9000
+        path: /
+        pathType: Prefix
+status:
+  loadBalancer: {}

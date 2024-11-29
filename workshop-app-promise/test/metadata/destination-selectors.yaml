@@ -1,0 +1,4 @@
+---
+- directory: platform
+  matchLabels:
+    environment: platform

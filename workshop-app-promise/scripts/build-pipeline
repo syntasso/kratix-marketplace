@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+set -eu -o pipefail
+
+testdir=$(cd "$(dirname "$0")"/../test; pwd)
+
+docker build --tag kratix-workshop/app-pipeline-image:v1.0.0 workflows/resource/configure/mypipeline/kratix-workshop-app-pipeline-image
+kind load docker-image kratix-workshop/app-pipeline-image:v1.0.0 --name platform

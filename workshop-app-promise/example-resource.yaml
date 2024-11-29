@@ -1,0 +1,10 @@
+apiVersion: workshop.kratix.io/v1
+kind: App
+metadata:
+  name: todo
+  namespace: default
+spec:
+  image: syntasso/sample-todo:v0.1.0
+  dbDriver: postgresql
+  service:
+    port: 8080
