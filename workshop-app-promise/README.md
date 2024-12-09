@@ -1,7 +1,7 @@
 # App Promise
 
 This Promise is the result of following [Kratix
-Workshop](https://docs.kratix.io/workshop/part-ii/intro) on Promise writting.
+Workshop](https://docs.kratix.io/workshop/part-ii/intro) on Promise writing.
 
 ## Setup
 
@@ -16,7 +16,7 @@ Workshop](https://docs.kratix.io/workshop/part-ii/intro) on Promise writting.
   https://raw.githubusercontent.com/syntasso/promise-postgresql/main/promise-release.yaml
   ```
 
-* Configure the Platform as a destiantion, and label the destinations
+* Configure the Platform as a destination, and label the destinations
   accordingly:
 
   ```bash
