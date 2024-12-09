@@ -24,7 +24,7 @@ commands:
           name: Install tools and deps
           command: |
             if [ ! -f ~/bin/kind ]; then
-              curl -L https://github.com/kubernetes-sigs/kind/releases/download/v0.14.0/kind-linux-amd64 -o ~/bin/kind
+              curl -L https://github.com/kubernetes-sigs/kind/releases/download/v0.25.0/kind-linux-amd64 -o ~/bin/kind
               chmod +x ~/bin/kind
             fi
 
@@ -36,7 +36,7 @@ commands:
       - run:
           name: Install Kratix
           command: |
-            kind create cluster --name platform --image kindest/node:v1.27.3
+            kind create cluster --name platform --image kindest/node:v1.31.2@sha256:18fbefc20a7113353c7b75b5c869d7145a6abd6269154825872dc59c1329912e
 
             kubectl apply --filename https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
             kubectl wait --for condition=available -n cert-manager deployment/cert-manager --timeout 60s
