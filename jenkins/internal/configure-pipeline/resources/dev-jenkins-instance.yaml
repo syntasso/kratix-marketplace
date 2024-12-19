@@ -22,7 +22,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.414.3-jdk17
+        image: jenkins/jenkins:2.479.2-jdk17
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 12
@@ -74,7 +74,7 @@ spec:
       - name: job-dsl
         version: 1.78.3
       - name: configuration-as-code
-        version: 1670.v564dc8b_982d0
+        version: 1850.va_a_8c31d3158b_
       - name: kubernetes-credentials-provider
         version: 1.208.v128ee9800c04
       - name: pipeline-model-definition

@@ -29,7 +29,7 @@ yq -i '. |
         { "name": "workflow-aggregator", "version": "2.6"},
         { "name": "git", "version": "4.11.3"},
         { "name": "job-dsl", "version": "1.78.3"},
-        { "name": "configuration-as-code", "version": "1670.v564dc8b_982d0"},
+        { "name": "configuration-as-code", "version": "1850.va_a_8c31d3158b_"},
         { "name": "kubernetes-credentials-provider", "version": "1.208.v128ee9800c04"}
     ] |
     del(.spec.seedJobs)' ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml
