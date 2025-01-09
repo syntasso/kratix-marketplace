@@ -11,7 +11,7 @@ spec:
     - name: CLUSTERNAME-dependencies
   sourceRef:
     kind: Bucket
-    name: kratix-bucket
+    name: kratix
     namespace: flux-system
   path: ./CLUSTERNAME/resources
   validation: client
@@ -30,7 +30,7 @@ spec:
   prune: true
   sourceRef:
     kind: Bucket
-    name: kratix-bucket
+    name: kratix
     namespace: flux-system
   validation: client
   path: ./CLUSTERNAME/dependencies
