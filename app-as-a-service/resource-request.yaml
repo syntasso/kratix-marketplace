@@ -6,7 +6,7 @@ metadata:
   namespace: default
 spec:
   name: todoer
-  image: syntasso/sample-todo:v0.1.0
+  image: syntasso/sample-todo-app:v1.0.0
   dbDriver: postgresql
   service:
-    port: 9000
+    port: 8080

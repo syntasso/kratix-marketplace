@@ -7,7 +7,7 @@ image=$(yq '.spec.image' /kratix/input/object.yaml)
 service_port=$(yq '.spec.service.port' /kratix/input/object.yaml)
 
 # Get the request name and namespace
-name=$(yq '.metadata.name' /kratix/input/object.yaml)
+name=$(yq '.spec.name' /kratix/input/object.yaml)
 namespace=$(yq '.metadata.namespace' /kratix/input/object.yaml)
 
 # Create a deployment
@@ -32,3 +32,8 @@ kubectl create ingress ${name} \
     --rule="${name}.local.gd/*=${name}:${service_port}" \
     --dry-run=client \
     --output yaml > /kratix/output/ingress.yaml
+
+# Store ingress endpoint in the status for users
+cat <<EOF > /kratix/metadata/status.yaml
+endpoint: "http://${name}.local.gd:31338"
+EOF
