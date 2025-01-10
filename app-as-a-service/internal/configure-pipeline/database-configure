@@ -8,7 +8,7 @@ resource_request = YAML.load_file('/kratix/input/object.yaml')
 
 dbDriver = resource_request.dig('spec', 'dbDriver')
 
-if dbDriver.nil?
+if dbDriver.nil? || dbDriver == 'none' then
   puts "No database driver specified, skipping"
   exit 0
 end
