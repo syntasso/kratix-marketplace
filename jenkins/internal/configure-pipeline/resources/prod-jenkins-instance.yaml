@@ -58,9 +58,9 @@ spec:
       - name: workflow-job
         version: 1308.v58d48a_763b_31
       - name: workflow-cps
-        version: 3691.v28b_14c465a_b_b_
+        version: 4002.v80ca_d0f47d7f
       - name: workflow-multibranch
-        version: 756.v891d88f2cd46
+        version: 783.va_6eb_ef636fb_d
       - name: workflow-aggregator
         version: "2.6"
       - name: git
