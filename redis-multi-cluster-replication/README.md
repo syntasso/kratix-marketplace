@@ -1,39 +1,49 @@
-# Redis Multi Cluster Replication Promise
-This promise provides an example of deploying Redis across three clusters, in a
-primary/replica configuration. The primary cluster is the only one that can be
-written to, and the replicas are read-only. The primary cluster is also
-responsible for replicating data to the replicas.
+# Redis Multi-Cluster Replication Promise
 
-This Promise relies on the existence of three Kubernetes Destination clusters:
-- europe (primary)
-- america (replica)
-- asia (replica)
+This Promise demonstrates deploying Redis across three Kubernetes clusters in a **primary/replica configuration**:
+- The **primary cluster** is write-enabled.
+- The **replica clusters** are read-only and sync data from the primary.
 
-The `./setup.bash` script will create these clusters for you, and set up the
-clusters to sync using ArgoCD from an in-cluster Gitea instead on the platform
-cluster.
+The primary cluster is responsible for replicating data to the replicas, ensuring consistency across the clusters.
 
-## Usage
-To use this Promise, you can run the `./setup.bash` script. This script will
-create the necessary clusters and deploy the Promise to the platform cluster.
-The script requires you have the following tools installed:
-- `kubectl`
-- `kind`
-- `git`
-- `yq`
-- `kratix` https://github.com/syntasso/kratix-cli
+## Prerequisites
 
-Once the Promise is deployed, you can create a Redis cluster by creating a
-`RedisMultiClusterReplication` object in the platform cluster. An example object
-is provided in `example-request.yaml`. Install it onto the platform cluster by
-running `kubectl --context kind-platform apply -f example-request.yaml`.
+This Promise assumes the existence of three Kubernetes clusters:
+- **europe** (primary)
+- **america** (replica)
+- **asia** (replica)
 
-You can then observe the deployment of the Redis cluster by running:
-```
-kubectl --context kind-platform get RedisMultiClusterReplication
-kubectl --context kind-worker-1 get pods
-kubectl --context kind-worker-2 get pods
-kubectl --context kind-worker-3 get pods
+The provided `./setup.bash` script will:
+1. Create these clusters locally using `kind` and register them with Kratix.
+2. Configure them to sync using ArgoCD, using the in-cluster Gitea on the platform cluster.
+
+### Required Tools
+
+Ensure the following tools are installed on your system:
+- [`kubectl`](https://kubernetes.io/docs/tasks/tools/)
+- [`kind`](https://kind.sigs.k8s.io/)
+- [`git`](https://git-scm.com/)
+- [`yq`](https://mikefarah.gitbook.io/yq/)
+- [`kratix`](https://github.com/syntasso/kratix-cli)
+
+## Setup Instructions
+
+1. Run the `./setup.bash` script to:
+   - Create the necessary clusters.
+   - Deploy the Promise to the platform cluster.
+
+2. Once deployed, create a Redis cluster by applying the `RedisMultiClusterReplication` object.
+  ```bash
+  kubectl --context kind-platform apply -f example-request.yaml
+  ```
+
+### Example Deployment
+You can watch the rollout of the Redis cluster across the three clusters by running the following command:
+```bash
+kubectl --context kind-platform get pods  # Pipeline pod orchestrating the deployment
+kubectl --context kind-worker-1 get pods  # Pods in the primary cluster
+kubectl --context kind-worker-2 get pods  # Pods in the first replica cluster
+kubectl --context kind-worker-3 get pods  # Pods in the second replica cluster
 ```
 
 Eventually you will see something like:
@@ -83,6 +93,12 @@ argocd               argocd-redis-648d946dd-wlpdv                        1/1    
 argocd               argocd-repo-server-554876df8b-lxt9n                 1/1     Running   0          63m
 argocd               argocd-server-6767446cb9-2t84b                      1/1     Running   0          63m
 default              redis-replica-replicas-0                            1/1     Running   0          38m
+```
+
+Inspecting the logs of the `redis-primary-master-0` pod will show the Redis cluster
+replicating data to the replicas.
+```bash
+kubectl --context kind-worker-1 logs redis-primary-master-0
 ```
 
 # Development
