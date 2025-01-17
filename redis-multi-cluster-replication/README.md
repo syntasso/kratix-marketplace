@@ -31,10 +31,12 @@ Ensure the following tools are installed on your system:
 1. Run the `./setup.bash` script to:
    - Create the necessary clusters.
    - Deploy the Promise to the platform cluster.
+   - If you want to build the Dockerfile for Promise locally as well to pull in
+     any changes, you can run `./setup.bash --build`.
 
 2. Once deployed, create a Redis cluster by applying the `RedisMultiClusterReplication` object.
   ```bash
-  kubectl --context kind-platform apply -f example-request.yaml
+  kubectl --context kind-platform apply -f example-resource.yaml
   ```
 
 ### Example Deployment
@@ -98,7 +100,7 @@ default              redis-replica-replicas-0                            1/1    
 Inspecting the logs of the `redis-primary-master-0` pod will show the Redis cluster
 replicating data to the replicas.
 ```bash
-kubectl --context kind-worker-1 logs redis-primary-master-0
+kubectl --context kind-worker-1 logs -f redis-primary-master-0
 ```
 
 # Development

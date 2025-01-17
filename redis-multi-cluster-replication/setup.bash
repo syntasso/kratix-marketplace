@@ -68,13 +68,17 @@ EOF
 
 deploy_redis() {
 	echo "Installing Promise"
-	kratix build container --all
-	kind load docker-image --name platform ghcr.io/syntasso/kratix-marketplace/redis-multi-cluster-configure-pipeline:v0.1.0
+	# if arg is --build then build image
+	if [ "$1" == "--build-and-push" ]; then
+		docker build -t ghcr.io/syntasso/kratix-marketplace/redis-multi-cluster-replication-configure-pipeline:v0.1.0 ./workflows/resource/configure/instance/configure-redis/
+		kind load docker-image --name platform ghcr.io/syntasso/kratix-marketplace/redis-multi-cluster-replication-configure-pipeline:v0.1.0
+	fi
 	kubectl --context kind-platform apply -f redis-multi-cluster-replication-promise.yaml
 }
 
 setup_platform_cluster
 create_kind_clusters
 register_destinations
-deploy_redis
-echo "Environment setup complete, to make a request run \`kubectl apply -f example-request.yaml\`"
+deploy_redis $@
+echo ""
+echo "Environment setup complete, to make a request run \`kubectl apply -f example-resource.yaml\`"
