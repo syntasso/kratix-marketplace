@@ -69,10 +69,12 @@ EOF
 deploy_redis() {
 	echo "Installing Promise"
 	# if arg is --build then build image
-	if [ "$1" == "--build-and-push" ]; then
+	if [ "${1:-}" == "--build-and-push" ]; then
 		docker build -t ghcr.io/syntasso/kratix-marketplace/redis-multi-cluster-replication-configure-pipeline:v0.1.0 ./workflows/resource/configure/instance/configure-redis/
 		kind load docker-image --name platform ghcr.io/syntasso/kratix-marketplace/redis-multi-cluster-replication-configure-pipeline:v0.1.0
 	fi
+	export PLATFORM_DESTINATION_IP=$(docker inspect platform-control-plane | yq ".[0].NetworkSettings.Networks.kind.IPAddress")
+	kubectl --context kind-platform create configmap redis-multi-cluster-replication-promise-data --from-literal=host=$PLATFORM_DESTINATION_IP --from-literal=port="31341"
 	kubectl --context kind-platform apply -f redis-multi-cluster-replication-promise.yaml
 }
 

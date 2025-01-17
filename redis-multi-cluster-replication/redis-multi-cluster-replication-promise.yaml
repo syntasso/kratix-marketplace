@@ -35,6 +35,15 @@ spec:
         metadata:
           name: instance
         spec:
+          rbac:
+            permissions:
+            - apiGroups:
+              - ""
+              resources:
+              - configmaps
+              verbs:
+              - get
+              - list
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/redis-multi-cluster-replication-configure-pipeline:v0.1.0
             name: configure-redis

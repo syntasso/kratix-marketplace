@@ -4,6 +4,9 @@ set -xe
 
 export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
 
+platform_ip=$(kubectl get cm redis-multi-cluster-replication-promise-data -o jsonpath='{.data.host}')
+platform_port=$(kubectl get cm redis-multi-cluster-replication-promise-data -o jsonpath='{.data.port}')
+
 mkdir -p /kratix/output/primary/
 mkdir -p /kratix/output/replica-1/
 mkdir -p /kratix/output/replica-2/
@@ -18,7 +21,7 @@ master:
   service:
     type: NodePort
     nodePorts:
-      redis: "31341"
+      redis: "$platform_port"
 EOF
 helm template redis-primary bitnami/redis --version 20.6.2 -f values.yaml > /kratix/output/primary/redis-primary.yaml
 
@@ -31,21 +34,16 @@ replica:
   externalMaster:
     enabled: true
     # In this case we know the address of the primary, this could be fetched dynamically instead
-    host: host.docker.internal
-    port: 31341
+    host: $platform_ip
+    port: $platform_port
   command:
     - redis-server
   args:
     - --replicaof
-    - host.docker.internal
-    - "31341"
+    - $platform_ip
+    - "$platform_port"
     - --replica-announce-ip
     - ${name}-replica-1
-  service:
-    type: NodePort
-    nodePorts:
-      redis: "31342"
-
 auth:
   enabled: false  # Disable authentication for simplicity
 
@@ -61,21 +59,16 @@ replica:
   externalMaster:
     enabled: true
     # In this case we know the address of the primary, this could be fetched dynamically instead
-    host: host.docker.internal
-    port: 31341
+    host: $platform_ip
+    port: $platform_port
   command:
     - redis-server
   args:
     - --replicaof
-    - host.docker.internal
-    - "31341"
+    - $platform_ip
+    - "$platform_port"
     - --replica-announce-ip
     - ${name}-replica-2
-  service:
-    type: NodePort
-    nodePorts:
-      redis: "31343"
-
 auth:
   enabled: false  # Disable authentication for simplicity
 EOF
