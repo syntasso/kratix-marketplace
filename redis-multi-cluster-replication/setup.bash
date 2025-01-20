@@ -59,7 +59,7 @@ spec:
     name: default
 EOF
 
-	pushd ~/workspace/kratix/
+	pushd kratix
 		./scripts/install-gitops --context kind-worker-1 --path europe --git --kustomization-name europe --git --gitops-provider argo
 		./scripts/install-gitops --context kind-worker-2 --path asia --git --kustomization-name asia --git --gitops-provider argo
 		./scripts/install-gitops --context kind-worker-3 --path america --git --kustomization-name america --git --gitops-provider argo
