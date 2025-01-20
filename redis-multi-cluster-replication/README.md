@@ -6,6 +6,8 @@ This Promise demonstrates deploying Redis across three Kubernetes clusters in a 
 
 The primary cluster is responsible for replicating data to the replicas, ensuring consistency across the clusters.
 
+![redis multi cluster promise - How Kratix Processes a Request](https://github.com/user-attachments/assets/e7e17ef7-6077-440d-ac1c-78b9c3c98509)
+
 ## Prerequisites
 
 This Promise assumes the existence of three Kubernetes clusters:
@@ -24,7 +26,7 @@ Ensure the following tools are installed on your system:
 - [`kind`](https://kind.sigs.k8s.io/)
 - [`git`](https://git-scm.com/)
 - [`yq`](https://mikefarah.gitbook.io/yq/)
-- [`kratix`](https://github.com/syntasso/kratix-cli)
+- [`kratix CLI`](https://github.com/syntasso/kratix-cli)
 
 ## Setup Instructions
 
