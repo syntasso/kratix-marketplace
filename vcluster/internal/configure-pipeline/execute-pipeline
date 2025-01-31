@@ -1,12 +1,14 @@
 #!/usr/bin/env sh
 
-set -x
+set -euxo pipefail
 #
 # Read current values from the provided resource request
 export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
 
+helm repo add loft-sh https://charts.loft.sh
+helm repo update
 helm template $name vcluster \
-  --values /tmp/transfer/vcluster.yaml \
+  --version 0.22.3 \
   --repo https://charts.loft.sh \
   --namespace $name \
   --repository-config='' > /kratix/output/vcluster.yaml
