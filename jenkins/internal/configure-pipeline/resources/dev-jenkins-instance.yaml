@@ -60,7 +60,7 @@ spec:
       - name: kubernetes
         version: 3802.vb_b_600831fcb_3
       - name: workflow-job
-        version: 1385.vb_58b_86ea_fff1
+        version: 1498.v33a_0c6f3a_4b_4
       - name: workflow-cps
         version: 4002.v80ca_d0f47d7f
       - name: workflow-multibranch
