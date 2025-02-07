@@ -64,7 +64,7 @@ spec:
       - name: workflow-cps
         version: 4002.v80ca_d0f47d7f
       - name: workflow-multibranch
-        version: 783.va_6eb_ef636fb_d
+        version: 795.ve0cb_1f45ca_9a_
       - name: workflow-aggregator
         version: "2.6"
       - name: git
