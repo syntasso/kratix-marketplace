@@ -32,6 +32,7 @@ metadata:
     type: vcluster
     clusterName: $name
 spec:
+  path: $name
   stateStoreRef:
     kind: BucketStateStore
     name: default
