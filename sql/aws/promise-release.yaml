@@ -1,9 +1,9 @@
 apiVersion: platform.kratix.io/v1alpha1
 kind: PromiseRelease
 metadata:
-  name: postgresql-aws
+  name: aws-rds
 spec:
   version: v1.0.0-beta.1
   sourceRef:
     type: http
-    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/58fa1afe0a7f8f8719d3132c70d84ebf8b08f6c4/sql/aws/promise.yaml
+    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/fea876c59906a678645ede11b869b781ec96038d/sql/aws/promise.yaml
