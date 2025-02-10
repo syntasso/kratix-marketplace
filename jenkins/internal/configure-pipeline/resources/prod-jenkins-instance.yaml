@@ -58,7 +58,7 @@ spec:
       - name: workflow-job
         version: 1505.vea_4b_20a_4a_495
       - name: workflow-cps
-        version: 4011.v91e9951fa_d5b_
+        version: 4018.vf02e01888da_f
       - name: workflow-multibranch
         version: 800.v5f0a_a_660950e
       - name: workflow-aggregator
