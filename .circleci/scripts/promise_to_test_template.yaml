@@ -46,10 +46,9 @@ commands:
 
             curl -sL https://github.com/syntasso/kratix/releases/latest/download/install-all-in-one.yaml | sed "s_syntasso.docker.scarf.sh/syntasso_syntasso_g" | kubectl apply -f -
             sleep 5
-            kubectl apply --filename https://github.com/syntasso/kratix/releases/latest/download/config-all-in-one.yaml
-
             kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 90s
 
+            kubectl apply --filename https://github.com/syntasso/kratix/releases/latest/download/config-all-in-one.yaml
             git clone https://github.com/syntasso/kratix /tmp/kratix
             pushd /tmp/kratix
             ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
