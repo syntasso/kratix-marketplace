@@ -1,0 +1,51 @@
+#!/usr/bin/env sh
+
+set -eux
+
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export image="$(yq eval '.spec.image' /kratix/input/object.yaml)"
+export service_port=$(yq eval '.spec.servicePort // 8080' /kratix/input/object.yaml)
+export replicas="$(yq eval '.spec.replicas // 1' /kratix/input/object.yaml)"
+export lifecycle="$(yq eval '.spec.lifecycle' /kratix/input/object.yaml)"
+export applicationEnv="$(yq -o=json '.spec.applicationEnv // []' /kratix/input/object.yaml)"
+
+export namespace="default"
+
+domain="local.gd"
+domainPort=":31338"
+configMapDomain=$(kubectl get configmap runtime-domain -ojsonpath='{.data.domain}' || true)
+configMapDomainPort=$(kubectl get configmap runtime-domain -ojsonpath='{.data.port}' || true)
+
+if [ -n "${configMapDomain}" ]; then
+    domain="${configMapDomain}"
+    domainPort="${configMapDomainPort}"
+fi
+
+kubectl create deployment ${name} \
+  --image=${image} --namespace=${namespace} \
+  --replicas=${replicas} \
+  --dry-run=client -o yaml > deployment.yaml
+
+yq '.spec.template.spec.containers[0].env = env(applicationEnv)' deployment.yaml > /kratix/output/deployment.yaml
+
+kubectl create service nodeport ${name} \
+    --namespace=${namespace} \
+    --tcp=${service_port}\
+    --dry-run=client \
+    --output yaml > /kratix/output/service.yaml
+
+kubectl create ingress ${name} \
+    --namespace=${namespace} \
+    --class="nginx" \
+    --rule="${name}.${namespace}.${domain}/*=${name}:${service_port}" \
+    --dry-run=client \
+    --output yaml > /kratix/output/ingress.yaml
+
+echo """
+- matchLabels:
+    environment: ${lifecycle}
+""" >> /kratix/metadata/destination-selectors.yaml
+
+export appUrl="http://${name}.${namespace}.${domain}${domainPort}"
+
+echo "url: ${appUrl}" >> /kratix/metadata/status.yaml
