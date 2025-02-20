@@ -3,7 +3,7 @@ kind: Promise
 metadata:
   name: runtime
   labels:
-    kratix.io/promise-version: v0.1.0
+    kratix.io/promise-version: v1.0.0
 spec:
   destinationSelectors:
   - matchLabels:
