@@ -4,7 +4,7 @@ set -e
 
 test_promise() {
   kubectl wait promise/runtime --for=condition=ConfigureWorkflowCompleted --timeout=120s
-  kubectl wait --for=condition=Available --timeout=5s deployment/ingress-nginx-controller --namespace=ingress-nginx
+  kubectl wait --for=condition=Available --timeout=5s deployment/nginx-nginx-ingress-controller
 }
 
 test_resource_request() {
