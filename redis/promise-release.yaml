@@ -6,4 +6,4 @@ spec:
   version: v0.1.0
   sourceRef:
     type: http
-    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/bdf7361a289ddf0b15fbc7029c5ffd2fdc700804/redis/promise.yaml
+    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/promise.yaml
