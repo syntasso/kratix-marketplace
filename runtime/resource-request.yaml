@@ -2,6 +2,7 @@ apiVersion: marketplace.kratix.io/v1alpha1
 kind: Runtime
 metadata:
   name: example-runtime
+  namespace: default
 spec:
   lifecycle: dev
   image: syntasso/website
