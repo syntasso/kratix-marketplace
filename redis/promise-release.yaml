@@ -1,0 +1,9 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: PromiseRelease
+metadata:
+  name: redis
+spec:
+  version: v0.1.0
+  sourceRef:
+    type: http
+    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/bdf7361a289ddf0b15fbc7029c5ffd2fdc700804/redis/promise.yaml

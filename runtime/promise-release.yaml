@@ -1,0 +1,9 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: PromiseRelease
+metadata:
+  name: runtime
+spec:
+  version: v1.0.0
+  sourceRef:
+    type: http
+    url: https://raw.githubusercontent.com/syntasso/kratix-marketplace/refs/heads/main/runtime/promise.yaml
