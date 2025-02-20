@@ -3,7 +3,7 @@ kind: Promise
 metadata:
   name: runtime
   labels:
-    kratix.io/promise-version: v1.0.0
+    kratix.io/promise-version: v0.1.0
 spec:
   destinationSelectors:
   - matchLabels:
@@ -84,9 +84,8 @@ spec:
           name: promise
         spec:
           containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/runtime-configure-pipeline:v0.1.0
-            name: promise-configure
-            command: [ promise-configure ]
+          - image: ghcr.io/syntasso/kratix-marketplace/nginx-ingress-configure-pipeline:v0.1.0
+            name: nginx-configure-pipeline
     resource:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1
