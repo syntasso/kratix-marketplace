@@ -14,7 +14,7 @@ This Promise provides Compound App-as-a-Service promise with two `requiredPromis
 This Promise has two `requiredPromise` that must be installed to fulfil App-As-A-Service resource requests:
 
 - [Nginx-ingress](https://github.com/syntasso/kratix-marketplace/tree/main/nginx-ingress)
-- [Postgres](https://github.com/syntasso/kratix-marketplace/tree/main/postgresql)
+- [Postgres](https://github.com/syntasso/promise-postgresql)
 
 These prerequisite promises can be installed via the `PromiseRelease`s in this repo:
 
