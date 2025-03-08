@@ -4,7 +4,7 @@ This Promise provides access to the [NGINX Ingress Controller (NIC)](https://doc
 in the global deployment configuration. Since this configuration only deploys a
 single instance per cluster, there is no need to request individual resources once
 the Promise is installed. For more details about the difference, see the NGINX
-documents [here](https://docs.nginx.com/nginx-ingress-controller/installation/running-multiple-ingress-controllers/).
+documents [here](https://docs.nginx.com/nginx-ingress-controller/installation/run-multiple-ingress-controllers/).
 
 For testing purposes, this cluster exposes the NGINX Ingress Controller as a
 NodePort service on `31338`. This is not recommended for production use.
