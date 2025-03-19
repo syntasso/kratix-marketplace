@@ -6,4 +6,4 @@ spec:
   version: v1.0.0-beta.1
   sourceRef:
     type: http
-    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/e0f35d82b4c5b254bb571dfe056ed169427c672f/promise.yaml
+    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/a2bfe298dc23104e18ba955fb216a23ef44f203d/promise.yaml
