@@ -7,6 +7,9 @@ metadata:
 spec:
   name: todoer
   image: syntasso/sample-todo-app:v1.0.0
+  env:
+    - name: APP_URL
+      value: "https://backstage.hack.ax.accessacloud.com"
   dbDriver: postgresql
   service:
     port: 8080

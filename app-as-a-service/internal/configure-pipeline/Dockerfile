@@ -4,6 +4,7 @@ RUN [ "mkdir", "/scripts" ]
 ENV PATH="${PATH}:/scripts/"
 COPY resource-configure /scripts/resource-configure
 COPY database-configure /scripts/database-configure
+COPY environment-vars-configure /scripts/environment-vars-configure
 
 CMD [ "sh", "-c", "./resource-configure" ]
 ENTRYPOINT []
