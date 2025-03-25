@@ -1,20 +1,25 @@
 #!/usr/bin/env ruby
 
 require 'yaml'
- 
+
+puts "Checking for enviroment variables..."
+
 # Load the existing deployment from the previous pipeline step
 existingDeployment = YAML.load_file('/kratix/output/deployment.yaml')
 
 # Get the user's input
 resource_request = YAML.load_file('/kratix/input/object.yaml')
 env = resource_request['spec']['env']
+
+if env.nil? then
+    puts "No Environment variables specified, skipping"
+    exit 0
+end
+
 name = resource_request.dig('metadata', 'name')
 namespace = resource_request.dig('metadata', 'namespace')
 
-if env.nil?
-  puts "No environment variables specified, skipping"
-  exit 0
-end
+
 
 # Create a new ConfigMap
 config_map = {
@@ -27,11 +32,13 @@ config_map = {
   'data' => {}
 }
 
+puts "Adding env vars to the config map"
 # Add the environment variables to the ConfigMap
 env.each do |item|
-  config_map['data'][item['name']] = item['value']
+  config_map['data'][item[0]] = item[1]
 end
 
+puts "Mounting config map to existing deployment"
 # Add the ConfigMap to the existing deployment
 existingDeployment['spec']['template']['spec']['containers'].each do |container|
   container['envFrom'] = [
@@ -43,6 +50,7 @@ existingDeployment['spec']['template']['spec']['containers'].each do |container|
   ]
 end
 
+
+
 File.write('/kratix/output/configmap.yaml', config_map.to_yaml)
 File.write('/kratix/output/deployment.yaml', existingDeployment.to_yaml)
-

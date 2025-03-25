@@ -37,3 +37,4 @@ kubectl create ingress ${name} \
 cat <<EOF > /kratix/metadata/status.yaml
 endpoint: "http://${name}.local.gd:31338"
 EOF
+

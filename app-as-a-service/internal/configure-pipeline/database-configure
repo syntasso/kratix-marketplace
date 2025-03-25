@@ -80,6 +80,7 @@ env = [{
 existingDeployment = YAML.load_file('/kratix/output/deployment.yaml')
 existingDeployment['spec']['template']['spec']['containers'][0]['env'] = env
 
+
 puts "Writing files to outputs"
 File.write('/kratix/output/deployment.yaml', existingDeployment.to_yaml)
 File.write('/kratix/output/platform/postgresql.yaml', postgresqlRequest.to_yaml)
