@@ -8,8 +8,8 @@ spec:
   name: todoer
   image: syntasso/sample-todo-app:v1.0.0
   env:
-    - name: Enterprise
-      value: "true"
+    ENTERPRISE: "true"
+    Version: "1.0.0"
   dbDriver: postgresql
   service:
     port: 8080
