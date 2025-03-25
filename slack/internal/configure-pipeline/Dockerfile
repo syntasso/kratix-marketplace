@@ -6,7 +6,9 @@ LABEL org.opencontainers.image.source=https://github.com/syntasso/kratix-marketp
 RUN [ "mkdir", "/tmp/transfer" ]
 RUN apk update && apk add --no-cache yq curl git
 
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.25.1/bin/linux/amd64/kubectl
+# NOTE requires buildx
+ARG TARGETARCH
+RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.25.1/bin/linux/${TARGETARCH}/kubectl
 RUN chmod u+x kubectl && mv kubectl /bin/kubectl
 
 ADD resources/* /tmp/transfer/
