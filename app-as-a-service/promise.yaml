@@ -4,6 +4,8 @@ metadata:
   creationTimestamp: null
   name: app
   namespace: default
+  labels:
+    kratix.io/promise-version: v1.0.0-beta.1
 spec:
   destinationSelectors:
     - matchLabels:
