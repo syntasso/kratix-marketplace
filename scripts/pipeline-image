@@ -17,7 +17,7 @@ for dir_name in $dirs; do
   fi
   version=v0.1.0
   if [ -f ${PWD}/${pipeline_dir}/VERSION ]; then
-    VERSION=$(cat ${PWD}/${pipeline_dir}/VERSION)
+    version=$(cat ${PWD}/${pipeline_dir}/VERSION)
   fi
   pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:${version}"
 
