@@ -39,3 +39,4 @@ message: "deployed to http://${name}.local.gd:31338"
 endpoint: "http://${name}.local.gd:31338"
 replicas: 1
 EOF
+

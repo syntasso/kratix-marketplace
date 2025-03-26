@@ -84,12 +84,14 @@ env = [{
 existingDeployment = YAML.load_file('/kratix/output/deployment.yaml')
 existingDeployment['spec']['template']['spec']['containers'][0]['env'] = env
 
+
 status = {
   'database' => {
     'teamId' => "#{teamId}",
     'dbName' => "#{dbName}"
   }
 }
+
 
 puts "Writing files to outputs"
 File.write('/kratix/output/deployment.yaml', existingDeployment.to_yaml)

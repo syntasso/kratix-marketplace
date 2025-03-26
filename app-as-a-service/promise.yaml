@@ -40,6 +40,11 @@ spec:
                       description: container image for application that will be deployed
                       example: gcr.io/syntasso/great-app
                       type: string
+                    env:
+                      description: the environment variables to add to the container
+                      type: object
+                      additionalProperties:
+                        type: string
                     name:
                       type: string
                       description: Name for application. Lowercase letters, numbers, and hyphens; must start and end with a letter or number.
@@ -74,9 +79,12 @@ spec:
           spec:
             containers:
               - name: create-resources
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 command: [resource-configure]
               - name: database-configure
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 command: [database-configure]
+              - name: environment-vars-configure
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
+                command: [environment-vars-configure]
 status: {}

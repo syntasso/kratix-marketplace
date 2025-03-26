@@ -15,8 +15,7 @@ for dir_name in $dirs; do
   if [ -n "${PIPELINE_DIR:-""}" ]; then
     pipeline_dir="${PIPELINE_DIR}"
   fi
-  pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:v0.1.0"
-
+  pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:v0.2.0"
   if [ -d "${PWD}/${pipeline_dir}" ]; then
     set -- "${args[@]}"
     while [ $# -gt 0 ]; do
