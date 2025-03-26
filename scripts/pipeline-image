@@ -15,7 +15,11 @@ for dir_name in $dirs; do
   if [ -n "${PIPELINE_DIR:-""}" ]; then
     pipeline_dir="${PIPELINE_DIR}"
   fi
-  pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:v0.1.0"
+  version=v0.1.0
+  if [ -f ${PWD}/${pipeline_dir}/VERSION ]; then
+    VERSION=$(cat ${PWD}/${pipeline_dir}/VERSION)
+  fi
+  pipeline_image="ghcr.io/syntasso/kratix-marketplace/${promise_name}-${dir_name}:${version}"
 
   if [ -d "${PWD}/${pipeline_dir}" ]; then
     set -- "${args[@]}"
