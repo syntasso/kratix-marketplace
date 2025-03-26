@@ -35,5 +35,7 @@ kubectl create ingress ${name} \
 
 # Store ingress endpoint in the status for users
 cat <<EOF > /kratix/metadata/status.yaml
+message: "deployed to http://${name}.local.gd:31338"
 endpoint: "http://${name}.local.gd:31338"
+replicas: 1
 EOF
