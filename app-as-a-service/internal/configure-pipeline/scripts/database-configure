@@ -94,5 +94,5 @@ status = {
 puts "Writing files to outputs"
 File.write('/kratix/output/deployment.yaml', existingDeployment.to_yaml)
 File.write('/kratix/output/platform/postgresql.yaml', postgresqlRequest.to_yaml)
-File.write('/kratix/metadata/destination-selectors.yaml', destinationSelectorsRequest.to_yaml)
-File.write('/kratix/metadata/status.yaml', status.to_yaml)
+File.write('/kratix/metadata/destination-selectors.yaml', destinationSelectorsRequest.to_yaml, mode: 'a+')
+File.write('/kratix/metadata/status.yaml', status.to_yaml, mode: 'a+')
