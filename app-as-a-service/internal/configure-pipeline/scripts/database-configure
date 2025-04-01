@@ -13,7 +13,7 @@ if dbDriver.nil? || dbDriver == 'none' then
   status = {
     'database' => 'null'
   }
-  File.write('/kratix/metadata/status.yaml', status.to_yaml)
+  File.write('/kratix/metadata/status.yaml', status.to_yaml, mode: 'a+')
   exit 0
 end
 
