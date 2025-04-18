@@ -1,0 +1,7 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: dummy
+metadata:
+  name: my-dummy
+  namespace:  kratix-platform-system #default
+spec:
+  name: dabou

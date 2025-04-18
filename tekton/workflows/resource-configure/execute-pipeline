@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+
+set -ex
+
+# Read current values from the provided resource request
+export name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+export dashboardEnabled="$(yq eval '.spec.dashboard.enabled // "false"' /kratix/input/object.yaml)"
+export dashboardMode="$(yq eval '.spec.dashboard.mode // "read-only"' /kratix/input/object.yaml)"
+export tektonVersion="$(yq eval '.spec.version // "latest"' /kratix/input/object.yaml)"
+
+if [[ "${dashboardEnabled}" = "true" ]]; then
+   ingressHost=$(yq eval '.spec.dashboard.ingress.url // "tekton-ui.cnoe.localtest.me"' /kratix/input/object.yaml)
+
+   cat <<EOF > /kratix/output/dashboard-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tekton-ui
+  namespace: tekton-pipelines
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: $ingressHost
+      http:
+        paths:
+          - backend:
+              service:
+                name: tekton-dashboard
+                port:
+                  number: 9097
+            path: /
+            pathType: Prefix
+EOF
+   if [[ "${dashboardMode}" = "read-only" ]]; then
+     cp /tmp/transfer/dashboard.yaml /kratix/output
+   else
+     cp /tmp/transfer/dashboard-full.yaml /kratix/output
+   fi
+fi
+
+cp /tmp/transfer/tekton-$tektonVersion.yaml /kratix/output

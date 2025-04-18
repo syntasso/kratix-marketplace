@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -e
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+mkdir -p ${PWD}/dependencies
+
+TEKTON_VERSION=${1:-latest}
+
+if [ "$TEKTON_VERSION" = "latest" ]; then
+  TEKTON_URL=$(curl -s https://api.github.com/repos/tektoncd/pipeline/releases/latest | grep browser_download_url | grep release.yaml | cut -d '"' -f 4)
+else
+  TEKTON_URL="https:/storage.googleapis.com/tekton-releases/pipeline/previous/${TEKTON_VERSION}/release.yaml"
+fi
+
+DASHBOARD_VERSION=${2:-latest}
+DASHBOARD_URL="https:/storage.googleapis.com/tekton-releases/dashboard/${DASHBOARD_VERSION}/release.yaml"
+DASHBOARD_FULL_URL="https:/storage.googleapis.com/tekton-releases/dashboard/${DASHBOARD_VERSION}/release-full.yaml"
+
+curl -sL -o ${PWD}/dependencies/tekton-$TEKTON_VERSION.yaml $TEKTON_URL
+curl -sL -o ${PWD}/dependencies/dashboard.yaml $DASHBOARD_URL
+curl -sL -o ${PWD}/dependencies/dashboard-full.yaml $DASHBOARD_FULL_URL
+
+cp -r ${PWD}/dependencies/*.yaml ${PWD}/workflows/resource-configure/resources
