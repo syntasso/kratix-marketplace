@@ -38,4 +38,5 @@ EOF
    fi
 fi
 
+echo "Copy the tekton file: tekton-$tektonVersion.yaml to /kratix/output"
 cp /tmp/transfer/tekton-$tektonVersion.yaml /kratix/output
