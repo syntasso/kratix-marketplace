@@ -3,17 +3,17 @@ kind: Promise
 metadata:
   name: nginx-ingress
   labels:
-    kratix.io/promise-version: v1.0.0-beta.1
+    kratix.io/promise-version: v1.0.0-beta.2
 spec:
   workflows:
     promise:
       configure:
-      - apiVersion: platform.kratix.io/v1alpha1
-        kind: Pipeline
-        metadata:
-          name: nginx-configure
-          namespace: default
-        spec:
-          containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/nginx-ingress-configure-pipeline:v0.1.0
-            name: nginx-configure-pipeline
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: nginx-configure
+            namespace: default
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/nginx-ingress-configure-pipeline:v0.2.0
+                name: nginx-configure-pipeline
