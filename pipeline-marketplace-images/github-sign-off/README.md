@@ -43,7 +43,6 @@ workflows:
         kind: Pipeline
         metadata:
           name: approval-gate
-          namespace: default
         spec:
           containers:
             - image: ghcr.io/syntasso/kratix-marketplace/pipeline-github-sign-off-image:v0.1.0
@@ -74,7 +73,6 @@ workflows:
         kind: Pipeline
         metadata:
           name: instance-configure
-          namespace: default
         spec:
           containers:
             - image: ghcr.io/syntasso/kratix-marketplace/pipeline-github-sign-off-image:v0.1.0

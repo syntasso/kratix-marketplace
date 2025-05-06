@@ -34,7 +34,6 @@ spec:
           kind: Pipeline
           metadata:
             name: resource-configure
-            namespace: default
           spec:
             containers:
               - name: <# TODO promise name>-configure-pipeline

@@ -3,7 +3,6 @@ kind: Promise
 metadata:
   creationTimestamp: null
   name: kubevela
-  namespace: default
 spec:
   workflows:
     promise:
@@ -12,7 +11,6 @@ spec:
           kind: Pipeline
           metadata:
             name: promise-configure
-            namespace: default
           spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/kubevela-configure-pipeline:v0.1.0

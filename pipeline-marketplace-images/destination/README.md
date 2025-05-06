@@ -8,7 +8,6 @@ workflows:
         kind: Pipeline
         metadata:
           name: instance-configure
-          namespace: default
         spec:
           containers:
             - image: ...
