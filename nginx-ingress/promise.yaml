@@ -12,7 +12,6 @@ spec:
           kind: Pipeline
           metadata:
             name: nginx-configure
-            namespace: default
           spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/nginx-ingress-configure-pipeline:v0.2.0

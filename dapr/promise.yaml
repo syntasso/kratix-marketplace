@@ -10,7 +10,6 @@ spec:
         kind: Pipeline
         metadata:
           name: promise-configure
-          namespace: default
         spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/dapr-configure-pipeline:v0.1.0

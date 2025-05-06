@@ -3,7 +3,6 @@ kind: Promise
 metadata:
   creationTimestamp: null
   name: redis
-  namespace: default
   labels:
     kratix.io/promise-version: v0.1.0
 spec:
@@ -46,7 +45,6 @@ spec:
           kind: Pipeline
           metadata:
             name: instance-configure
-            namespace: default
           spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/redis-configure-pipeline:v0.1.0
@@ -57,7 +55,6 @@ spec:
           kind: Pipeline
           metadata:
             name: promise-configure
-            namespace: default
           spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/redis-configure-pipeline:v0.1.0

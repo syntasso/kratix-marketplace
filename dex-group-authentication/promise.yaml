@@ -204,7 +204,6 @@ spec:
         kind: Pipeline
         metadata:
           name: instance-config
-          namespace: default
         spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/dex-group-authentication-configure-pipeline:v0.1.0

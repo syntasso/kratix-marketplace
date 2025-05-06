@@ -40,7 +40,6 @@ spec:
         kind: Pipeline
         metadata:
           name: promise-configure
-          namespace: default
         spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/knative-configure-pipeline:v0.1.0
@@ -51,7 +50,6 @@ spec:
         kind: Pipeline
         metadata:
           name: instance-configure
-          namespace: default
         spec:
           containers:
           - image: ghcr.io/syntasso/kratix-marketplace/knative-configure-pipeline:v0.1.0
