@@ -41,8 +41,9 @@ image in your pipeline, you must ensure that:
   certificate. See [Bring your own
   certificate](https://github.com/bitnami-labs/sealed-secrets/blob/main/docs/bring-your-own-certificates.md)
   for details.
-- On the Platform Cluster, there's a `sealed-secrets` ConfigMap on the `default`
-  namespace with a key `certificate` containing the public part of the certificate.
+- On the Platform Cluster, there's a ConfigMap (named `sealed-secrets` on the
+  `default` namespace by default) with a `certificate` key containing the
+  public part of the certificate.
 
 The commands below are similar to what you'll need to run:
 
@@ -59,6 +60,19 @@ kubectl --namespace default create configmap sealed-secrets \
 Add the image to the workflow definition in your Promise. The image will
 fetch the certificate from the ConfigMap and replace any Secret with the SealedSecret
 equivalent.
+
+### Override the kubeseal configmap name
+
+To use a different configmap name, amend the container as follow:
+```
+- image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
+  name: sealed-secrets
+  env:
+  - name: KUBESEAL_CONFIGMAP
+    value: sealed-secrets-dev
+  - name: KUBESEAL_NAMESPACE
+    value: kratix
+```
 
 ## Limitations
 
