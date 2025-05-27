@@ -11,5 +11,8 @@ ARG TARGETARCH
 RUN curl -Lo kubeseal.tar.gz https://github.com/bitnami-labs/sealed-secrets/releases/download/v${KUBESEAL_VERSION}/kubeseal-${KUBESEAL_VERSION}-linux-${TARGETARCH}.tar.gz
 RUN tar -xvzf kubeseal.tar.gz kubeseal && chmod u+x kubeseal && mv kubeseal /bin/kubeseal
 
+ENV KUBESEAL_CONFIGMAP=sealed-secrets
+ENV KUBESEAL_NAMESPACE=default
+
 CMD [ "sh", "-c", "./execute-pipeline" ]
 ENTRYPOINT []
