@@ -23,7 +23,7 @@ workflows:
           containers:
             - image: ...
               name: ...
-            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
+            - image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.2.0
               name: sealed-secrets
 ```
 
@@ -65,7 +65,7 @@ equivalent.
 
 To use a different configmap name, amend the container as follow:
 ```
-- image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.1.0
+- image: ghcr.io/syntasso/kratix-marketplace/pipeline-sealedsecrets-image:v0.2.0
   name: sealed-secrets
   env:
   - name: KUBESEAL_CONFIGMAP
