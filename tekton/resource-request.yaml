@@ -1,0 +1,12 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: tekton
+metadata:
+  name: tekton
+  namespace: default
+spec:
+  version: v0.68.1 # latest
+  dashboard:
+    mode: read-only
+    enabled: true
+    ingress:
+      url: tekton-ui.cnoe.localtest.me
