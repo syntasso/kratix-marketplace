@@ -53,7 +53,6 @@ spec:
       conditions: null
       storedVersions: null
   workflows:
-    promise: {}
     resource:
       configure:
       - apiVersion: platform.kratix.io/v1alpha1
@@ -62,6 +61,6 @@ spec:
           name: tekton-package
         spec:
           containers:
-          - image: tekton-configure:0.1.0
+          - image: ghcr.io/syntasso/kratix-marketplace/tekton-configure-pipeline:v0.1.0
             name: create-instance
 status: {}

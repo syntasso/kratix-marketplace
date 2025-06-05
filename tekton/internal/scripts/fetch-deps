@@ -20,4 +20,4 @@ curl -sL -o ${PWD}/dependencies/tekton-$TEKTON_VERSION.yaml $TEKTON_URL
 curl -sL -o ${PWD}/dependencies/dashboard.yaml $DASHBOARD_URL
 curl -sL -o ${PWD}/dependencies/dashboard-full.yaml $DASHBOARD_FULL_URL
 
-cp -r ${PWD}/dependencies/*.yaml ${PWD}/workflows/resource-configure/resources
+cp -r ${PWD}/dependencies/*.yaml ${PWD}/configure-pipeline/resources
