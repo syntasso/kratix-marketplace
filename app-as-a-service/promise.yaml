@@ -60,7 +60,7 @@ spec:
           storage: true
   requiredPromises:
     - name: postgresql
-      version: v1.0.0-beta.2
+      version: v1.0.0-beta.3
     - name: nginx-ingress
       version: v1.0.0-beta.1
   workflows:
