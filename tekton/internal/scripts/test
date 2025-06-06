@@ -6,6 +6,8 @@ test_promise() {
 }
 
 test_resource_request() {
+  kubectl get pods -A
+  kubectl logs -l kratix.io/resource-name=tekton -c create-instance
   kubectl wait tekton.marketplace.kratix.io tekton --for=condition=ConfigureWorkflowCompleted --timeout=30s
 }
 
