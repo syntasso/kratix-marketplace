@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl get crd tekton.marketplace.kratix.io
+}
+
+test_resource_request() {
+  kubectl wait tekton.marketplace.kratix.io tekton --for=condition=ConfigureWorkflowCompleted --timeout=30s
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
