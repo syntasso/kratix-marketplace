@@ -2,36 +2,49 @@
 
 set -euo pipefail
 
-issueURL=$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)
-if [ "$issueURL" == "null" ]; then
-  echo "No approval issue was created for this request, skipping approval check."
-  exit 0
-fi
+function wait_for_approval() {
+  issue=${1:-$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)}
+  if [ "$issue" == "null" ]; then
+    echo "No approval issue was created for this request, skipping approval check."
+    exit 0
+  fi
 
-echo "Waiting for approval on issue ${issueURL}."
-GITHUB_REPOSITORY=$(echo $issueURL | cut -d"/" -f4-5)
-current_state=$(gh issue view ${issueURL} --json state --jq .state)
-while [ "$current_state" != "CLOSED" ]; do
-  echo -n "."
+  echo "Waiting for approval on issue ${issue}."
+  GITHUB_REPOSITORY=$(echo $issue | cut -d"/" -f4-5)
+  current_state=$(gh issue view ${issue} --json state --jq .state)
+  while [ "$current_state" != "CLOSED" ]; do
+    echo -n "."
+    sleep 5
+    current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issue} --json state --jq .state)
+  done
+
+  echo "Issue ${issue} is closed. Checking if it was approved"
   sleep 5
-  current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issueURL} --json state --jq .state)
-done
 
-echo "Issue ${issueURL} is closed. Checking if it was approved"
-sleep 5
+  issueNumber=$(basename ${issue})
+  result=$(gh --repo $GITHUB_REPOSITORY issue list \
+    --state closed \
+    --search reason:completed \
+    --json number --jq ".[] | select(.number == $issueNumber)")
 
-issueNumber=$(basename ${issueURL})
-result=$(gh --repo $GITHUB_REPOSITORY issue list \
-  --state closed \
-  --search reason:completed \
-  --json number --jq ".[] | select(.number == $issueNumber)")
+  if [ -z "$result" ]; then
+    echo "Issue closed as not planned. Rejecting request..."
+    echo "rejected" > /kratix/metadata/approval-state
+  else
+    echo "Issue closed as completed. Approving request..."
+    echo "approved" > /kratix/metadata/approval-state
+  fi
+}
 
-if [ -z "$result" ]; then
-  echo "Issue closed as not planned. Rejecting request..."
-  echo "rejected" > /kratix/metadata/approval-state
-else
-  echo "Issue closed as completed. Approving request..."
-  echo "approved" > /kratix/metadata/approval-state
+function update_status(){
+  echo "message: Request $(cat /kratix/metadata/approval-state)" >> /kratix/metadata/status.yaml
+}
+
+function main(){
+  wait_for_approval
+  update_status
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
 fi
-
-echo "message: Request $(cat /kratix/metadata/approval-state)" >> /kratix/metadata/status.yaml

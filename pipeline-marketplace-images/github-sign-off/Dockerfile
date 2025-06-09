@@ -7,5 +7,9 @@ WORKDIR /gh
 ENV PATH="/gh:${PATH}"
 ADD create-issue create-issue
 ADD wait-approval wait-approval
+ADD create-and-wait-for-approval create-and-wait-for-approval
+
+RUN chmod +x /gh/*
+
 
 ENTRYPOINT []
