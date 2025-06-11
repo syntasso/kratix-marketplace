@@ -2,29 +2,59 @@
 
 set -euo pipefail
 
-if [ -f /kratix/metadata/auto-approve ]; then
-  echo "Auto-approve enabled. Skipping issue creation..."
-  exit 0
+export SKIP_EXIT_CODE=2
+export ISSUE_ALREADY_EXISTS_EXIT_CODE=1
+
+function create_issue() {
+  if [ -f /kratix/metadata/skip-approval ]; then
+    echo "Skipping approval process as per configuration..."
+    return $SKIP_EXIT_CODE
+  fi
+
+  if [ -f /kratix/metadata/auto-approve ]; then
+    echo "Auto-approve enabled. Skipping issue creation..."
+    return $SKIP_EXIT_CODE
+  fi
+
+  currentRequest=$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)
+  if [ "$currentRequest" != "null" ]; then
+    echo "Approval issue already exists (or auto-approved). Skipping issue creation..."
+    return $ISSUE_ALREADY_EXISTS_EXIT_CODE
+  fi
+
+  {
+    echo ""
+    echo "Close the issue to accept; Close it as not-planned to reject"
+    echo ""
+    echo '```yaml'
+    yq 'del(.status)' /kratix/input/object.yaml
+    echo '```'
+  } > issue-body
+
+  issue=$(gh issue create \
+    --repo "$GITHUB_REPOSITORY" \
+    --title "New $(yq -r '.kind' /kratix/input/object.yaml) request waiting approval" \
+    --body-file issue-body)
+
+  echo "$issue"
+  return 0
+}
+
+function update_status() {
+  issue="$1"
+  echo "approvalIssue: $(echo $issue)" > /kratix/metadata/status.yaml
+  echo "message: Waiting approval. Check $(echo $issue) for details" >> /kratix/metadata/status.yaml
+}
+
+function main() {
+  issue=$(create_issue)
+  if [ $? -eq 0 ]; then
+    update_status "$issue"
+  else
+    echo "No issue created. Skipping status update."
+  fi
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  main "$@"
 fi
-
-currentRequest=$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)
-if [ "$currentRequest" != "null" ]; then
-  echo "Approval issue already exists (or auto-approved). Skipping issue creation..."
-  exit 0
-fi
-
-echo "New $(yq -r '.kind' /kratix/input/object.yaml) requested"
-echo "" >> issue-body
-echo "Close the issue to accept; Close it as not-planned to reject" >> issue-body
-echo "" >> issue-bod
-echo '```yaml' >> issue-body
-cat /kratix/input/object.yaml | yq 'del(.status)' >> issue-body
-echo '```' >> issue-body
-
-issue=$(gh issue create \
-  --repo $GITHUB_REPOSITORY \
-  --title "New $(yq -r '.kind' /kratix/input/object.yaml) request waiting approval" \
-  --body-file issue-body)
-
-echo "approvalIssue: $(echo $issue)" > /kratix/metadata/status.yaml
-echo "message: Waiting approval. Check $(echo $issue) for details" >> /kratix/metadata/status.yaml
