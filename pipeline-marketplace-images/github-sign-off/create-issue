@@ -2,21 +2,24 @@
 
 set -euo pipefail
 
+export SKIP_EXIT_CODE=2
+export ISSUE_ALREADY_EXISTS_EXIT_CODE=1
+
 function create_issue() {
   if [ -f /kratix/metadata/skip-approval ]; then
     echo "Skipping approval process as per configuration..."
-    return 2
+    return $SKIP_EXIT_CODE
   fi
 
   if [ -f /kratix/metadata/auto-approve ]; then
     echo "Auto-approve enabled. Skipping issue creation..."
-    return 2
+    return $SKIP_EXIT_CODE
   fi
 
   currentRequest=$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)
   if [ "$currentRequest" != "null" ]; then
     echo "Approval issue already exists (or auto-approved). Skipping issue creation..."
-    return 1
+    return $ISSUE_ALREADY_EXISTS_EXIT_CODE
   fi
 
   {

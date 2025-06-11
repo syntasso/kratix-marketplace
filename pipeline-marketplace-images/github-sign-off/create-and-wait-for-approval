@@ -5,29 +5,30 @@ set -euxo pipefail
 source create-issue
 source wait-approval
 
-# Run create_issue and safely capture its output and exit code
 set +e
 issue=$(create_issue)
 exit_code=$?
 set -e
 
-# 2 = skip-approval or auto-approve => exit cleanly
-if [ "$exit_code" -eq 2 ]; then
+if [ "$exit_code" -eq "$SKIP_EXIT_CODE" ]; then
   echo "Skipping approval process as per configuration or auto-approve enabled."
   exit 0
 fi
 
-# 1 = issue already exists or was auto-approved previously
-# In that case, re-fetch it from the object
-if [ "$exit_code" -eq 1 ]; then
+if [ "$exit_code" -eq "$ISSUE_ALREADY_EXISTS_EXIT_CODE" ]; then
   issue=$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)
 fi
 
-# Validate the issue string before continuing
-if [ -z "$issue" ] || [ "$issue" == "null" ]; then
-  echo "❌ ERROR: No approval issue found or created. Cannot continue."
-  exit 1
+if [ "$exit_code" -eq 0 ]; then
+  if [ -z "$issue" ] || [ "$issue" == "null" ]; then
+    echo "❌ ERROR: No approval issue found or created. Cannot continue."
+    exit 1
+  fi
+
+  wait_for_approval "$issue"
+  exit 0
 fi
 
-# Proceed to wait for approval
-wait_for_approval "$issue"
+echo "❌ ERROR: Failed to create or retrieve approval issue. Exit code: $exit_code"
+exit 1
+
