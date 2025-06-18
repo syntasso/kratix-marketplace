@@ -3,7 +3,7 @@ kind: PromiseRelease
 metadata:
   name: postgresql
 spec:
-  version: v1.0.0-beta.2
+  version: v1.0.0-beta.3
   sourceRef:
     type: http
-    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/a2bfe298dc23104e18ba955fb216a23ef44f203d/promise.yaml
+    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/85a1533ae04a438f0f5994e5f581249cbfd8987f/promise.yaml
