@@ -35,7 +35,7 @@ dbName = "#{name}db"
 Dir.mkdir('/kratix/output/platform') unless File.exist?('/kratix/output/platform')
 
 postgresqlRequest = {
-  'apiVersion' => "marketplace.kratix.io/v1alpha1",
+  'apiVersion' => "marketplace.kratix.io/v1alpha2",
   'kind' => 'postgresql',
   'metadata' => {
     'name' => "#{dbName}",
