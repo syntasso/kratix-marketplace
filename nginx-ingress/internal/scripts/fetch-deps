@@ -22,4 +22,8 @@ for url in "${urls[@]}"; do
     curl -sL -o ${PWD}/configure-pipeline/dependencies/$(basename $url) $url
 done
 
-helm template nginx nginx-stable/nginx-ingress --version 2.1.0 --namespace default --skip-crds > ${PWD}/configure-pipeline/dependencies/helm-template.yaml
+helm template nginx nginx-stable/nginx-ingress \
+  --version 2.1.0 \
+  --set controller.service.type=NodePort,controller.service.httpPort.nodePort=31338 \
+  --namespace default \
+  --skip-crds > ${PWD}/configure-pipeline/dependencies/helm-template.yaml

@@ -269,13 +269,13 @@ metadata:
     app.kubernetes.io/managed-by: Helm
 spec:
   externalTrafficPolicy: Local
-  type: LoadBalancer
+  type: NodePort
   ports:
   - port: 80
     targetPort: 80
     protocol: TCP
     name: http
-    nodePort: 
+    nodePort: 31338
   - port: 443
     targetPort: 443
     protocol: TCP
@@ -384,7 +384,6 @@ spec:
           - -nginx-status-port=8080
           - -nginx-status-allow-cidrs=127.0.0.1
           - -report-ingress-status
-          - -external-service=nginx-nginx-ingress-controller
           - -enable-leader-election=true
           - -leader-election-lock-name=nginx-nginx-ingress-leader-election
           - -enable-prometheus-metrics=true
