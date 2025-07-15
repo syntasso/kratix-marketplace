@@ -1,8 +1,12 @@
 # AWS DB Promise
 
-## Pre-requisites
+This Promise provides RDS-as-a-Service. The following parameters are available:
 
-### Credentials
+* `spec.dbName`: The name of the database to create.
+* `spec.engine`: The database engine to use. Supported values are `mysql`, `postgres`, and `mariadb`.
+* `spec.size`: The size of this deployment. Supported values are `micro`, `small`, `medium`, and `large`.
+
+## Pre-requisites
 
 To use this promise, you must have a Access Key and Secret Access Key for your
 AWS account. The IAM user associated with these keys must have the permission to
@@ -17,13 +21,7 @@ kubectl create secret generic aws-rds \
     --from-literal=secretAccessKey=<your secret access key>
 ```
 
-## Usage
-
-This Promise provides RDS-as-a-Service. The following parameters are available:
-
-* `spec.dbName`: The name of the database to create.
-* `spec.engine`: The database engine to use. Supported values are `mysql`, `postgres`, and `mariadb`.
-* `spec.size`: The size of this deployment. Supported values are `micro`, `small`, `medium`, and `large`.
+## Install Promise
 
 To install:
 ```
