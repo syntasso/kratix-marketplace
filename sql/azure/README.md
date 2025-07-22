@@ -5,7 +5,7 @@ which can be `small` or `large`.
 
 ## Prerequisites
 
-Requires a secret for connecting to azure:
+Requires a secret for connecting to azure with permissions to create SQL databases:
 
 ```
 kubectl create secret generic azure-credentials --from-file=key=key.pem \
