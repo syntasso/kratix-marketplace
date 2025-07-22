@@ -5,33 +5,36 @@ which can be `small` or `large`.
 
 ## Prerequisites
 
-To use this Promise, you will need to create one more secret which is the GCP Service Account permissions needed to create Cloud SQL databases. You can follow Google documentation, or review the following commands via the gcloud CLI:
+To use this Promise, you will need:
+* SQL Admin API enabled in your project (you can check [here](https://console.developers.google.com/apis/api/sqladmin.googleapis.com/overview), just navigate to the correct project)
+* A GCP Service Account authorized to create Cloud SQL databases
+    You can follow Google documentation, or review the following commands via the gcloud CLI:
 
-```bash
-export DIR_GCLOUD_CONFIG="${HOME}/.config/gcloud"
-export GCP_SERVICE_ACCOUNT_NAME="kratix-sql-$(whoami)-14635" # TOOD ${RANDOM}
-export PROJECT_ID=$(sed -n -e 's/^project = //p' ${DIR_GCLOUD_CONFIG}/configurations/config_$(cat ${DIR_GCLOUD_CONFIG}/active_config))
+    ```bash
+    export DIR_GCLOUD_CONFIG="${HOME}/.config/gcloud"
+    export GCP_SERVICE_ACCOUNT_NAME="kratix-sql-$(whoami)-${RANDOM}"
+    export PROJECT_ID=$(sed -n -e 's/^project = //p' ${DIR_GCLOUD_CONFIG}/configurations/config_$(cat ${DIR_GCLOUD_CONFIG}/active_config))
 
-gcloud iam service-accounts create ${GCP_SERVICE_ACCOUNT_NAME} --display-name="Kratix Cloud SQL Manager"
-gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${GCP_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role="roles/cloudsql.admin"
-gcloud iam service-accounts keys create ${DIR_GCLOUD_CONFIG}/kratix-sql-manager-key.json --iam-account "${GCP_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
-```
+    gcloud iam service-accounts create ${GCP_SERVICE_ACCOUNT_NAME} --display-name="Kratix Cloud SQL Manager"
+    gcloud projects add-iam-policy-binding ${PROJECT_ID} --member="serviceAccount:${GCP_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com" --role="roles/cloudsql.admin"
+    gcloud iam service-accounts keys create ${DIR_GCLOUD_CONFIG}/kratix-sql-manager-key.json --iam-account "${GCP_SERVICE_ACCOUNT_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+    ```
+* A secret with a key for that service account in your cluster
+    To generate this, you can store the secret key in `${DIR_GCLOUD_CONFIG}/kratix-sql-manager-key.json` and use the following command to generate the Kubernetes secret:
 
-Once you have the key json stored in `${DIR_GCLOUD_CONFIG}/kratix-sql-manager-key.json` you can use the following command to generate the Kubernetes secret:
-
-```bash
-export DIR_GCLOUD_CONFIG="${HOME}/.config/gcloud"
-export PROJECT_ID=$(sed -n -e 's/^project = //p' ${DIR_GCLOUD_CONFIG}/configurations/config_$(cat ${DIR_GCLOUD_CONFIG}/active_config))
-cat << EOF | kubectl apply -f -
-apiVersion: v1
-data:
-  credentialsjson: $(cat ${DIR_GCLOUD_CONFIG}/kratix-sql-manager-key.json | base64 -w0)
-  project_id: $(echo ${PROJECT_ID} | base64 -w0)
-kind: Secret
-metadata:
-  name: gcp-credentials
-EOF
-```
+    ```bash
+    export DIR_GCLOUD_CONFIG="${HOME}/.config/gcloud"
+    export PROJECT_ID=$(sed -n -e 's/^project = //p' ${DIR_GCLOUD_CONFIG}/configurations/config_$(cat ${DIR_GCLOUD_CONFIG}/active_config))
+    cat << EOF | kubectl apply -f -
+    apiVersion: v1
+    data:
+      credentialsjson: $(cat ${DIR_GCLOUD_CONFIG}/kratix-sql-manager-key.json | base64 -w0)
+      project_id: $(echo ${PROJECT_ID} | base64 -w0)
+    kind: Secret
+    metadata:
+      name: gcp-credentials
+    EOF
+    ```
 
 ## Install Promise
 
