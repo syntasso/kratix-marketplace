@@ -13,8 +13,13 @@ if [ $size = large ]; then
 fi
 
 # Replace defaults with user provided values
+cat /tmp/transfer/kafka-node-pool.yaml |  \
+  yq eval '.spec.replicas = env(replicas)' | \
+  yq eval '.metadata.name = env(name)' | \
+  yq eval '.metadata.labels."strimzi.io/cluster" = env(name)' \
+  > /kratix/output/kafka-node-pool.yaml
+
 cat /tmp/transfer/kafka-instance.yaml |  \
-  yq eval '.spec.kafka.replicas = env(replicas)' | \
   yq eval '.metadata.name = env(name)' - \
   > /kratix/output/kafka-instance.yaml
 
