@@ -1,29 +1,34 @@
 # AWS DB Promise
 
-## Pre-requisites
-
-### Credentials
-
-To use this promise, you must have a Access Key and Secret Access Key for your
-AWS account. The IAM user associated with these keys must have the permission to
-create and delete RDS instances.
-
-Create a Kubernetes Secret with the credentials:
-
-```bash
-kubectl create secret generic aws-rds \
-    --namespace default \
-    --from-literal=accessKeyID=<your access key> \
-    --from-literal=secretAccessKey=<your secret access key>
-```
-
-## Usage
-
 This Promise provides RDS-as-a-Service. The following parameters are available:
 
 * `spec.dbName`: The name of the database to create.
 * `spec.engine`: The database engine to use. Supported values are `mysql`, `postgres`, and `mariadb`.
 * `spec.size`: The size of this deployment. Supported values are `micro`, `small`, `medium`, and `large`.
+
+## Pre-requisites
+
+To use this promise, you must have:
+
+* A Access Key and Secret Access Key for your AWS account with permission to manage RDS instances
+    You can follow AWS documentation, or review the following commands via the AWS CLI:
+
+    ```bash
+    export IAM_USER="kratix-$(whoami)-${RANDOM}-rds"
+    aws iam create-user --user-name ${IAM_USER} --no-cli-pager 
+    aws iam attach-user-policy --user-name ${IAM_USER} --policy-arn arn:aws:iam::aws:policy/AmazonRDSFullAccess --no-cli-pager 
+    eval $(aws iam create-access-key --user-name ${IAM_USER} --output text --no-cli-pager --query 'AccessKey.[AccessKeyId,SecretAccessKey]' | \
+        awk '{print "export RDS_KEY_ID=\"" $1 "\"\nexport RDS_SECRET_ACCESS_KEY=\"" $2 "\""}')
+    ```
+* A secret with a key for that service account in your cluster
+    ```bash
+    kubectl create secret generic aws-rds \
+        --namespace default \
+        --from-literal=accessKeyID=${RDS_KEY_ID} \
+        --from-literal=secretAccessKey=${RDS_SECRET_ACCESS_KEY}
+    ```
+
+## Install Promise
 
 To install:
 ```

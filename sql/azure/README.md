@@ -1,6 +1,11 @@
 # sql
 
-Requires a secret for connecting to azure:
+This Promise provides sql-as-a-Service. The Promise has 1 field `.spec.size`
+which can be `small` or `large`.
+
+## Prerequisites
+
+Requires a secret for connecting to azure with permissions to create SQL databases:
 
 ```
 kubectl create secret generic azure-credentials --from-file=key=key.pem \
@@ -8,8 +13,7 @@ kubectl create secret generic azure-credentials --from-file=key=key.pem \
     --from-literal=tenantID=<tenantID>
 ```
 
-This Promise provides sql-as-a-Service. The Promise has 1 field `.spec.size`
-which can be `small` or `large`.
+## Install Promise
 
 To install:
 ```
