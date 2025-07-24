@@ -36,11 +36,9 @@ exitCode=$?
 set -e
 if [ $exitCode -eq 0 ]; then
   echo "Instance $name already exists"
-  exit 0
+else
+  gcloud sql instances create $name --database-version=MYSQL_8_0 --region=us-central --tier=db-f1-micro
 fi
-
-gcloud sql instances create $name --database-version=MYSQL_8_0 --region=us-central --tier=db-f1-micro
-
 
 cat <<EOF > /kratix/metadata/status.yaml
 instanceStatus: available
