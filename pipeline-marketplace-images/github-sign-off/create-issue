@@ -27,7 +27,15 @@ function create_issue() {
     echo "Close the issue to accept; Close it as not-planned to reject"
     echo ""
     echo '```yaml'
-    yq 'del(.status)' /kratix/input/object.yaml
+    yq 'del(.status)
+        | del(.metadata.managedFields)
+        | del(.metadata.annotations)
+        | del(.metadata.uid)
+        | del(.metadata.finalizers)
+        | del(.metadata.creationTimestamp)
+        | del(.metadata.labels)
+        | del(.metadata.resourceVersion)
+        | del(.metadata.generation)' /kratix/input/object.yaml
     echo '```'
   } > issue-body
 
