@@ -1,13 +1,11 @@
-FROM "alpine"
+FROM python:3.12-alpine
 
 LABEL org.opencontainers.image.authors="kratix@syntasso.io"
 LABEL org.opencontainers.image.source=https://github.com/syntasso/kratix-marketplace
 
-RUN [ "mkdir", "/tmp/transfer" ]
-RUN apk update && apk add --no-cache yq
+RUN apk update && apk add --no-cache yq kubectl curl git
+RUN python3 -m pip install git+https://github.com/syntasso/kratix-python.git PyYAML
 
-ADD resources/* /tmp/transfer/
-ADD execute-pipeline execute-pipeline
+ADD execute-pipeline.py execute-pipeline.py
 
-CMD [ "sh", "-c", "./execute-pipeline" ]
-ENTRYPOINT []
+ENTRYPOINT ["python", "/execute-pipeline.py"]
