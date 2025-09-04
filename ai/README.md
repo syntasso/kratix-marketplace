@@ -1,14 +1,78 @@
-TODO:
+# AI Promise
 
-- secret for keys
-- secret for models
-- postgresql as dep
-- postgresql on platform cluster?
-- pipeline names for promise configure
+This Kratix promise provides AI-as-a-service, powered by [LiteLLM](https://litellm.ai/). It allows platform users to request and consume various AI models in a standardized way.
 
-# AI
+## High-Level Features
 
-This Promise provides AI-as-a-service. 
+- **Model Selection:** Request specific AI models such as GPT-5, Gemini 2.5 Pro, and Claude Opus 4.
+- **Tiered Deployments:** Choose from different deployment sizes (small, medium, large) to match your performance and cost requirements.
+- **Optional UI:** A user interface can be enabled for easier interaction with the AI models.
+- **Team Ownership:** Assign ownership of each AI service instance to a specific team.
+
+## How it Works
+
+When a user creates a resource request, the promise does the following:
+
+1. **Team and Key Generation:** A new team is created in LiteLLM, and a unique API key is generated for that team. This key is stored in a Kubernetes secret.
+2. **Rate Limiting and Budgeting:** Based on the selected tier, rate limits (requests per minute, tokens per minute) and a budget are assigned to the team.
+3. **(Optional) UI Deployment:** If requested, an OpenWebUI instance is deployed and configured to use the team's API key and the LiteLLM service.
+
+## Prerequisites
+
+Before installing the promise, you must create a secret named `litellm-creds` in the `default` namespace. This secret contains the LiteLLM master key and the model list configuration. 
+
+Here is an example of the `litellm-creds` secret:
+
+```yaml
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: litellm-creds
+stringData:
+  config.yaml: |
+      model_list:
+        - model_name: gemini-2.5-pro
+          litellm_params:
+            model: ollama/tinydolphin
+            api_base: http://ollama.default.svc.cluster.local:11434
+            api_key: dummy
+  LITELLM_MASTER_KEY: "sk-123456789"
+  LITELLM_SALT_KEY: "sk-012345678"
+```
+
+## Constraints & Configuration
+
+- **Environment:** This promise is a proof-of-concept and should not be used in production without significant modifications. It is intended to be a starting point for building your own AI promise, tailored to your organization's needs.
+- **Models:** The available models are defined in the `promise.yaml` and the `litellm-creds` secret. To use your own custom models, you must:
+    1.  Modify the `promise.yaml` to include your model names. For example:
+        ```yaml
+        spec:
+          api:
+            spec:
+              versions:
+                - name: v1alpha1
+                  schema:
+                    openAPIV3Schema:
+                      properties:
+                        spec:
+                          properties:
+                            models:
+                              items:
+                                enum:
+                                  - gpt-5
+                                  - gemini-2.5-pro
+                                  - claude-opus-4
+                                  - your-custom-model
+        ```
+    2.  Update the `model_list` in the `litellm-creds` secret to define the parameters for your models.
+
+- **Dependencies:** This promise depends on a PostgreSQL database, which is requested from the [PostgreSQL Promise](https://github.com/syntasso/promise-postgresql).
+
+---
+
+## Installation
 
 To install:
 ```
