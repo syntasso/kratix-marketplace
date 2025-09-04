@@ -1,6 +1,8 @@
 # AI Promise
 
-This Kratix promise provides AI-as-a-service, powered by [LiteLLM](https://litellm.ai/). It allows platform users to request and consume various AI models in a standardized way.
+This Kratix promise provides AI-as-a-service, powered by
+[LiteLLM](https://litellm.ai/). It allows platform users to request and consume
+various AI models in a standardized way.
 
 ## High-Level Features
 
@@ -8,6 +10,14 @@ This Kratix promise provides AI-as-a-service, powered by [LiteLLM](https://litel
 - **Tiered Deployments:** Choose from different deployment sizes (small, medium, large) to match your performance and cost requirements.
 - **Optional UI:** A user interface can be enabled for easier interaction with the AI models.
 - **Team Ownership:** Assign ownership of each AI service instance to a specific team.
+
+## Limitations
+This Promise as-is only works in a single-cluster setup, that is to say that the
+workflows produced by this Promise need to be deployed to the same cluster where
+Kratix is deployed. This is due to the fact that the LiteLLM service is deployed
+in the same cluster as Kratix, and the Promise Workflows need to make API calls
+to the LiteLLM service. Future versions of this Promise will support
+multi-cluster.
 
 ## How it Works
 
@@ -33,14 +43,16 @@ metadata:
 stringData:
   config.yaml: |
       model_list:
-        - model_name: gemini-2.5-pro
+        - model_name: gpt-5
           litellm_params:
-            model: ollama/tinydolphin
-            api_base: http://ollama.default.svc.cluster.local:11434
-            api_key: dummy
+            model: gpt-5
+            api_base: <YOUR_API_ENDPOINT>
+            api_key: <YOUR_OPENAI_API_KEY>
   LITELLM_MASTER_KEY: "sk-123456789"
   LITELLM_SALT_KEY: "sk-012345678"
 ```
+
+Add in your models under `model_list` as needed.
 
 ## Constraints & Configuration
 
@@ -68,7 +80,10 @@ stringData:
         ```
     2.  Update the `model_list` in the `litellm-creds` secret to define the parameters for your models.
 
-- **Dependencies:** This promise depends on a PostgreSQL database, which is requested from the [PostgreSQL Promise](https://github.com/syntasso/promise-postgresql).
+- **Dependencies:** This promise depends on a PostgreSQL database, which is
+requested from the [PostgreSQL
+Promise](https://github.com/syntasso/promise-postgresql). As notes above, you
+will need to modify this Promise to deploy request to the Platform cluster.
 
 ---
 

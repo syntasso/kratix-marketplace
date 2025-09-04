@@ -86,7 +86,7 @@ func (c *llmClient) findTeamID(ctx context.Context, team string) (string, error)
 	return "", nil
 }
 
-func (c *llmClient) createTeam(ctx context.Context, tier, team string) (string, error) {
+func (c *llmClient) createTeam(ctx context.Context, team, tier string) (string, error) {
 	limits := tierLimits(tier) // pick RPM, TPM, budget based on tier
 
 	payload := map[string]any{
