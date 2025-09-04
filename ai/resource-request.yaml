@@ -1,7 +1,12 @@
 apiVersion: marketplace.kratix.io/v1alpha1
-kind: redis
+kind: ai
 metadata:
   name: example
   namespace: default
 spec:
-  size: small
+  tier: small
+  ui: true
+  team: engineering
+  models:
+  - gpt-5
+  - gemini-2.5-pro

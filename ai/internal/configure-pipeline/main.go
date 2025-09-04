@@ -4,6 +4,8 @@ import (
 	"log"
 
 	kratix "github.com/syntasso/kratix-go"
+	kubernetes "k8s.io/client-go/kubernetes"
+	ctrlcfg "sigs.k8s.io/controller-runtime/pkg/client/config"
 )
 
 var sdk = kratix.New()
@@ -14,13 +16,22 @@ func main() {
 	log.Printf("Promise name: %s", sdk.PromiseName())
 	log.Printf("Pipeline name: %s", sdk.PipelineName())
 
+	cfg, err := ctrlcfg.GetConfig()
+	if err != nil {
+		log.Fatalf("get kube config: %v", err)
+	}
+	kube, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		log.Fatalf("build clientset: %v", err)
+	}
+
 	if sdk.WorkflowType() == "promise" {
 		if sdk.PipelineName() == "provision-postgres-db" {
 			deployPostgres()
 			return
 		}
-		if sdk.PipelineName() != "litellm-deploy" {
-			deployLiteLLM()
+		if sdk.PipelineName() == "litellm-deploy" {
+			deployLiteLLM(kube)
 			return
 		}
 		panic("unknown pipeline name " + sdk.PipelineName())
@@ -42,7 +53,16 @@ func main() {
 			panic(err)
 		}
 		log.Printf("Setting up LiteLLM for team %s on tier %s with models %v", team, tier, models)
-		setupLiteLLMTeam(tier.(string), team.(string), toStringSlice(models))
+		setupLiteLLMTeam(kube, tier.(string), team.(string), toStringSlice(models))
+		status := kratix.NewStatus()
+		statusValues := map[string]string{
+			"apiCredsSecretName": team.(string) + "-litellm-key",
+			"apiEndpoint":        "http://litellm.default.svc.cluster.local:4000",
+		}
+
+		if err := sdk.WriteStatus(status); err != nil {
+			log.Fatalf("failed to write status: %v", err)
+		}
 
 		uiEnabled, err := res.GetValue("spec.ui")
 		if err != nil {
@@ -50,8 +70,11 @@ func main() {
 		}
 		if uiEnabledBool, ok := uiEnabled.(bool); ok && uiEnabledBool {
 			log.Printf("Setting up OpenWebUI")
-			deployOpenWebUI()
+			deployOpenWebUI(team.(string), toStringSlice(models))
+			statusValues["uiEndpoint"] = "http://" + team.(string) + "-openwebui.default.svc.cluster.local:8080"
 		}
+		status.Set("ai", statusValues)
+		sdk.WriteStatus(status)
 	} else {
 		panic("unknown workflow type " + sdk.WorkflowType())
 	}

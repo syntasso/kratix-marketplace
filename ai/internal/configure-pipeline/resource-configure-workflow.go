@@ -7,28 +7,70 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/yaml"
 )
 
-func setupLiteLLMTeam(tier, team string, models []string) {
+func setupLiteLLMTeam(kube *kubernetes.Clientset, tier, team string, models []string) {
+	sec, err := kube.CoreV1().Secrets("default").Get(context.Background(), "litellm-creds", metav1.GetOptions{})
+	if err != nil {
+		log.Fatalf("failed to get secret: %v", err)
+	}
+
+	rawVal, ok := sec.Data["LITELLM_MASTER_KEY"]
+	if !ok {
+		log.Fatalf("secret missing LITELLM_MASTER_KEY field")
+	}
+
+	auth := string(rawVal)
+
+	key := generateTeamAndKey(auth, team, tier, models)
+
+	sec = &corev1.Secret{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: "v1",
+			Kind:       "Secret",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      team + "-litellm-key",
+			Namespace: "default",
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			"LITELLM_MASTER_KEY": []byte(key),
+		},
+	}
+
+	b, err := yaml.Marshal(sec)
+	if err != nil {
+		log.Fatalf("marshal secret: %v", err)
+	}
+
+	sdk.WriteOutput(team+"-litellm-key.yaml", b)
 
 }
 
-func deployOpenWebUI() {
+func deployOpenWebUI(team string, models []string) {
 	ctx := context.Background()
 
-	releaseName := "openwebui"
+	releaseName := team + "-openwebui"
 	namespace := "default"
 	chartRef := "open-webui/open-webui"
 	chartVersion := "7.6.0"
 
+	modelsStr := strings.Join(models, ",")
+
 	valuesYAML := `
+nameOverride: ` + team + `-openwebui
 ollama:
   enabled: false
 
@@ -41,10 +83,10 @@ extraEnvVars:
   - name: OPENAI_API_KEY
     valueFrom:
       secretKeyRef:
-        name: litellm-secrets
+        name: ` + team + `-litellm-key
         key: LITELLM_MASTER_KEY
   - name: DEFAULT_MODELS
-    value: local-tiny
+    value: ` + modelsStr + `
 
 resources:
   requests:
@@ -70,7 +112,6 @@ ingress:
 	settings.RepositoryConfig = repoFile
 
 	// Repos
-	addOrUpdateRepo(settings, "otwld", "https://helm.otwld.com/")
 	addOrUpdateRepo(settings, "open-webui", "https://open-webui.github.io/helm-charts")
 
 	// Action config

@@ -15,7 +15,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 
-	ctrlcfg "sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/yaml"
 )
 
@@ -28,29 +27,20 @@ metadata:
 spec:
   env: dev
   teamId: litellm
-		dbName: litellm
+  dbName: litellm
 `))
 }
 
-func deployLiteLLM() {
+func deployLiteLLM(kube *kubernetes.Clientset) {
 	ctx := context.Background()
 	ns := "default"
 	app := "litellm"
-
-	cfg, err := ctrlcfg.GetConfig()
-	if err != nil {
-		log.Fatalf("get kube config: %v", err)
-	}
-	kube, err := kubernetes.NewForConfig(cfg)
-	if err != nil {
-		log.Fatalf("build clientset: %v", err)
-	}
 
 	// derive DATABASE_URL from existing Secret
 	pgSecretName := "litellm.litellm-litellm-postgresql.credentials.postgresql.acid.zalan.do"
 
 	var pg *corev1.Secret
-	err = wait.PollImmediate(5*time.Second, 5*time.Minute, func() (bool, error) {
+	err := wait.PollImmediate(5*time.Second, 5*time.Minute, func() (bool, error) {
 		s, err := kube.CoreV1().Secrets(ns).Get(ctx, pgSecretName, metav1.GetOptions{})
 		if err != nil {
 			if k8serrors.IsNotFound(err) {
@@ -82,34 +72,12 @@ func deployLiteLLM() {
 	fmt.Println("Wrote manifests to /kratix/output")
 }
 
-// func generateLiteLLMConfigSecret(ns, app string) {
-// 	cm := &corev1.ConfigMap{
-// 		TypeMeta:   metav1.TypeMeta{APIVersion: "v1", Kind: "ConfigMap"},
-// 		ObjectMeta: metav1.ObjectMeta{Name: app + "-config-file", Namespace: ns},
-// 		Data: map[string]string{
-// 			"config.yaml": `model_list:
-//   - model_name: local-tiny
-//     litellm_params:
-//       model: ollama/tinydolphin
-//       api_base: http://ollama.default.svc.cluster.local:11434
-//       api_key: dummy
-// `,
-// 		},
-// 	}
-// 	writeYAML("10-"+app+"-configmap.yaml", cm)
-// }
-
 func generateLitellmSecret(ns, app, dbURL string) {
-	// mk := getenvDefault("LITELLM_MASTER_KEY", "sk-123456789")
-	// sk := getenvDefault("LITELLM_SALT_KEY", "sk-123456789")
-
 	sec := &corev1.Secret{
 		TypeMeta:   metav1.TypeMeta{APIVersion: "v1", Kind: "Secret"},
 		ObjectMeta: metav1.ObjectMeta{Name: app + "-db", Namespace: ns},
 		Type:       corev1.SecretTypeOpaque,
 		StringData: map[string]string{
-			// "LITELLM_MASTER_KEY": mk,
-			// "LITELLM_SALT_KEY":   sk,
 			"DATABASE_URL": dbURL,
 		},
 	}
@@ -154,7 +122,7 @@ func generateLitellmDeployment(ns, app string) {
 						Name: "config-volume",
 						VolumeSource: corev1.VolumeSource{
 							Secret: &corev1.SecretVolumeSource{
-								SecretName: app + "-config",
+								SecretName: app + "-creds",
 								Items: []corev1.KeyToPath{{
 									Key:  "config.yaml",
 									Path: "config.yaml",
