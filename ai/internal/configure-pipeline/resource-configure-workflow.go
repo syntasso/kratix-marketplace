@@ -20,61 +20,111 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+const (
+	ns                 = "default"
+	masterKeyField     = "LITELLM_MASTER_KEY"
+	openWebUIRepoName  = "open-webui"
+	openWebUIRepoURL   = "https://open-webui.github.io/helm-charts"
+	openWebUIChartRef  = "open-webui/open-webui"
+	openWebUIChartVer  = "7.6.0"
+	openAIBaseAPI      = "http://litellm.default.svc.cluster.local:4000"
+	outputChartPath    = "openwebui.yaml"
+	keySecretSuffix    = "-litellm-key"
+	keySecretFilename  = "%s-litelllm-key.yaml"
+	litellmCredsSecret = "litellm-creds"
+)
+
 func setupLiteLLMTeam(kube *kubernetes.Clientset, tier, team string, models []string) {
-	sec, err := kube.CoreV1().Secrets("default").Get(context.Background(), "litellm-creds", metav1.GetOptions{})
+	ctx := context.Background()
+
+	sec, err := kube.CoreV1().Secrets(ns).Get(ctx, litellmCredsSecret, metav1.GetOptions{})
 	if err != nil {
-		log.Fatalf("failed to get secret: %v", err)
+		log.Fatalf("get secret %q: %v", litellmCredsSecret, err)
 	}
-
-	rawVal, ok := sec.Data["LITELLM_MASTER_KEY"]
+	raw, ok := sec.Data[masterKeyField]
 	if !ok {
-		log.Fatalf("secret missing LITELLM_MASTER_KEY field")
+		log.Fatalf("secret %q missing %s", litellmCredsSecret, masterKeyField)
 	}
-
-	auth := string(rawVal)
+	auth := string(raw)
 
 	key := generateTeamAndKey(auth, team, tier, models)
 
-	sec = &corev1.Secret{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: "v1",
-			Kind:       "Secret",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      team + "-litellm-key",
-			Namespace: "default",
-		},
-		Type: corev1.SecretTypeOpaque,
-		Data: map[string][]byte{
-			"LITELLM_MASTER_KEY": []byte(key),
-		},
+	out := &corev1.Secret{
+		TypeMeta:   metav1.TypeMeta{APIVersion: "v1", Kind: "Secret"},
+		ObjectMeta: metav1.ObjectMeta{Name: team + keySecretSuffix, Namespace: ns},
+		Type:       corev1.SecretTypeOpaque,
+		Data:       map[string][]byte{masterKeyField: []byte(key)},
 	}
-
-	b, err := yaml.Marshal(sec)
+	b, err := yaml.Marshal(out)
 	if err != nil {
 		log.Fatalf("marshal secret: %v", err)
 	}
-
-	sdk.WriteOutput(team+"-litellm-key.yaml", b)
-
+	if err := sdk.WriteOutput(fmt.Sprintf("%s-litelllm-key.yaml", team), b); err != nil {
+		log.Fatalf("write output: %v", err)
+	}
 }
 
 func deployOpenWebUI(team string, models []string) {
 	ctx := context.Background()
 
-	releaseName := team + "-openwebui"
-	namespace := "default"
-	chartRef := "open-webui/open-webui"
-	chartVersion := "7.6.0"
+	settings := helmEnv()
+	addOrUpdateRepo(settings, openWebUIRepoName, openWebUIRepoURL)
 
-	modelsStr := strings.Join(models, ",")
+	actionCfg := new(action.Configuration)
+	if err := actionCfg.Init(settings.RESTClientGetter(), ns, "memory", log.Printf); err != nil {
+		log.Fatalf("init helm: %v", err)
+	}
 
-	valuesYAML := `
+	inst := action.NewInstall(actionCfg)
+	inst.DryRun = true
+	inst.ClientOnly = true
+	inst.DisableHooks = true
+	inst.Replace = true
+	inst.Wait = false
+	inst.ReleaseName = team + "-openwebui"
+	inst.Namespace = ns
+	inst.CreateNamespace = false
+	inst.ChartPathOptions.Version = openWebUIChartVer
+
+	chartPath, err := inst.ChartPathOptions.LocateChart(openWebUIChartRef, settings)
+	if err != nil {
+		log.Fatalf("locate chart: %v", err)
+	}
+	ch, err := loader.Load(chartPath)
+	if err != nil {
+		log.Fatalf("load chart: %v", err)
+	}
+
+	vals := renderValues(team, models)
+	rel, err := inst.RunWithContext(ctx, ch, vals)
+	if err != nil {
+		log.Fatalf("helm render: %v", err)
+	}
+
+	// combine manifests
+	var buf bytes.Buffer
+	buf.WriteString(rel.Manifest)
+	for _, hk := range rel.Hooks {
+		if buf.Len() > 0 {
+			buf.WriteString("\n---\n")
+		}
+		buf.WriteString(hk.Manifest)
+	}
+
+	if err := sdk.WriteOutput(outputChartPath, buf.Bytes()); err != nil {
+		log.Fatalf("write output: %v", err)
+	}
+	fmt.Println("Rendered chart to /kratix/output/" + outputChartPath)
+}
+
+func renderValues(team string, models []string) map[string]any {
+	yml := `
 nameOverride: ` + team + `-openwebui
+
 ollama:
   enabled: false
 
-openaiBaseApiUrl: http://litellm.default.svc.cluster.local:4000
+openaiBaseApiUrl: ` + openAIBaseAPI + `
 
 pipelines:
   enabled: false
@@ -83,10 +133,10 @@ extraEnvVars:
   - name: OPENAI_API_KEY
     valueFrom:
       secretKeyRef:
-        name: ` + team + `-litellm-key
-        key: LITELLM_MASTER_KEY
+        name: ` + team + keySecretSuffix + `
+        key: ` + masterKeyField + `
   - name: DEFAULT_MODELS
-    value: ` + modelsStr + `
+    value: ` + strings.Join(models, ",") + `
 
 resources:
   requests:
@@ -102,70 +152,21 @@ service:
 ingress:
   enabled: false
 `
+	out := map[string]any{}
+	if err := yaml.Unmarshal([]byte(yml), &out); err != nil {
+		log.Fatalf("parse values: %v", err)
+	}
+	return out
+}
 
-	// Helm env
-	settings := cli.New()
+func helmEnv() *cli.EnvSettings {
+	s := cli.New()
 	cacheDir := filepath.Join(os.TempDir(), "helm-cache")
 	repoFile := filepath.Join(os.TempDir(), "helm-repositories.yaml")
 	_ = os.MkdirAll(cacheDir, 0o755)
-	settings.RepositoryCache = cacheDir
-	settings.RepositoryConfig = repoFile
-
-	// Repos
-	addOrUpdateRepo(settings, "open-webui", "https://open-webui.github.io/helm-charts")
-
-	// Action config
-	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, "memory", log.Printf); err != nil {
-		log.Fatalf("init helm action config: %v", err)
-	}
-
-	// Install action in dry mode
-	inst := action.NewInstall(actionConfig)
-	inst.DryRun = true
-	inst.ClientOnly = true
-	inst.DisableHooks = true
-	inst.Replace = true
-	inst.Wait = false
-	inst.ReleaseName = releaseName
-	inst.Namespace = namespace
-	inst.CreateNamespace = false
-	inst.ChartPathOptions.Version = chartVersion
-
-	chartPath, err := inst.ChartPathOptions.LocateChart(chartRef, settings)
-	if err != nil {
-		log.Fatalf("locate chart: %v", err)
-	}
-	ch, err := loader.Load(chartPath)
-	if err != nil {
-		log.Fatalf("load chart: %v", err)
-	}
-
-	vals := map[string]any{}
-	if err := yaml.Unmarshal([]byte(valuesYAML), &vals); err != nil {
-		log.Fatalf("parse values: %v", err)
-	}
-
-	rel, err := inst.RunWithContext(ctx, ch, vals)
-	if err != nil {
-		log.Fatalf("helm render: %v", err)
-	}
-
-	// Single combined YAML
-	var buf bytes.Buffer
-	buf.WriteString(rel.Manifest)
-	for _, hk := range rel.Hooks {
-		if buf.Len() > 0 {
-			buf.WriteString("\n---\n")
-		}
-		buf.WriteString(hk.Manifest)
-	}
-
-	if err := sdk.WriteOutput("openwebui.yaml", buf.Bytes()); err != nil {
-		log.Fatalf("write output: %v", err)
-	}
-
-	fmt.Println("Rendered chart to /kratix/output/openwebui.yaml")
+	s.RepositoryCache = cacheDir
+	s.RepositoryConfig = repoFile
+	return s
 }
 
 func addOrUpdateRepo(settings *cli.EnvSettings, name, url string) {
@@ -175,21 +176,24 @@ func addOrUpdateRepo(settings *cli.EnvSettings, name, url string) {
 			rf = f
 		}
 	}
+
 	entry := &repo.Entry{Name: name, URL: url}
 	if existing := rf.Get(name); existing != nil {
 		existing.URL = url
 	} else {
 		rf.Update(entry)
 	}
+
 	if err := rf.WriteFile(settings.RepositoryConfig, 0o644); err != nil {
 		log.Fatalf("write repo file: %v", err)
 	}
-	chRepo, err := repo.NewChartRepository(entry, getter.All(settings))
+
+	cr, err := repo.NewChartRepository(entry, getter.All(settings))
 	if err != nil {
 		log.Fatalf("new chart repo %s: %v", name, err)
 	}
-	chRepo.CachePath = settings.RepositoryCache
-	if _, err := chRepo.DownloadIndexFile(); err != nil {
+	cr.CachePath = settings.RepositoryCache
+	if _, err := cr.DownloadIndexFile(); err != nil {
 		log.Fatalf("update index %s: %v", name, err)
 	}
 }
