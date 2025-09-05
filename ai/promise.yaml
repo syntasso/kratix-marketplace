@@ -1,0 +1,98 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: Promise
+metadata:
+  name: ai
+  labels:
+    kratix.io/backstage: "true"
+spec:
+  destinationSelectors:
+  - matchLabels:
+      environment: dev
+  api:
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      name: ai.marketplace.kratix.io
+    spec:
+      group: marketplace.kratix.io
+      names:
+        kind: ai
+        plural: ai
+        singular: ai
+      scope: Namespaced
+      versions:
+        - name: v1alpha1
+          schema:
+            openAPIV3Schema:
+              properties:
+                spec:
+                  properties:
+                    tier:
+                      type: string
+                      description: Size of deployment
+                      enum:
+                        - small
+                        - medium
+                        - large
+                    ui:
+                      type: boolean
+                      description: Whether to enable the UI
+                    team:
+                      type: string
+                      description: Owning team
+                    models:
+                      type: array
+                      description: List of model names to enable
+                      items:
+                        type: string
+                        enum:
+                          # add and remove models as needed
+                          - gpt-5
+                          - gemini-2.5-pro
+                          - claude-opus-4
+                  type: object
+              type: object
+          served: true
+          storage: true
+  workflows:
+    promise:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: provision-postgres-db
+          spec:
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
+                name: configure-postgres-db
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: litellm-deploy
+          spec:
+            rbac:
+              permissions:
+                - apiGroups: [""]
+                  verbs: ["get", "list", "watch"]
+                  resources: ["secrets"]
+                  resourceNamespace: "*"
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
+                name: configure-litellm
+    resource:
+      configure:
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: instance-configure
+          spec:
+            rbac:
+              permissions:
+                - apiGroups: [""]
+                  verbs: ["get", "list", "watch"]
+                  resources: ["secrets"]
+                  resourceNamespace: "*"
+            containers:
+              - image: ghcr.io/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
+                name: configure-pipeline
+status: {}

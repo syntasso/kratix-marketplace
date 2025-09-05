@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      name: ollama
+  template:
+    metadata:
+      labels:
+        name: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: ollama-tiny-dolphin:local
+        ports:
+        - name: http
+          containerPort: 11434
+          protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ollama
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    name: ollama
+  ports:
+  - protocol: TCP
+    port: 11434
+    targetPort: 11434
