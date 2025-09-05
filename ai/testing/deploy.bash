@@ -16,7 +16,7 @@ pushd $ROOT/ollama/
   kubectl apply -f ollama.yaml
 popd
   
-kubectl apply -f ~/workspace/promise-postgresql/promise.yaml
+kubectl apply -f https://raw.githubusercontent.com/syntasso/promise-postgresql/refs/heads/main/promise.yaml
 echo "Marking platform cluster as dev environment, to ensure everything is deployed to it"
 kubectl label destinations.platform.kratix.io platform-cluster environment=dev --overwrite || true
 kubectl label destinations.platform.kratix.io platform environment=dev --overwrite || true
