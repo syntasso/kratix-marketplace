@@ -6,7 +6,7 @@ various AI models in a standardized way.
 
 ## High-Level Features
 
-- **Model Selection:** Request specific AI models such as GPT-5, Gemini 2.5 Pro, and Claude Opus 4.
+- **Model Selection:** Request specific AI models such as GPT-5, Gemini 2.5 Pro, and Claude Opus 4. Any model that supports the OpenAI API or Ollama API can be integrated.
 - **Tiered Deployments:** Choose from different deployment sizes (small, medium, large) to match your performance and cost requirements.
 - **Optional UI:** A user interface can be enabled for easier interaction with the AI models.
 - **Team Ownership:** Assign ownership of each AI service instance to a specific team.
