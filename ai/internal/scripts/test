@@ -1,15 +1,40 @@
 #!/usr/bin/env bash
 set -e
 
+check_statefulset_health() {
+  local namespace="$1"
+  local sts_name="$2"
+
+  # Wait for rollout to complete
+  if ! kubectl rollout status statefulset "$sts_name" -n "$namespace" --timeout=120s; then
+    echo "StatefulSet rollout failed or timed out"
+    return 1
+  fi
+
+  # Compare ready vs desired replicas
+  local ready desired
+  ready=$(kubectl get statefulset "$sts_name" -n "$namespace" -o jsonpath='{.status.readyReplicas}')
+  desired=$(kubectl get statefulset "$sts_name" -n "$namespace" -o jsonpath='{.status.replicas}')
+
+  if [[ "$ready" != "$desired" ]]; then
+    echo "StatefulSet $sts_name not healthy: $ready/$desired ready"
+    return 1
+  fi
+
+  echo "StatefulSet $sts_name is healthy: $ready/$desired ready"
+  return 0
+}
+
 test_promise() {
-  kubectl wait promise/redis --for=condition=ConfigureWorkflowCompleted --timeout=120s
-  kubectl get crd redisfailovers.databases.spotahome.com
-  kubectl wait --for=condition=Available --timeout=5s deployment/redisoperator
+  kubectl wait promise/ai --for=condition=ConfigureWorkflowCompleted --timeout=120s
+  kubectl wait --for=condition=Available --timeout=5s deployment/litellm
 }
 
 test_resource_request() {
-  kubectl wait --for=condition=Available --timeout=5s deployment/rfs-example
+  check_statefulset_health default engineering-openwebui
 }
+
+
 
 if [ "$1" = "promise" ]; then
   test_promise
