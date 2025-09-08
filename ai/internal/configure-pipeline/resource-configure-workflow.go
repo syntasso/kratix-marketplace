@@ -46,11 +46,18 @@ func setupLiteLLMTeam(kube *kubernetes.Clientset, tier, team string, models []st
 	}
 	auth := string(raw)
 
-	key := generateTeamAndKey(auth, team, tier, models)
+	secretName := team + keySecretSuffix
 
+	var key string
+	sec, err = kube.CoreV1().Secrets(ns).Get(ctx, secretName, metav1.GetOptions{})
+	if err != nil {
+		key = generateTeamAndKey(auth, team, tier, models)
+	} else {
+		key = string(sec.Data[masterKeyField])
+	}
 	out := &corev1.Secret{
 		TypeMeta:   metav1.TypeMeta{APIVersion: "v1", Kind: "Secret"},
-		ObjectMeta: metav1.ObjectMeta{Name: team + keySecretSuffix, Namespace: ns},
+		ObjectMeta: metav1.ObjectMeta{Name: secretName, Namespace: ns},
 		Type:       corev1.SecretTypeOpaque,
 		Data:       map[string][]byte{masterKeyField: []byte(key)},
 	}
