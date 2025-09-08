@@ -17,7 +17,8 @@ workflows produced by this Promise need to be deployed to the same cluster where
 Kratix is deployed. This is due to the fact that the LiteLLM service is deployed
 in the same cluster as Kratix, and the Promise Workflows need to make API calls
 to the LiteLLM service. Future versions of this Promise will support
-multi-cluster.
+multi-cluster. You will also need to ensure the Postgresql Promise is installed
+and configured to deploy to the same cluster.
 
 ## How it Works
 
@@ -82,7 +83,7 @@ Add in your models under `model_list` as needed.
 
 - **Dependencies:** This promise depends on a PostgreSQL database, which is
 requested from the [PostgreSQL
-Promise](https://github.com/syntasso/promise-postgresql). As notes above, you
+Promise](https://github.com/syntasso/promise-postgresql). As noted above, you
 will need to modify this Promise to deploy request to the Platform cluster.
 
 ---

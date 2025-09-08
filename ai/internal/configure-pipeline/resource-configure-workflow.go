@@ -30,7 +30,6 @@ const (
 	openAIBaseAPI      = "http://litellm.default.svc.cluster.local:4000"
 	outputChartPath    = "openwebui.yaml"
 	keySecretSuffix    = "-litellm-key"
-	keySecretFilename  = "%s-litelllm-key.yaml"
 	litellmCredsSecret = "litellm-creds"
 )
 
@@ -59,7 +58,7 @@ func setupLiteLLMTeam(kube *kubernetes.Clientset, tier, team string, models []st
 	if err != nil {
 		log.Fatalf("marshal secret: %v", err)
 	}
-	if err := sdk.WriteOutput(fmt.Sprintf("%s-litelllm-key.yaml", team), b); err != nil {
+	if err := sdk.WriteOutput(fmt.Sprintf("%s-litellm-key.yaml", team), b); err != nil {
 		log.Fatalf("write output: %v", err)
 	}
 }
