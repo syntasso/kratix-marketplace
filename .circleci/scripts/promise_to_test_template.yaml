@@ -120,6 +120,10 @@ jobs:
             if test -f ./internal/scripts/pipeline-image; then
               ./internal/scripts/pipeline-image build load
             fi
+
+            if test -f "internal/scripts/pre-test"; then
+              ./internal/scripts/pre-test
+            fi
             kubectl create --filename promise.yaml
       - retry/run-with-retry:
           command: << parameters.promise_dir >>/internal/scripts/test promise
@@ -145,9 +149,6 @@ jobs:
           working_directory: ~/repo/<< parameters.promise_dir >>
           command: |
             if test -f "resource-request.yaml"; then
-              if test -f "internal/scripts/pre-test"; then
-                ./internal/scripts/pre-test
-              fi
               kubectl apply --filename resource-request.yaml
             fi
       - retry/run-with-retry:
