@@ -24,6 +24,11 @@ master:
     type: NodePort
     nodePorts:
       redis: "$primary_port"
+image:
+  repository: bitnamilegacy/redis
+global:
+  security:
+    allowInsecureImages: true
 EOF
 helm template redis-primary bitnami/redis --version 20.6.2 -f values.yaml > /kratix/output/primary/redis-primary.yaml
 
@@ -48,6 +53,11 @@ replica:
     - ${name}-replica-1
 auth:
   enabled: false  # Disable authentication for simplicity
+image:
+  repository: bitnamilegacy/redis
+global:
+  security:
+    allowInsecureImages: true
 
 EOF
 helm template redis-replica bitnami/redis --version 20.6.2 -f values.yaml > /kratix/output/replica-1/redis-replica.yaml
@@ -73,6 +83,11 @@ replica:
     - ${name}-replica-2
 auth:
   enabled: false  # Disable authentication for simplicity
+image:
+  repository: bitnamilegacy/redis
+global:
+  security:
+    allowInsecureImages: true
 EOF
 helm template redis-replica bitnami/redis --version 20.6.2 -f values.yaml > /kratix/output/replica-2/redis-replica.yaml
 
