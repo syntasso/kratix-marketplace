@@ -92,7 +92,7 @@ def main():
         print(f"Unsupported major version {major_version}, defaulting to 6")
         version = "6.0.10"
 
-    version = resource.get_value("spec.version", default=major_version)
+    version = resource.get_value("spec.version", default=version)
     print("Creating mongodb with version:", version)
 
     # Write mongodb request and secret to output
