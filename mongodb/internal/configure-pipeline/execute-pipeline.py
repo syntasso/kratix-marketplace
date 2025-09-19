@@ -80,12 +80,8 @@ def main():
     password= "supersecret"
 
     # Get correct mongodb version
-    try:
-        major_version = resource.get_value("spec.majorVersion")
-    except:
-        print("major version not specified, defaulting to 6")
-        major_version = 6
-    
+    major_version = resource.get_value("spec.majorVersion", default=6)
+
     if major_version == 4:
         version = "4.4.23"
     elif major_version == 5:
@@ -95,15 +91,8 @@ def main():
     else:
         print(f"Unsupported major version {major_version}, defaulting to 6")
         version = "6.0.10"
-    
-    try:
-        spec_version = resource.get_value("spec.version")
-    except:
-        spec_version = None
-    
-    if spec_version is not None:
-        version = spec_version
 
+    version = resource.get_value("spec.version", default=major_version)
     print("Creating mongodb with version:", version)
 
     # Write mongodb request and secret to output
