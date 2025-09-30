@@ -63,7 +63,7 @@ spec:
             name: provision-postgres-db
           spec:
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
+              - image: syntasso.docker.reo.dev/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
                 name: configure-postgres-db
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
@@ -93,6 +93,6 @@ spec:
                   resources: ["secrets"]
                   resourceNamespace: "*"
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
+              - image: syntasso.docker.reo.dev/syntasso/kratix-marketplace/ai-configure-pipeline:v0.1.0
                 name: configure-pipeline
 status: {}
