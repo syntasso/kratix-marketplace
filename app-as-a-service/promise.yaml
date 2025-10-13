@@ -74,8 +74,8 @@ spec:
             containers:
               - name: create-resources
                 image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
-                command: [resource-configure]
+                args: ["resource-configure"]
               - name: database-configure
                 image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
-                command: [database-configure]
+                args: ["database-configure"]
 status: {}
