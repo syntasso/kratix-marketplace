@@ -22,13 +22,17 @@ func main() {
 		log.Fatalf("usage: %s <pipeline-name>", os.Args[0])
 	}
 	arg := args[0]
+	st, err := sdk.ReadStatus()
+	if err != nil {
+		st = kratix.NewStatus() // start with empty status
+	}
 	switch arg {
 	case "resource-configure":
-		if err := runResource(sdk); err != nil {
+		if err := runResource(sdk, st); err != nil {
 			log.Fatalf("resource pipeline: %v", err)
 		}
 	case "database-configure":
-		if err := runDatabase(sdk); err != nil {
+		if err := runDatabase(sdk, st); err != nil {
 			log.Fatalf("database pipeline: %v", err)
 		}
 	default:
@@ -36,7 +40,7 @@ func main() {
 	}
 }
 
-func runResource(sdk *kratix.KratixSDK) error {
+func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
 	res, err := sdk.ReadResourceInput()
 	if err != nil {
 		return fmt.Errorf("read input: %w", err)
@@ -81,14 +85,13 @@ func runResource(sdk *kratix.KratixSDK) error {
 	}
 
 	endpoint := fmt.Sprintf("http://%s.local.gd:31338", name)
-	st := kratix.NewStatus()
 	_ = st.Set("message", "deployed to "+endpoint)
 	_ = st.Set("endpoint", endpoint)
 	_ = st.Set("replicas", int64(1))
-	return sdk.WriteStatus(st)
+	return nil
 }
 
-func runDatabase(sdk *kratix.KratixSDK) error {
+func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	res, err := sdk.ReadResourceInput()
 	if err != nil {
 		return fmt.Errorf("read input: %w", err)
@@ -145,7 +148,6 @@ func runDatabase(sdk *kratix.KratixSDK) error {
 			Value: dbName,
 		},
 	}
-	ensureFirstContainer(&deploy)
 	deploy.Spec.Template.Spec.Containers[0].Env = env
 	if err := writeYAMLObject(sdk, "deployment.yaml", &deploy); err != nil {
 		return fmt.Errorf("write updated deployment: %w", err)
@@ -166,7 +168,6 @@ func runDatabase(sdk *kratix.KratixSDK) error {
 		return fmt.Errorf("write postgresql request: %w", err)
 	}
 
-	// 3) destination selectors
 	ds := []kratix.DestinationSelector{
 		{Directory: "platform", MatchLabels: map[string]string{"environment": "platform"}},
 	}
@@ -174,8 +175,6 @@ func runDatabase(sdk *kratix.KratixSDK) error {
 		return fmt.Errorf("write destination selectors: %w", err)
 	}
 
-	// 4) status
-	st := kratix.NewStatus()
 	_ = st.Set("database.teamId", teamID)
 	_ = st.Set("database.dbName", dbName)
 	return sdk.WriteStatus(st)
@@ -229,18 +228,6 @@ func readDeployment(path string) (appsv1.Deployment, error) {
 	}
 	return d, nil
 }
-
-func ensureFirstContainer(d *appsv1.Deployment) {
-	if len(d.Spec.Template.Spec.Containers) == 0 {
-		d.Spec.Template.Spec.Containers = []corev1.Container{{
-			Name:  d.Name,
-			Image: "missing",
-			Ports: []corev1.ContainerPort{{ContainerPort: 8080}},
-		}}
-	}
-}
-
-/* ---------------- tiny accessors ---------------- */
 
 func get(res kratix.Resource, path string) any {
 	v, err := res.GetValue(path)
