@@ -178,7 +178,8 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	ds := []kratix.DestinationSelector{
 		{Directory: "platform", MatchLabels: map[string]string{"environment": "platform"}},
 	}
-	if err := sdk.WriteDestinationSelectors(ds); err != nil {
+
+	if err := writeDestinationSelectors(ds); err != nil {
 		return fmt.Errorf("write destination selectors: %w", err)
 	}
 
@@ -272,4 +273,12 @@ func mustStringOrEmpty(v any) string {
 	default:
 		return mustString(v)
 	}
+}
+
+func writeDestinationSelectors(ds []kratix.DestinationSelector) error {
+	data, err := yaml.Marshal(ds)
+	if err != nil {
+		return fmt.Errorf("marshal destination selectors: %w", err)
+	}
+	return os.WriteFile("/kratix/metadata/destination-selectors.yaml", data, 0o644)
 }
