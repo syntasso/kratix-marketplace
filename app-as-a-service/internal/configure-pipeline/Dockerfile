@@ -1,8 +1,11 @@
-FROM ghcr.io/syntasso/kratix-pipeline-utility:v0.0.1
-RUN [ "mkdir", "/scripts" ]
+FROM golang:1.25-alpine AS builder
+WORKDIR /src
+RUN apk add --no-cache git kubectl
+COPY ./scripts/go.mod ./scripts/go.sum ./scripts/main.go ./
+RUN go mod download
+COPY . .
+ENV CGO_ENABLED=0
+RUN go build -o /app/main .
 
-ENV PATH="${PATH}:/scripts/"
-COPY scripts/ /scripts/
+ENTRYPOINT ["/app/main"]
 
-CMD [ "sh", "-c", "./resource-configure" ]
-ENTRYPOINT []
