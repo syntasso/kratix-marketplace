@@ -22,6 +22,7 @@ func main() {
 		log.Fatalf("usage: %s <pipeline-name>", os.Args[0])
 	}
 	arg := args[0]
+	fmt.Println("Pipeline requested:", arg)
 	st, err := sdk.ReadStatus()
 	if err != nil {
 		st = kratix.NewStatus() // start with empty status
@@ -38,9 +39,11 @@ func main() {
 	default:
 		log.Fatalf("unknown pipeline %q", sdk.PipelineName())
 	}
+	fmt.Println("Finished executing main.")
 }
 
 func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
+	fmt.Println("Executing runResource...")
 	res, err := sdk.ReadResourceInput()
 	if err != nil {
 		return fmt.Errorf("read input: %w", err)
@@ -50,6 +53,7 @@ func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
 	name := mustString(get(res, "spec.name"))
 	namespace := mustString(get(res, "metadata.namespace"))
 	servicePort := mustString(get(res, "spec.service.port"))
+	fmt.Println("resource-configure inputs:", "image="+image, "name="+name, "namespace="+namespace, "servicePort="+servicePort)
 
 	deployYAML := runKubectl(
 		"create", "deployment", name,
@@ -88,10 +92,12 @@ func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
 	_ = st.Set("message", "deployed to "+endpoint)
 	_ = st.Set("endpoint", endpoint)
 	_ = st.Set("replicas", int64(1))
+	fmt.Println("Finished executing runResource.")
 	return nil
 }
 
 func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
+	fmt.Println("Executing runDatabase...")
 	res, err := sdk.ReadResourceInput()
 	if err != nil {
 		return fmt.Errorf("read input: %w", err)
@@ -100,6 +106,7 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	dbDriver := mustStringOrEmpty(get(res, "spec.dbDriver"))
 	name := mustString(get(res, "metadata.name"))
 	namespace := mustString(get(res, "metadata.namespace"))
+	fmt.Println("database-configure inputs:", "dbDriver="+dbDriver, "name="+name, "namespace="+namespace)
 
 	if dbDriver == "" || dbDriver == "none" {
 		st := kratix.NewStatus()
@@ -177,12 +184,12 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 
 	_ = st.Set("database.teamId", teamID)
 	_ = st.Set("database.dbName", dbName)
+	fmt.Println("Finished executing runDatabase.")
 	return sdk.WriteStatus(st)
 }
 
-/* ---------------- helpers ---------------- */
-
 func runKubectl(args ...string) []byte {
+	fmt.Printf("Executing runKubectl: %v", args)
 	cmd := exec.Command("kubectl", args...)
 	out, err := cmd.Output()
 	if err != nil {
