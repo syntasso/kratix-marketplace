@@ -93,7 +93,7 @@ func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
 	_ = st.Set("endpoint", endpoint)
 	_ = st.Set("replicas", int64(1))
 	fmt.Println("Finished executing runResource.")
-	return nil
+	return sdk.WriteStatus(st)
 }
 
 func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
