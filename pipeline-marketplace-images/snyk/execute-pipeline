@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -xeuo pipefail
+set -euo pipefail
 
 export SNYK_TOKEN="$(kubectl get secret snyk-token -o=jsonpath='{.data.token}' | base64 -d)"
 
