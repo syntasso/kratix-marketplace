@@ -1,31 +1,61 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 export SNYK_TOKEN="$(kubectl get secret snyk-token -o=jsonpath='{.data.token}' | base64 -d)"
 
-set -x
+images="$(grep -hoE 'image:\s*.*' /kratix/output/* | sed -E 's/.*image:\s*//' | sort -u)"
+echo "Scanning images:"
+echo "$images"
 
-to_scan=()
-IFS=$'\n'
-for f in $(cat /kratix/output/* | grep "image: "); do
-  image="$(echo $f | sed -e 's/^[[:space:]]*//' | sed 's/^- //' | yq '.image')"
-  to_scan+=( $image )
-done
+vuln=0
+bad_list=""
+clean_list=""
 
-echo "Scanning images: ${to_scan[@]}"
-
-found_vulns=false
-for image in "${to_scan[@]}"; do
-  if ! snyk container test $image; then
-    found_vulns=true
+while IFS= read -r img; do
+  if snyk container test "$img"; then
+    clean_list+="- $img"$'\n'
+  else
+    vuln=$((vuln+1))
+    bad_list+="- $img"$'\n'
   fi
-done
+done <<< "$images"
 
-if $found_vulns; then
+total="$(printf "%s\n" "$images" | sed '/^\s*$/d' | wc -l | tr -d ' ')"
+ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+mkdir -p /kratix/metadata
+{
+  echo "securityReport: |"
+  echo "  Security scan summary"
+  echo "  ----------------------"
+  echo "  Timestamp: $ts"
+  echo "  Total images scanned: $total"
+  echo
+  if [ "$vuln" -gt 0 ]; then
+    echo "  Vulnerable images ($vuln):"
+    printf "  %s" "${bad_list//$'\n'/$'\n  '}"
+    echo
+  fi
+  echo "  Clean images: $((total - vuln))"
+  if [ -n "$clean_list" ]; then
+    printf "  %s" "${clean_list//$'\n'/$'\n  '}"
+    echo
+  fi
+  if [ "$vuln" -gt 0 ]; then
+    echo "  Result: FAIL"
+  else
+    echo "  Result: PASS"
+  fi
+  echo "  See full Snyk output in job logs."
+} >> /kratix/metadata/status.yaml
+
+if [ "$vuln" -gt 0 ]; then
   echo "Found vulnerabilities in some of the images"
-  echo "See report above"
-  exit 1
+  if [ "${ERROR_ON_VULN:-true}" == "true" ]; then
+    exit 1
+  fi
+
+  exit 0
 fi
 
 echo "No vulnerabilities found"
