@@ -22,7 +22,7 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.479.2-jdk17
+        image: jenkins/jenkins:2.504.1-jdk17
         imagePullPolicy: Always
         livenessProbe:
           failureThreshold: 12
@@ -70,11 +70,11 @@ spec:
       - name: git
         version: 5.7.0
       - name: git-client
-        version: 6.1.1
+        version: 6.4.1
       - name: job-dsl
         version: "1.90"
       - name: configuration-as-code
-        version: 1932.v75cb_b_f1b_698d
+        version: 1985.vdda_32d0c4ea_b_
       - name: kubernetes-credentials-provider
         version: 1.273.v15e69b_55ea_8e
       - name: pipeline-model-definition

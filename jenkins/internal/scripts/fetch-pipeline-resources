@@ -18,7 +18,7 @@ done
 # version starting point found in: https://github.com/jenkinsci/kubernetes-operator/issues/794#issuecomment-1397889838
 # then updated based on errors on startup
 yq -i '. | 
-    .spec.master.containers[0].image="jenkins/jenkins:2.396-jdk17" |
+    .spec.master.containers[0].image="jenkins/jenkins:2.504.1-jdk17" |
     .spec.master.containers[0].env= [
         { "name": "DEBUG_JENKINS_OPERATOR", "value": "true"},
         { "name": "JAVA_OPTS", "value": "-Xmx2048m -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=80.0 -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"}
@@ -27,10 +27,11 @@ yq -i '. |
         { "name": "kubernetes", "version": "3802.vb_b_600831fcb_3"},
         { "name": "workflow-job", "version": "1284.v2fe8ed4573d4"},
         { "name": "workflow-aggregator", "version": "2.6"},
-        { "name": "git", "version": "4.11.3"},
-        { "name": "job-dsl", "version": "1.78.3"},
-        { "name": "configuration-as-code", "version": "1850.va_a_8c31d3158b_"},
-        { "name": "kubernetes-credentials-provider", "version": "1.208.v128ee9800c04"}
+        { "name": "git", "version": "5.7.0"},
+        { "name": "git-client", "version": "6.4.1"},
+        { "name": "job-dsl", "version": "1.90"},
+        { "name": "configuration-as-code", "version": "1985.vdda_32d0c4ea_b_"},
+        { "name": "kubernetes-credentials-provider", "version": "1.273.v15e69b_55ea_8e"}
     ] |
     del(.spec.seedJobs)' ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml
 
