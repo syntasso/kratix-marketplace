@@ -1,18 +1,44 @@
 package main
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strconv"
+	"strings"
 
+	"github.com/google/go-containerregistry/pkg/authn"
+	"github.com/google/go-containerregistry/pkg/name"
+	"github.com/google/go-containerregistry/pkg/v1/remote"
 	kratix "github.com/syntasso/kratix-go"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/yaml"
+)
+
+const (
+	defaultLauncherImage      = "ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0"
+	defaultReloaderImage      = "alpine:3.20"
+	launcherImageEnv          = "VAULT_LAUNCHER_IMAGE"
+	reloaderImageEnv          = "VAULT_RELOADER_IMAGE"
+	launcherInitContainerName = "vault-launcher-init"
+	rotationSidecarName       = "vault-rotation-reloader"
+	launcherBinaryPath        = "/vault/bin/vault-env-launcher"
+	vaultCredentialsFilePath  = "/vault/secrets/pg-db.env"
+	appPIDFilePath            = "/vault/run/app.pid"
+	launcherVolumeName        = "vault-launcher-bin"
+	runtimeVolumeName         = "vault-runtime"
+)
+
+var (
+	nonAlnumDashPattern = regexp.MustCompile(`[^a-z0-9-]+`)
+	multiDashPattern    = regexp.MustCompile(`-+`)
 )
 
 func main() {
@@ -119,43 +145,75 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 
 	teamID := name + "team"
 	dbName := name + "db"
+	vaultAuthPath := "kubernetes"
+	appServiceAccount := appendKubeNameSuffix(name, "-app-sa", 63)
+	instanceName := fmt.Sprintf("%s-%s-postgresql", teamID, dbName)
+	vaultAuthRole, vaultDBRole := deriveVaultResourceNames(namespace, teamID, dbName)
+	vaultCredentialsPath := fmt.Sprintf("database/creds/%s", vaultDBRole)
 
-	// 1) update existing deployment with env
+	if err := writeServiceAccount(sdk, appServiceAccount, namespace); err != nil {
+		return fmt.Errorf("write service account: %w", err)
+	}
+
+	// 1) update existing deployment with vault startup wiring
 	deploy, err := readDeployment("/kratix/output/deployment.yaml")
 	if err != nil {
 		return fmt.Errorf("read existing deployment: %w", err)
 	}
-	secretRef := fmt.Sprintf("%s.%s-%s-postgresql.credentials.postgresql.acid.zalan.do", teamID, teamID, dbName)
+	if len(deploy.Spec.Template.Spec.Containers) == 0 {
+		return fmt.Errorf("deployment has no containers")
+	}
 
-	env := []corev1.EnvVar{
-		{
-			Name: "PGPASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretRef},
-					Key:                  "password",
-				},
-			},
-		},
-		{
-			Name: "PGUSER",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: secretRef},
-					Key:                  "username",
-				},
-			},
-		},
+	appContainer := &deploy.Spec.Template.Spec.Containers[0]
+	resolvedCommand, err := resolveImageCommand(appContainer.Image)
+	if err != nil {
+		return fmt.Errorf("resolve image command for %q: %w", appContainer.Image, err)
+	}
+
+	appContainer.Env = []corev1.EnvVar{
 		{
 			Name:  "PGHOST",
-			Value: fmt.Sprintf("%s-%s-postgresql.default.svc.cluster.local", teamID, dbName),
+			Value: fmt.Sprintf("%s.%s.svc.cluster.local", instanceName, namespace),
 		},
 		{
 			Name:  "DBNAME",
 			Value: dbName,
 		},
+		{
+			Name:  "DB_CREDENTIALS_FILE",
+			Value: vaultCredentialsFilePath,
+		},
+		{
+			Name:  "APP_PID_FILE",
+			Value: appPIDFilePath,
+		},
 	}
-	deploy.Spec.Template.Spec.Containers[0].Env = env
+	appContainer.Command = []string{launcherBinaryPath}
+	appContainer.Args = resolvedCommand
+	upsertVolumeMount(appContainer, corev1.VolumeMount{Name: launcherVolumeName, MountPath: "/vault/bin", ReadOnly: true})
+	upsertVolumeMount(appContainer, corev1.VolumeMount{Name: runtimeVolumeName, MountPath: "/vault/run"})
+
+	if deploy.Spec.Template.Annotations == nil {
+		deploy.Spec.Template.Annotations = map[string]string{}
+	}
+	for key, value := range buildVaultAgentAnnotations(vaultAuthPath, vaultAuthRole, vaultCredentialsPath, appContainer.Name) {
+		deploy.Spec.Template.Annotations[key] = value
+	}
+
+	trueValue := true
+	deploy.Spec.Template.Spec.ShareProcessNamespace = &trueValue
+	deploy.Spec.Template.Spec.ServiceAccountName = appServiceAccount
+	upsertVolume(&deploy.Spec.Template.Spec, corev1.Volume{
+		Name:         launcherVolumeName,
+		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+	})
+	upsertVolume(&deploy.Spec.Template.Spec, corev1.Volume{
+		Name:         runtimeVolumeName,
+		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
+	})
+	upsertInitContainer(&deploy.Spec.Template.Spec, buildLauncherInitContainer())
+	upsertContainer(&deploy.Spec.Template.Spec, buildRotationSidecar())
+
 	if err := writeYAMLObject(sdk, "deployment.yaml", &deploy); err != nil {
 		return fmt.Errorf("write updated deployment: %w", err)
 	}
@@ -169,8 +227,15 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	pg.SetKind("postgresql")
 	pg.SetName(dbName)
 	pg.SetNamespace(namespace)
+
+	_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "namespace")
 	_ = unstructured.SetNestedField(pg.Object, teamID, "spec", "teamId")
 	_ = unstructured.SetNestedField(pg.Object, dbName, "spec", "dbName")
+	_ = unstructured.SetNestedField(pg.Object, true, "spec", "vault", "enabled")
+	_ = unstructured.SetNestedField(pg.Object, appServiceAccount, "spec", "vault", "appServiceAccount")
+	_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "vault", "appServiceAccountNamespace")
+	_ = unstructured.SetNestedField(pg.Object, vaultAuthPath, "spec", "vault", "kubernetesAuthPath")
+
 	if err := writeYAMLMap(sdk, "platform/postgresql.yaml", pg.Object); err != nil {
 		return fmt.Errorf("write postgresql request: %w", err)
 	}
@@ -178,13 +243,18 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	ds := []kratix.DestinationSelector{
 		{Directory: "platform", MatchLabels: map[string]string{"environment": "platform"}},
 	}
-
 	if err := writeDestinationSelectors(ds); err != nil {
 		return fmt.Errorf("write destination selectors: %w", err)
 	}
 
 	_ = st.Set("database.teamId", teamID)
 	_ = st.Set("database.dbName", dbName)
+	_ = st.Set("database.serviceAccount", appServiceAccount)
+	_ = st.Set("database.vaultEnabled", true)
+	_ = st.Set("database.vaultAuthPath", fmt.Sprintf("auth/%s/login", vaultAuthPath))
+	_ = st.Set("database.vaultRole", vaultAuthRole)
+	_ = st.Set("database.vaultCredentialsPath", vaultCredentialsPath)
+	_ = st.Set("database.credentialsFile", vaultCredentialsFilePath)
 	fmt.Println("Finished executing runDatabase.")
 	return sdk.WriteStatus(st)
 }
@@ -202,6 +272,152 @@ func runKubectl(args ...string) []byte {
 	return out
 }
 
+func resolveImageCommand(image string) ([]string, error) {
+	ref, err := name.ParseReference(image, name.WeakValidation)
+	if err != nil {
+		return nil, fmt.Errorf("parse image reference: %w", err)
+	}
+
+	img, err := remote.Image(ref, remote.WithAuthFromKeychain(authn.DefaultKeychain))
+	if err != nil {
+		return nil, fmt.Errorf("fetch image config: %w", err)
+	}
+
+	cfgFile, err := img.ConfigFile()
+	if err != nil {
+		return nil, fmt.Errorf("read image config: %w", err)
+	}
+
+	resolved := make([]string, 0, len(cfgFile.Config.Entrypoint)+len(cfgFile.Config.Cmd))
+	resolved = append(resolved, cfgFile.Config.Entrypoint...)
+	resolved = append(resolved, cfgFile.Config.Cmd...)
+	if len(resolved) == 0 {
+		return nil, fmt.Errorf("image has no entrypoint/cmd to wrap")
+	}
+
+	return resolved, nil
+}
+
+func buildLauncherInitContainer() corev1.Container {
+	copyCommand := "cp /app/vault-env-launcher /vault/bin/vault-env-launcher && chmod 0755 /vault/bin/vault-env-launcher"
+
+	return corev1.Container{
+		Name:    launcherInitContainerName,
+		Image:   getenvOrDefault(launcherImageEnv, defaultLauncherImage),
+		Command: []string{"/bin/sh", "-ec"},
+		Args:    []string{copyCommand},
+		VolumeMounts: []corev1.VolumeMount{
+			{Name: launcherVolumeName, MountPath: "/vault/bin"},
+		},
+	}
+}
+
+func buildRotationSidecar() corev1.Container {
+	reloadScript := `set -eu
+ENV_FILE="${DB_CREDENTIALS_FILE:-/vault/secrets/pg-db.env}"
+PID_FILE="${APP_PID_FILE:-/vault/run/app.pid}"
+INTERVAL="${ROTATION_CHECK_INTERVAL_SECONDS:-15}"
+
+while [ ! -s "$ENV_FILE" ]; do
+  sleep 2
+done
+last="$(sha256sum "$ENV_FILE" | awk '{print $1}')"
+
+while true; do
+  sleep "$INTERVAL"
+  [ -s "$ENV_FILE" ] || continue
+  current="$(sha256sum "$ENV_FILE" | awk '{print $1}')"
+  if [ "$current" != "$last" ]; then
+    if [ -f "$PID_FILE" ]; then
+      pid="$(cat "$PID_FILE" 2>/dev/null || true)"
+      if [ -n "$pid" ]; then
+        kill -TERM "$pid" 2>/dev/null || true
+      fi
+    fi
+    last="$current"
+  fi
+done`
+
+	return corev1.Container{
+		Name:    rotationSidecarName,
+		Image:   getenvOrDefault(reloaderImageEnv, defaultReloaderImage),
+		Command: []string{"/bin/sh", "-ec"},
+		Args:    []string{reloadScript},
+		Env: []corev1.EnvVar{
+			{Name: "DB_CREDENTIALS_FILE", Value: vaultCredentialsFilePath},
+			{Name: "APP_PID_FILE", Value: appPIDFilePath},
+			{Name: "ROTATION_CHECK_INTERVAL_SECONDS", Value: "15"},
+		},
+		VolumeMounts: []corev1.VolumeMount{
+			{Name: runtimeVolumeName, MountPath: "/vault/run"},
+		},
+	}
+}
+
+func buildVaultAgentAnnotations(vaultAuthPath, vaultAuthRole, vaultCredentialsPath, appContainerName string) map[string]string {
+	const secretAlias = "pg-creds"
+	return map[string]string{
+		"vault.hashicorp.com/agent-inject":                         "true",
+		"vault.hashicorp.com/agent-pre-populate":                   "true",
+		"vault.hashicorp.com/auth-path":                            fmt.Sprintf("auth/%s", vaultAuthPath),
+		"vault.hashicorp.com/role":                                 vaultAuthRole,
+		"vault.hashicorp.com/agent-inject-containers":              fmt.Sprintf("%s,%s", appContainerName, rotationSidecarName),
+		"vault.hashicorp.com/agent-inject-secret-" + secretAlias:   vaultCredentialsPath,
+		"vault.hashicorp.com/agent-inject-file-" + secretAlias:     "pg-db.env",
+		"vault.hashicorp.com/agent-inject-template-" + secretAlias: vaultCredentialsTemplate(vaultCredentialsPath),
+		"vault.hashicorp.com/agent-inject-command-" + secretAlias:  "chmod 0644 /vault/secrets/pg-db.env",
+	}
+}
+
+func vaultCredentialsTemplate(vaultCredentialsPath string) string {
+	return fmt.Sprintf(`{{- with secret %q -}}
+PGUSER={{ .Data.username }}
+PGPASSWORD={{ .Data.password }}
+DB_USER={{ .Data.username }}
+DB_PASSWORD={{ .Data.password }}
+{{- end -}}`, vaultCredentialsPath)
+}
+
+func deriveVaultResourceNames(namespace, teamID, dbName string) (string, string) {
+	safeIdentifier := sanitizeIdentifier(fmt.Sprintf("%s-%s-%s", namespace, teamID, dbName))
+	if safeIdentifier == "" {
+		safeIdentifier = "postgresql"
+	}
+
+	baseName := "postgresql-" + safeIdentifier
+	vaultAuthRole := shortenIdentifier(baseName+"-auth", 48)
+	vaultDBRole := shortenIdentifier(baseName+"-db", 64)
+	return vaultAuthRole, vaultDBRole
+}
+
+func sanitizeIdentifier(value string) string {
+	safe := strings.ToLower(value)
+	safe = nonAlnumDashPattern.ReplaceAllString(safe, "-")
+	safe = multiDashPattern.ReplaceAllString(safe, "-")
+	safe = strings.Trim(safe, "-")
+	return safe
+}
+
+func shortenIdentifier(value string, maxLen int) string {
+	if len(value) <= maxLen {
+		return value
+	}
+
+	hashBytes := sha256.Sum256([]byte(value))
+	hash := hex.EncodeToString(hashBytes[:])[:8]
+	keepLen := maxLen - 9
+	if keepLen < 1 {
+		keepLen = 1
+	}
+
+	prefix := strings.TrimRight(value[:keepLen], "-")
+	if prefix == "" {
+		return hash
+	}
+
+	return prefix + "-" + hash
+}
+
 func writeYAMLObject(sdk *kratix.KratixSDK, filename string, obj any) error {
 	b, err := yaml.Marshal(obj)
 	if err != nil {
@@ -216,6 +432,18 @@ func writeYAMLMap(sdk *kratix.KratixSDK, filename string, m map[string]any) erro
 		return err
 	}
 	return sdk.WriteOutput(filename, b)
+}
+
+func writeServiceAccount(sdk *kratix.KratixSDK, name, namespace string) error {
+	sa := map[string]any{
+		"apiVersion": "v1",
+		"kind":       "ServiceAccount",
+		"metadata": map[string]any{
+			"name":      name,
+			"namespace": namespace,
+		},
+	}
+	return writeYAMLMap(sdk, "serviceaccount.yaml", sa)
 }
 
 func readDeployment(path string) (appsv1.Deployment, error) {
@@ -273,6 +501,75 @@ func mustStringOrEmpty(v any) string {
 	default:
 		return mustString(v)
 	}
+}
+
+func appendKubeNameSuffix(base, suffix string, maxLen int) string {
+	cleanBase := strings.Trim(base, "-")
+	if cleanBase == "" {
+		cleanBase = "app"
+	}
+
+	maxBaseLen := maxLen - len(suffix)
+	if maxBaseLen < 1 {
+		return strings.Trim(strings.TrimPrefix(suffix, "-"), "-")
+	}
+
+	if len(cleanBase) > maxBaseLen {
+		cleanBase = strings.TrimRight(cleanBase[:maxBaseLen], "-")
+	}
+	if cleanBase == "" {
+		cleanBase = "app"
+	}
+
+	return cleanBase + suffix
+}
+
+func upsertVolume(spec *corev1.PodSpec, volume corev1.Volume) {
+	for i := range spec.Volumes {
+		if spec.Volumes[i].Name == volume.Name {
+			spec.Volumes[i] = volume
+			return
+		}
+	}
+	spec.Volumes = append(spec.Volumes, volume)
+}
+
+func upsertVolumeMount(container *corev1.Container, mount corev1.VolumeMount) {
+	for i := range container.VolumeMounts {
+		if container.VolumeMounts[i].Name == mount.Name {
+			container.VolumeMounts[i] = mount
+			return
+		}
+	}
+	container.VolumeMounts = append(container.VolumeMounts, mount)
+}
+
+func upsertContainer(spec *corev1.PodSpec, container corev1.Container) {
+	for i := range spec.Containers {
+		if spec.Containers[i].Name == container.Name {
+			spec.Containers[i] = container
+			return
+		}
+	}
+	spec.Containers = append(spec.Containers, container)
+}
+
+func upsertInitContainer(spec *corev1.PodSpec, container corev1.Container) {
+	for i := range spec.InitContainers {
+		if spec.InitContainers[i].Name == container.Name {
+			spec.InitContainers[i] = container
+			return
+		}
+	}
+	spec.InitContainers = append(spec.InitContainers, container)
+}
+
+func getenvOrDefault(key, fallback string) string {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return fallback
+	}
+	return value
 }
 
 func writeDestinationSelectors(ds []kratix.DestinationSelector) error {

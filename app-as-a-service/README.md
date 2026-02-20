@@ -23,6 +23,18 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/promises/postgresql-promise-release.yaml
 ```
 
+When `dbDriver: postgresql` is set, the configure pipeline:
+
+- creates a dedicated workload `ServiceAccount` for the app in the target namespace
+- runs the app `Deployment` using that service account
+- provisions a `postgresql` resource request with Vault enabled and bound to that service account
+- adds Vault Agent injector annotations so credentials are rendered to `/vault/secrets/pg-db.env`
+- wraps application startup with a launcher that reads those credentials into env vars before starting the original image entrypoint/cmd
+- runs a small reloader sidecar that restarts the app container when the credential file rotates
+- does not use Zalando operator credential Secret env wiring
+
+The configure pipeline resolves the image entrypoint/cmd from the registry so the wrapper can preserve normal startup behavior.
+
 The following fields are configurable:
 
 - name: application name
