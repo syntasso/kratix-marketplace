@@ -23,17 +23,8 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/promises/postgresql-promise-release.yaml
 ```
 
-When `dbDriver: postgresql` is set, the configure pipeline:
-
-- creates a dedicated workload `ServiceAccount` for the app in the target namespace
-- runs the app `Deployment` using that service account
-- provisions a `postgresql` resource request with Vault enabled and bound to that service account
-- adds Vault Agent injector annotations so credentials are rendered to `/vault/secrets/pg-db.env`
-- wraps application startup with a launcher that reads those credentials into env vars before starting the original image entrypoint/cmd
-- runs a small reloader sidecar that restarts the app container when the credential file rotates
-- does not use Zalando operator credential Secret env wiring
-
-The configure pipeline resolves the image entrypoint/cmd from the registry so the wrapper can preserve normal startup behavior.
+When `dbDriver: postgresql` is set, the configure pipeline provisions a `postgresql` resource request.
+Vault integration is optional and described in the [Vault Integration](#vault-integration) section.
 
 The following fields are configurable:
 
@@ -54,6 +45,38 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 This resource request deploys the Kratix [sample Golang app](https://github.com/syntasso/sample-todo-list-app).
 
 To test the sample app once it is successfully deployed, access it at `http://todoer.local.gd:31338`.
+
+## Vault Integration
+
+Vault is opt-in for each app resource. Without the Vault label, the app still uses PostgreSQL and no Vault-specific wiring is applied.
+
+To opt into Vault for a specific app, add this label to the resource metadata:
+```
+app-as-a-service.marketplace.kratix.io/vault: "true"
+```
+
+Tip: you can set this label directly in the resource YAML before applying it, or add it later:
+```
+kubectl label app <app-name> app-as-a-service.marketplace.kratix.io/vault=true --overwrite
+```
+
+If you want this to be automatic, use an admission webhook (for example, a mutating webhook) to inject
+`app-as-a-service.marketplace.kratix.io/vault: "true"` into matching app resources.
+
+When the Vault label is set to `true`, a dedicated `vault-configure` workflow step:
+
+- creates a dedicated workload `ServiceAccount` for the app in the target namespace
+- runs the app `Deployment` using that service account
+- updates the `postgresql` resource request to enable Vault and bind it to that service account
+- adds Vault Agent injector annotations so credentials are rendered to `/vault/secrets/pg-db.env`
+- wraps application startup with a launcher that reads those credentials into env vars before starting the original image entrypoint/cmd
+- runs a small reloader sidecar that restarts the app container when the credential file rotates
+
+The configure pipeline resolves the image entrypoint/cmd from the registry so the wrapper can preserve normal startup behavior.
+
+Or apply the example request with Vault enabled:
+```
+kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-as-a-service/resource-request-vault.yaml
 ```
 
 ## Development

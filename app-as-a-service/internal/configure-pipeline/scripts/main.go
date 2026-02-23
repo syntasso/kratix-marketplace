@@ -25,9 +25,13 @@ import (
 const (
 	defaultLauncherImage      = "ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0"
 	defaultReloaderImage      = "alpine:3.20"
+	defaultPostgresWaitImage  = "alpine:3.20"
+	vaultOptInLabelKey        = "app-as-a-service.marketplace.kratix.io/vault"
 	launcherImageEnv          = "VAULT_LAUNCHER_IMAGE"
 	reloaderImageEnv          = "VAULT_RELOADER_IMAGE"
+	postgresWaitImageEnv      = "POSTGRES_WAIT_IMAGE"
 	launcherInitContainerName = "vault-launcher-init"
+	postgresWaitInitName      = "postgres-ready-wait"
 	rotationSidecarName       = "vault-rotation-reloader"
 	launcherBinaryPath        = "/vault/bin/vault-env-launcher"
 	vaultCredentialsFilePath  = "/vault/secrets/pg-db.env"
@@ -61,6 +65,10 @@ func main() {
 	case "database-configure":
 		if err := runDatabase(sdk, st); err != nil {
 			log.Fatalf("database pipeline: %v", err)
+		}
+	case "vault-configure":
+		if err := runVaultConfigure(sdk, st); err != nil {
+			log.Fatalf("vault pipeline: %v", err)
 		}
 	default:
 		log.Fatalf("unknown pipeline %q", sdk.PipelineName())
@@ -143,19 +151,138 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 		return fmt.Errorf("unsupported db driver %q. supported: postgresql", dbDriver)
 	}
 
-	teamID := name + "team"
-	dbName := name + "db"
+	pgIdentity := derivePostgresIdentity(name)
+
+	// update deployment with non-vault database wiring via operator-managed secret
+	deploy, err := readDeployment("/kratix/output/deployment.yaml")
+	if err != nil {
+		return fmt.Errorf("read existing deployment: %w", err)
+	}
+	if len(deploy.Spec.Template.Spec.Containers) == 0 {
+		return fmt.Errorf("deployment has no containers")
+	}
+
+	appContainer := &deploy.Spec.Template.Spec.Containers[0]
+	appContainer.Env = []corev1.EnvVar{
+		{Name: "PGHOST", Value: fmt.Sprintf("%s.%s.svc.cluster.local", pgIdentity.instanceName, namespace)},
+		{Name: "DBNAME", Value: pgIdentity.dbName},
+		{
+			Name: "PGUSER",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "username",
+				},
+			},
+		},
+		{
+			Name: "PGPASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "password",
+				},
+			},
+		},
+		{
+			Name: "DB_USER",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "username",
+				},
+			},
+		},
+		{
+			Name: "DB_PASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "password",
+				},
+			},
+		},
+	}
+
+	if err := writeYAMLObject(sdk, "deployment.yaml", &deploy); err != nil {
+		return fmt.Errorf("write updated deployment: %w", err)
+	}
+
+	// write base postgresql CR. Vault-specific fields are added in vault-configure.
+	if err := os.MkdirAll(filepath.Clean("/kratix/output/platform"), 0o755); err != nil {
+		return fmt.Errorf("mkdir platform: %w", err)
+	}
+	pg := &unstructured.Unstructured{Object: map[string]any{}}
+	pg.SetAPIVersion("marketplace.kratix.io/v1alpha2")
+	pg.SetKind("postgresql")
+	pg.SetName(pgIdentity.requestName)
+	pg.SetNamespace(namespace)
+
+	_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "namespace")
+	_ = unstructured.SetNestedField(pg.Object, pgIdentity.teamID, "spec", "teamId")
+	_ = unstructured.SetNestedField(pg.Object, pgIdentity.dbName, "spec", "dbName")
+
+	if err := writeYAMLMap(sdk, "platform/postgresql.yaml", pg.Object); err != nil {
+		return fmt.Errorf("write postgresql request: %w", err)
+	}
+
+	ds := []kratix.DestinationSelector{
+		{Directory: "platform", MatchLabels: map[string]string{"environment": "platform"}},
+	}
+	if err := writeDestinationSelectors(ds); err != nil {
+		return fmt.Errorf("write destination selectors: %w", err)
+	}
+
+	_ = st.Set("database.teamId", pgIdentity.teamID)
+	_ = st.Set("database.dbName", pgIdentity.dbName)
+	_ = st.Set("database.requestName", pgIdentity.requestName)
+	_ = st.Set("database.instanceName", pgIdentity.instanceName)
+	_ = st.Set("database.credentialsSecret", pgIdentity.credentialsSecretName)
+	_ = st.Set("database.vaultEnabled", false)
+	_ = st.Set("database.serviceAccount", nil)
+	_ = st.Set("database.vaultAuthPath", nil)
+	_ = st.Set("database.vaultRole", nil)
+	_ = st.Set("database.vaultCredentialsPath", nil)
+	_ = st.Set("database.credentialsFile", nil)
+	fmt.Println("Finished executing runDatabase.")
+	return sdk.WriteStatus(st)
+}
+
+func runVaultConfigure(sdk *kratix.KratixSDK, st kratix.Status) error {
+	fmt.Println("Executing runVaultConfigure...")
+	res, err := sdk.ReadResourceInput()
+	if err != nil {
+		return fmt.Errorf("read input: %w", err)
+	}
+
+	dbDriver := mustStringOrEmpty(get(res, "spec.dbDriver"))
+	name := mustString(get(res, "metadata.name"))
+	namespace := mustString(get(res, "metadata.namespace"))
+	vaultEnabled := hasLabelTrue(res, vaultOptInLabelKey)
+	fmt.Println("vault-configure inputs:", "dbDriver="+dbDriver, "name="+name, "namespace="+namespace, fmt.Sprintf("%s=%t", vaultOptInLabelKey, vaultEnabled))
+
+	if dbDriver == "" || dbDriver == "none" {
+		fmt.Println("vault-configure skipped: no database requested")
+		return nil
+	}
+	if dbDriver != "postgresql" {
+		return fmt.Errorf("unsupported db driver %q. supported: postgresql", dbDriver)
+	}
+	if !vaultEnabled {
+		fmt.Println("vault-configure skipped: vault label not enabled")
+		return nil
+	}
+
+	pgIdentity := derivePostgresIdentity(name)
 	vaultAuthPath := "kubernetes"
 	appServiceAccount := appendKubeNameSuffix(name, "-app-sa", 63)
-	instanceName := fmt.Sprintf("%s-%s-postgresql", teamID, dbName)
-	vaultAuthRole, vaultDBRole := deriveVaultResourceNames(namespace, teamID, dbName)
+	vaultAuthRole, vaultDBRole := deriveVaultResourceNames(namespace, pgIdentity.teamID, pgIdentity.dbName)
 	vaultCredentialsPath := fmt.Sprintf("database/creds/%s", vaultDBRole)
 
 	if err := writeServiceAccount(sdk, appServiceAccount, namespace); err != nil {
 		return fmt.Errorf("write service account: %w", err)
 	}
 
-	// 1) update existing deployment with vault startup wiring
 	deploy, err := readDeployment("/kratix/output/deployment.yaml")
 	if err != nil {
 		return fmt.Errorf("read existing deployment: %w", err)
@@ -171,22 +298,10 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	}
 
 	appContainer.Env = []corev1.EnvVar{
-		{
-			Name:  "PGHOST",
-			Value: fmt.Sprintf("%s.%s.svc.cluster.local", instanceName, namespace),
-		},
-		{
-			Name:  "DBNAME",
-			Value: dbName,
-		},
-		{
-			Name:  "DB_CREDENTIALS_FILE",
-			Value: vaultCredentialsFilePath,
-		},
-		{
-			Name:  "APP_PID_FILE",
-			Value: appPIDFilePath,
-		},
+		{Name: "PGHOST", Value: fmt.Sprintf("%s.%s.svc.cluster.local", pgIdentity.instanceName, namespace)},
+		{Name: "DBNAME", Value: pgIdentity.dbName},
+		{Name: "DB_CREDENTIALS_FILE", Value: vaultCredentialsFilePath},
+		{Name: "APP_PID_FILE", Value: appPIDFilePath},
 	}
 	appContainer.Command = []string{launcherBinaryPath}
 	appContainer.Args = resolvedCommand
@@ -211,6 +326,7 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 		Name:         runtimeVolumeName,
 		VolumeSource: corev1.VolumeSource{EmptyDir: &corev1.EmptyDirVolumeSource{}},
 	})
+	upsertInitContainer(&deploy.Spec.Template.Spec, buildPostgresWaitInitContainer(pgIdentity.instanceName, namespace))
 	upsertInitContainer(&deploy.Spec.Template.Spec, buildLauncherInitContainer())
 	upsertContainer(&deploy.Spec.Template.Spec, buildRotationSidecar())
 
@@ -218,44 +334,26 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 		return fmt.Errorf("write updated deployment: %w", err)
 	}
 
-	// 2) write postgresql CR using unstructured
-	if err := os.MkdirAll(filepath.Clean("/kratix/output/platform"), 0o755); err != nil {
-		return fmt.Errorf("mkdir platform: %w", err)
+	pgObject, err := readYAMLMap("/kratix/output/platform/postgresql.yaml")
+	if err != nil {
+		return fmt.Errorf("read postgresql request: %w", err)
 	}
-	pg := &unstructured.Unstructured{Object: map[string]any{}}
-	pg.SetAPIVersion("marketplace.kratix.io/v1alpha2")
-	pg.SetKind("postgresql")
-	pg.SetName(dbName)
-	pg.SetNamespace(namespace)
+	_ = unstructured.SetNestedField(pgObject, true, "spec", "vault", "enabled")
+	_ = unstructured.SetNestedField(pgObject, appServiceAccount, "spec", "vault", "appServiceAccount")
+	_ = unstructured.SetNestedField(pgObject, namespace, "spec", "vault", "appServiceAccountNamespace")
+	_ = unstructured.SetNestedField(pgObject, vaultAuthPath, "spec", "vault", "kubernetesAuthPath")
 
-	_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "namespace")
-	_ = unstructured.SetNestedField(pg.Object, teamID, "spec", "teamId")
-	_ = unstructured.SetNestedField(pg.Object, dbName, "spec", "dbName")
-	_ = unstructured.SetNestedField(pg.Object, true, "spec", "vault", "enabled")
-	_ = unstructured.SetNestedField(pg.Object, appServiceAccount, "spec", "vault", "appServiceAccount")
-	_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "vault", "appServiceAccountNamespace")
-	_ = unstructured.SetNestedField(pg.Object, vaultAuthPath, "spec", "vault", "kubernetesAuthPath")
-
-	if err := writeYAMLMap(sdk, "platform/postgresql.yaml", pg.Object); err != nil {
+	if err := writeYAMLMap(sdk, "platform/postgresql.yaml", pgObject); err != nil {
 		return fmt.Errorf("write postgresql request: %w", err)
 	}
 
-	ds := []kratix.DestinationSelector{
-		{Directory: "platform", MatchLabels: map[string]string{"environment": "platform"}},
-	}
-	if err := writeDestinationSelectors(ds); err != nil {
-		return fmt.Errorf("write destination selectors: %w", err)
-	}
-
-	_ = st.Set("database.teamId", teamID)
-	_ = st.Set("database.dbName", dbName)
 	_ = st.Set("database.serviceAccount", appServiceAccount)
 	_ = st.Set("database.vaultEnabled", true)
 	_ = st.Set("database.vaultAuthPath", fmt.Sprintf("auth/%s/login", vaultAuthPath))
 	_ = st.Set("database.vaultRole", vaultAuthRole)
 	_ = st.Set("database.vaultCredentialsPath", vaultCredentialsPath)
 	_ = st.Set("database.credentialsFile", vaultCredentialsFilePath)
-	fmt.Println("Finished executing runDatabase.")
+	fmt.Println("Finished executing runVaultConfigure.")
 	return sdk.WriteStatus(st)
 }
 
@@ -308,6 +406,35 @@ func buildLauncherInitContainer() corev1.Container {
 		Args:    []string{copyCommand},
 		VolumeMounts: []corev1.VolumeMount{
 			{Name: launcherVolumeName, MountPath: "/vault/bin"},
+		},
+	}
+}
+
+func buildPostgresWaitInitContainer(instanceName, namespace string) corev1.Container {
+	waitScript := `set -eu
+HOST="${PGHOST:?missing PGHOST}"
+PORT="${PGPORT:-5432}"
+TIMEOUT="${PG_WAIT_TIMEOUT_SECONDS:-900}"
+START="$(date +%s)"
+
+while ! nc -z "$HOST" "$PORT" >/dev/null 2>&1; do
+  NOW="$(date +%s)"
+  if [ $((NOW - START)) -ge "$TIMEOUT" ]; then
+    echo "timed out waiting for postgres at ${HOST}:${PORT}" >&2
+    exit 1
+  fi
+  sleep 2
+done`
+
+	return corev1.Container{
+		Name:    postgresWaitInitName,
+		Image:   getenvOrDefault(postgresWaitImageEnv, defaultPostgresWaitImage),
+		Command: []string{"/bin/sh", "-ec"},
+		Args:    []string{waitScript},
+		Env: []corev1.EnvVar{
+			{Name: "PGHOST", Value: fmt.Sprintf("%s.%s.svc.cluster.local", instanceName, namespace)},
+			{Name: "PGPORT", Value: "5432"},
+			{Name: "PG_WAIT_TIMEOUT_SECONDS", Value: "900"},
 		},
 	}
 }
@@ -376,6 +503,44 @@ PGPASSWORD={{ .Data.password }}
 DB_USER={{ .Data.username }}
 DB_PASSWORD={{ .Data.password }}
 {{- end -}}`, vaultCredentialsPath)
+}
+
+type postgresIdentity struct {
+	teamID                string
+	requestName           string
+	dbName                string
+	instanceName          string
+	credentialsSecretName string
+}
+
+func derivePostgresIdentity(appName string) postgresIdentity {
+	// Postgres operator appends a hash to the instance label value; keep the base
+	// app token short enough so generated labels stay <= 63 chars.
+	baseName := shortenPostgresResourceBase(appName)
+	teamID := baseName + "team"
+	requestName := baseName + "db"
+	dbName := requestName
+	instanceName := fmt.Sprintf("%s-%s-postgresql", teamID, requestName)
+	credentialsSecretName := fmt.Sprintf("%s.%s.credentials.postgresql.acid.zalan.do", teamID, instanceName)
+
+	return postgresIdentity{
+		teamID:                teamID,
+		requestName:           requestName,
+		dbName:                dbName,
+		instanceName:          instanceName,
+		credentialsSecretName: credentialsSecretName,
+	}
+}
+
+func shortenPostgresResourceBase(appName string) string {
+	const maxBaseLen = 17
+
+	safe := sanitizeIdentifier(appName)
+	if safe == "" {
+		safe = "app"
+	}
+
+	return shortenIdentifier(safe, maxBaseLen)
 }
 
 func deriveVaultResourceNames(namespace, teamID, dbName string) (string, string) {
@@ -463,6 +628,57 @@ func readDeployment(path string) (appsv1.Deployment, error) {
 		d.Kind = "Deployment"
 	}
 	return d, nil
+}
+
+func readYAMLMap(path string) (map[string]any, error) {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var out map[string]any
+	if err := yaml.Unmarshal(b, &out); err != nil {
+		return nil, err
+	}
+	if out == nil {
+		out = map[string]any{}
+	}
+	return out, nil
+}
+
+func hasLabelTrue(res kratix.Resource, label string) bool {
+	v, err := res.GetValue("metadata.labels")
+	if err != nil || v == nil {
+		return false
+	}
+
+	switch labels := v.(type) {
+	case map[string]any:
+		return isTruthy(labels[label])
+	case map[string]string:
+		value, ok := labels[label]
+		if !ok {
+			return false
+		}
+		return strings.EqualFold(strings.TrimSpace(value), "true")
+	default:
+		return false
+	}
+}
+
+func isTruthy(v any) bool {
+	if v == nil {
+		return false
+	}
+
+	switch value := v.(type) {
+	case bool:
+		return value
+	case string:
+		return strings.EqualFold(strings.TrimSpace(value), "true")
+	default:
+		return strings.EqualFold(strings.TrimSpace(fmt.Sprintf("%v", value)), "true")
+	}
 }
 
 func get(res kratix.Resource, path string) any {

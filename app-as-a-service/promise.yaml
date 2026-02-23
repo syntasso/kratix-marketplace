@@ -78,4 +78,7 @@ spec:
               - name: database-configure
                 image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
                 args: ["database-configure"]
+              - name: vault-configure
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                args: ["vault-configure"]
 status: {}
