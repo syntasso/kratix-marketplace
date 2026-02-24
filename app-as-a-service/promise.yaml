@@ -69,15 +69,47 @@ spec:
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
           metadata:
-            name: resource-configure
+            name: db-request
           spec:
             containers:
-              - name: create-resources
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
-                args: ["resource-configure"]
-              - name: database-configure
+              - name: create-db-request
                 image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
                 args: ["database-configure"]
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: resource-configure
+          spec:
+            rbac:
+              permissions:
+                - apiGroups:
+                    - marketplace.kratix.io
+                  resources:
+                    - postgresqls
+                  verbs:
+                    - get
+            containers:
+              - name: create-base-resources
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                args: ["resource-configure"]
+              - name: wait-db-ready
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
+                args: ["wait-db-ready"]
+                env:
+                  - name: POSTGRES_READY_TIMEOUT_SECONDS
+                    value: "900"
+                  - name: POSTGRES_READY_POLL_INTERVAL_SECONDS
+                    value: "5"
+                  - name: VAULT_ADDR
+                    valueFrom:
+                      secretKeyRef:
+                        name: postgresql-vault
+                        key: address
+                  - name: VAULT_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: postgresql-vault
+                        key: token
               - name: vault-configure
                 image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.0
                 args: ["vault-configure"]

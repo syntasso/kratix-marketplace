@@ -4,13 +4,16 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
@@ -70,6 +73,10 @@ func main() {
 		if err := runVaultConfigure(sdk, st); err != nil {
 			log.Fatalf("vault pipeline: %v", err)
 		}
+	case "wait-db-ready":
+		if err := runWaitDatabaseReady(sdk, st); err != nil {
+			log.Fatalf("wait database ready pipeline: %v", err)
+		}
 	default:
 		log.Fatalf("unknown pipeline %q", sdk.PipelineName())
 	}
@@ -86,6 +93,8 @@ func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
 	image := mustString(get(res, "spec.image"))
 	name := mustString(get(res, "spec.name"))
 	namespace := mustString(get(res, "metadata.namespace"))
+	resourceName := mustString(get(res, "metadata.name"))
+	dbDriver := mustStringOrEmpty(get(res, "spec.dbDriver"))
 	servicePort := mustString(get(res, "spec.service.port"))
 	fmt.Println("resource-configure inputs:", "image="+image, "name="+name, "namespace="+namespace, "servicePort="+servicePort)
 
@@ -96,6 +105,29 @@ func runResource(sdk *kratix.KratixSDK, st kratix.Status) error {
 		"--image="+image,
 		"--dry-run=client", "-o", "yaml",
 	)
+	if dbDriver == "postgresql" {
+		var deploy appsv1.Deployment
+		if err := yaml.Unmarshal(deployYAML, &deploy); err != nil {
+			return fmt.Errorf("parse generated deployment: %w", err)
+		}
+		if deploy.APIVersion == "" {
+			deploy.APIVersion = "apps/v1"
+		}
+		if deploy.Kind == "" {
+			deploy.Kind = "Deployment"
+		}
+
+		pgIdentity := derivePostgresIdentity(resourceName)
+		if err := applyNonVaultDatabaseWiring(&deploy, pgIdentity, namespace); err != nil {
+			return fmt.Errorf("wire non-vault database in deployment: %w", err)
+		}
+
+		patchedDeployYAML, err := yaml.Marshal(&deploy)
+		if err != nil {
+			return fmt.Errorf("marshal generated deployment: %w", err)
+		}
+		deployYAML = patchedDeployYAML
+	}
 	if err := sdk.WriteOutput("deployment.yaml", deployYAML); err != nil {
 		return fmt.Errorf("write deployment: %w", err)
 	}
@@ -140,6 +172,7 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	dbDriver := mustStringOrEmpty(get(res, "spec.dbDriver"))
 	name := mustString(get(res, "metadata.name"))
 	namespace := mustString(get(res, "metadata.namespace"))
+	vaultEnabled := hasLabelTrue(res, vaultOptInLabelKey)
 	fmt.Println("database-configure inputs:", "dbDriver="+dbDriver, "name="+name, "namespace="+namespace)
 
 	if dbDriver == "" || dbDriver == "none" {
@@ -154,58 +187,20 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	pgIdentity := derivePostgresIdentity(name)
 
 	// update deployment with non-vault database wiring via operator-managed secret
+	// if a deployment manifest already exists in this pipeline run.
 	deploy, err := readDeployment("/kratix/output/deployment.yaml")
 	if err != nil {
-		return fmt.Errorf("read existing deployment: %w", err)
-	}
-	if len(deploy.Spec.Template.Spec.Containers) == 0 {
-		return fmt.Errorf("deployment has no containers")
-	}
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("read existing deployment: %w", err)
+		}
+	} else {
+		if err := applyNonVaultDatabaseWiring(&deploy, pgIdentity, namespace); err != nil {
+			return fmt.Errorf("wire non-vault database in deployment: %w", err)
+		}
 
-	appContainer := &deploy.Spec.Template.Spec.Containers[0]
-	appContainer.Env = []corev1.EnvVar{
-		{Name: "PGHOST", Value: fmt.Sprintf("%s.%s.svc.cluster.local", pgIdentity.instanceName, namespace)},
-		{Name: "DBNAME", Value: pgIdentity.dbName},
-		{
-			Name: "PGUSER",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
-					Key:                  "username",
-				},
-			},
-		},
-		{
-			Name: "PGPASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
-					Key:                  "password",
-				},
-			},
-		},
-		{
-			Name: "DB_USER",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
-					Key:                  "username",
-				},
-			},
-		},
-		{
-			Name: "DB_PASSWORD",
-			ValueFrom: &corev1.EnvVarSource{
-				SecretKeyRef: &corev1.SecretKeySelector{
-					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
-					Key:                  "password",
-				},
-			},
-		},
-	}
-
-	if err := writeYAMLObject(sdk, "deployment.yaml", &deploy); err != nil {
-		return fmt.Errorf("write updated deployment: %w", err)
+		if err := writeYAMLObject(sdk, "deployment.yaml", &deploy); err != nil {
+			return fmt.Errorf("write updated deployment: %w", err)
+		}
 	}
 
 	// write base postgresql CR. Vault-specific fields are added in vault-configure.
@@ -221,6 +216,31 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "namespace")
 	_ = unstructured.SetNestedField(pg.Object, pgIdentity.teamID, "spec", "teamId")
 	_ = unstructured.SetNestedField(pg.Object, pgIdentity.dbName, "spec", "dbName")
+	if vaultEnabled {
+		vaultAuthPath := "kubernetes"
+		appServiceAccount := appendKubeNameSuffix(name, "-app-sa", 63)
+		vaultAuthRole, vaultDBRole := deriveVaultResourceNames(namespace, pgIdentity.teamID, pgIdentity.dbName)
+		vaultCredentialsPath := fmt.Sprintf("database/creds/%s", vaultDBRole)
+
+		_ = unstructured.SetNestedField(pg.Object, true, "spec", "vault", "enabled")
+		_ = unstructured.SetNestedField(pg.Object, appServiceAccount, "spec", "vault", "appServiceAccount")
+		_ = unstructured.SetNestedField(pg.Object, namespace, "spec", "vault", "appServiceAccountNamespace")
+		_ = unstructured.SetNestedField(pg.Object, vaultAuthPath, "spec", "vault", "kubernetesAuthPath")
+
+		_ = st.Set("database.vaultEnabled", true)
+		_ = st.Set("database.serviceAccount", appServiceAccount)
+		_ = st.Set("database.vaultAuthPath", fmt.Sprintf("auth/%s/login", vaultAuthPath))
+		_ = st.Set("database.vaultRole", vaultAuthRole)
+		_ = st.Set("database.vaultCredentialsPath", vaultCredentialsPath)
+		_ = st.Set("database.credentialsFile", vaultCredentialsFilePath)
+	} else {
+		_ = st.Set("database.vaultEnabled", false)
+		_ = st.Set("database.serviceAccount", nil)
+		_ = st.Set("database.vaultAuthPath", nil)
+		_ = st.Set("database.vaultRole", nil)
+		_ = st.Set("database.vaultCredentialsPath", nil)
+		_ = st.Set("database.credentialsFile", nil)
+	}
 
 	if err := writeYAMLMap(sdk, "platform/postgresql.yaml", pg.Object); err != nil {
 		return fmt.Errorf("write postgresql request: %w", err)
@@ -238,12 +258,6 @@ func runDatabase(sdk *kratix.KratixSDK, st kratix.Status) error {
 	_ = st.Set("database.requestName", pgIdentity.requestName)
 	_ = st.Set("database.instanceName", pgIdentity.instanceName)
 	_ = st.Set("database.credentialsSecret", pgIdentity.credentialsSecretName)
-	_ = st.Set("database.vaultEnabled", false)
-	_ = st.Set("database.serviceAccount", nil)
-	_ = st.Set("database.vaultAuthPath", nil)
-	_ = st.Set("database.vaultRole", nil)
-	_ = st.Set("database.vaultCredentialsPath", nil)
-	_ = st.Set("database.credentialsFile", nil)
 	fmt.Println("Finished executing runDatabase.")
 	return sdk.WriteStatus(st)
 }
@@ -334,19 +348,6 @@ func runVaultConfigure(sdk *kratix.KratixSDK, st kratix.Status) error {
 		return fmt.Errorf("write updated deployment: %w", err)
 	}
 
-	pgObject, err := readYAMLMap("/kratix/output/platform/postgresql.yaml")
-	if err != nil {
-		return fmt.Errorf("read postgresql request: %w", err)
-	}
-	_ = unstructured.SetNestedField(pgObject, true, "spec", "vault", "enabled")
-	_ = unstructured.SetNestedField(pgObject, appServiceAccount, "spec", "vault", "appServiceAccount")
-	_ = unstructured.SetNestedField(pgObject, namespace, "spec", "vault", "appServiceAccountNamespace")
-	_ = unstructured.SetNestedField(pgObject, vaultAuthPath, "spec", "vault", "kubernetesAuthPath")
-
-	if err := writeYAMLMap(sdk, "platform/postgresql.yaml", pgObject); err != nil {
-		return fmt.Errorf("write postgresql request: %w", err)
-	}
-
 	_ = st.Set("database.serviceAccount", appServiceAccount)
 	_ = st.Set("database.vaultEnabled", true)
 	_ = st.Set("database.vaultAuthPath", fmt.Sprintf("auth/%s/login", vaultAuthPath))
@@ -357,17 +358,228 @@ func runVaultConfigure(sdk *kratix.KratixSDK, st kratix.Status) error {
 	return sdk.WriteStatus(st)
 }
 
+func runWaitDatabaseReady(sdk *kratix.KratixSDK, st kratix.Status) error {
+	fmt.Println("Executing runWaitDatabaseReady...")
+	res, err := sdk.ReadResourceInput()
+	if err != nil {
+		return fmt.Errorf("read input: %w", err)
+	}
+
+	dbDriver := mustStringOrEmpty(get(res, "spec.dbDriver"))
+	name := mustString(get(res, "metadata.name"))
+	namespace := mustString(get(res, "metadata.namespace"))
+	vaultEnabled := hasLabelTrue(res, vaultOptInLabelKey)
+	fmt.Println("wait-db-ready inputs:", "dbDriver="+dbDriver, "name="+name, "namespace="+namespace, fmt.Sprintf("%s=%t", vaultOptInLabelKey, vaultEnabled))
+
+	if dbDriver == "" || dbDriver == "none" {
+		fmt.Println("wait-db-ready skipped: no database requested")
+		return nil
+	}
+	if dbDriver != "postgresql" {
+		return fmt.Errorf("unsupported db driver %q. supported: postgresql", dbDriver)
+	}
+
+	pgIdentity := derivePostgresIdentity(name)
+	timeoutSeconds := getenvIntOrDefault("POSTGRES_READY_TIMEOUT_SECONDS", 900)
+	pollIntervalSeconds := getenvIntOrDefault("POSTGRES_READY_POLL_INTERVAL_SECONDS", 5)
+	timeout := time.Duration(timeoutSeconds) * time.Second
+	pollInterval := time.Duration(pollIntervalSeconds) * time.Second
+	deadline := time.Now().Add(timeout)
+
+	var lastObserved string
+	for {
+		snapshot, err := readPostgresReadinessSnapshot(namespace, pgIdentity.requestName)
+		if err != nil {
+			lastObserved = err.Error()
+		} else {
+			isReady := snapshot.Reconciled == "True" &&
+				snapshot.WorksSucceeded == "True" &&
+				snapshot.Host != ""
+			if isReady {
+				if !vaultEnabled {
+					_ = st.Set("database.host", snapshot.Host)
+					fmt.Println("Finished executing runWaitDatabaseReady.")
+					return sdk.WriteStatus(st)
+				}
+
+				vaultReady := snapshot.VaultAuthPath != "" &&
+					snapshot.VaultRole != "" &&
+					snapshot.VaultCredentialsPath != ""
+				if vaultReady {
+					roleReady, roleErr := isVaultRoleConfigured(snapshot)
+					if roleErr != nil {
+						lastObserved = roleErr.Error()
+					} else if roleReady {
+						_ = st.Set("database.host", snapshot.Host)
+						_ = st.Set("database.vaultEnabled", true)
+						_ = st.Set("database.vaultAuthPath", snapshot.VaultAuthPath)
+						_ = st.Set("database.vaultRole", snapshot.VaultRole)
+						_ = st.Set("database.vaultCredentialsPath", snapshot.VaultCredentialsPath)
+						fmt.Println("Finished executing runWaitDatabaseReady.")
+						return sdk.WriteStatus(st)
+					} else {
+						lastObserved = fmt.Sprintf("vault auth/db roles not ready: role=%q dbCredsPath=%q", snapshot.VaultRole, snapshot.VaultCredentialsPath)
+					}
+					time.Sleep(pollInterval)
+					continue
+				}
+			}
+
+			lastObserved = fmt.Sprintf(
+				"host=%q reconciled=%q worksSucceeded=%q vaultAuthPath=%q vaultRole=%q vaultCredentialsPath=%q",
+				snapshot.Host,
+				snapshot.Reconciled,
+				snapshot.WorksSucceeded,
+				snapshot.VaultAuthPath,
+				snapshot.VaultRole,
+				snapshot.VaultCredentialsPath,
+			)
+		}
+
+		if time.Now().After(deadline) {
+			return fmt.Errorf("timed out waiting for postgresql/%s to be ready. last observed: %s", pgIdentity.requestName, lastObserved)
+		}
+		time.Sleep(pollInterval)
+	}
+}
+
 func runKubectl(args ...string) []byte {
 	fmt.Printf("Executing runKubectl: %v", args)
-	cmd := exec.Command("kubectl", args...)
-	out, err := cmd.Output()
+	out, err := runKubectlOutput(args...)
 	if err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
-			log.Fatalf("kubectl %v failed: %v\nstderr:\n%s", args, err, string(ee.Stderr))
-		}
 		log.Fatalf("kubectl %v failed: %v", args, err)
 	}
 	return out
+}
+
+func runKubectlOutput(args ...string) ([]byte, error) {
+	cmd := exec.Command("kubectl", args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return nil, fmt.Errorf("%w: %s", err, strings.TrimSpace(string(out)))
+	}
+	return out, nil
+}
+
+type postgresReadinessSnapshot struct {
+	Host                 string
+	Reconciled           string
+	WorksSucceeded       string
+	VaultAuthPath        string
+	VaultRole            string
+	VaultCredentialsPath string
+}
+
+func readPostgresReadinessSnapshot(namespace, requestName string) (postgresReadinessSnapshot, error) {
+	resource := fmt.Sprintf("postgresql/%s", requestName)
+
+	host, err := kubectlJSONPath(namespace, resource, "{.status.connectionDetails.host}")
+	if err != nil {
+		return postgresReadinessSnapshot{}, err
+	}
+	reconciled, err := kubectlJSONPath(namespace, resource, `{.status.conditions[?(@.type=="Reconciled")].status}`)
+	if err != nil {
+		return postgresReadinessSnapshot{}, err
+	}
+	worksSucceeded, err := kubectlJSONPath(namespace, resource, `{.status.conditions[?(@.type=="WorksSucceeded")].status}`)
+	if err != nil {
+		return postgresReadinessSnapshot{}, err
+	}
+	vaultAuthPath, err := kubectlJSONPath(namespace, resource, "{.status.connectionDetails.vaultAuthPath}")
+	if err != nil {
+		return postgresReadinessSnapshot{}, err
+	}
+	vaultRole, err := kubectlJSONPath(namespace, resource, "{.status.connectionDetails.vaultRole}")
+	if err != nil {
+		return postgresReadinessSnapshot{}, err
+	}
+	vaultCredentialsPath, err := kubectlJSONPath(namespace, resource, "{.status.connectionDetails.vaultCredentialsPath}")
+	if err != nil {
+		return postgresReadinessSnapshot{}, err
+	}
+
+	return postgresReadinessSnapshot{
+		Host:                 firstField(host),
+		Reconciled:           firstField(reconciled),
+		WorksSucceeded:       firstField(worksSucceeded),
+		VaultAuthPath:        firstField(vaultAuthPath),
+		VaultRole:            firstField(vaultRole),
+		VaultCredentialsPath: firstField(vaultCredentialsPath),
+	}, nil
+}
+
+func kubectlJSONPath(namespace, resource, path string) (string, error) {
+	out, err := runKubectlOutput("get", resource, "--namespace="+namespace, "-o", "jsonpath="+path)
+	if err != nil {
+		return "", err
+	}
+	return strings.TrimSpace(string(out)), nil
+}
+
+func firstField(value string) string {
+	fields := strings.Fields(strings.TrimSpace(value))
+	if len(fields) == 0 {
+		return ""
+	}
+	return fields[0]
+}
+
+func isVaultRoleConfigured(snapshot postgresReadinessSnapshot) (bool, error) {
+	vaultAddr := strings.TrimSpace(os.Getenv("VAULT_ADDR"))
+	vaultToken := strings.TrimSpace(os.Getenv("VAULT_TOKEN"))
+	if vaultAddr == "" || vaultToken == "" {
+		return false, fmt.Errorf("vault enabled but VAULT_ADDR/VAULT_TOKEN not configured for wait-db-ready")
+	}
+
+	authMount := strings.TrimPrefix(snapshot.VaultAuthPath, "auth/")
+	authMount = strings.TrimSuffix(authMount, "/login")
+	if authMount == "" {
+		return false, fmt.Errorf("invalid vault auth path %q", snapshot.VaultAuthPath)
+	}
+
+	dbRole := strings.TrimPrefix(snapshot.VaultCredentialsPath, "database/creds/")
+	if dbRole == "" {
+		return false, fmt.Errorf("invalid vault credentials path %q", snapshot.VaultCredentialsPath)
+	}
+
+	authRoleExists, err := vaultPathExists(vaultAddr, vaultToken, fmt.Sprintf("auth/%s/role/%s", authMount, snapshot.VaultRole))
+	if err != nil {
+		return false, err
+	}
+	if !authRoleExists {
+		return false, nil
+	}
+
+	dbRoleExists, err := vaultPathExists(vaultAddr, vaultToken, fmt.Sprintf("database/roles/%s", dbRole))
+	if err != nil {
+		return false, err
+	}
+	return dbRoleExists, nil
+}
+
+func vaultPathExists(vaultAddr, vaultToken, path string) (bool, error) {
+	url := fmt.Sprintf("%s/v1/%s", strings.TrimRight(vaultAddr, "/"), path)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return false, err
+	}
+	req.Header.Set("X-Vault-Token", vaultToken)
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusOK {
+		return true, nil
+	}
+	if resp.StatusCode == http.StatusNotFound {
+		return false, nil
+	}
+
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 1024))
+	return false, fmt.Errorf("vault path %q check failed with %d: %s", path, resp.StatusCode, strings.TrimSpace(string(body)))
 }
 
 func resolveImageCommand(image string) ([]string, error) {
@@ -394,6 +606,57 @@ func resolveImageCommand(image string) ([]string, error) {
 	}
 
 	return resolved, nil
+}
+
+func applyNonVaultDatabaseWiring(deploy *appsv1.Deployment, pgIdentity postgresIdentity, namespace string) error {
+	if len(deploy.Spec.Template.Spec.Containers) == 0 {
+		return fmt.Errorf("deployment has no containers")
+	}
+
+	appContainer := &deploy.Spec.Template.Spec.Containers[0]
+	appContainer.Env = []corev1.EnvVar{
+		{Name: "PGHOST", Value: fmt.Sprintf("%s.%s.svc.cluster.local", pgIdentity.instanceName, namespace)},
+		{Name: "DBNAME", Value: pgIdentity.dbName},
+		{
+			Name: "PGUSER",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "username",
+				},
+			},
+		},
+		{
+			Name: "PGPASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "password",
+				},
+			},
+		},
+		{
+			Name: "DB_USER",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "username",
+				},
+			},
+		},
+		{
+			Name: "DB_PASSWORD",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: pgIdentity.credentialsSecretName},
+					Key:                  "password",
+				},
+			},
+		},
+	}
+
+	upsertInitContainer(&deploy.Spec.Template.Spec, buildPostgresWaitInitContainer(pgIdentity.instanceName, namespace))
+	return nil
 }
 
 func buildLauncherInitContainer() corev1.Container {
@@ -786,6 +1049,19 @@ func getenvOrDefault(key, fallback string) string {
 		return fallback
 	}
 	return value
+}
+
+func getenvIntOrDefault(key string, fallback int) int {
+	value := strings.TrimSpace(os.Getenv(key))
+	if value == "" {
+		return fallback
+	}
+
+	intValue, err := strconv.Atoi(value)
+	if err != nil || intValue <= 0 {
+		return fallback
+	}
+	return intValue
 }
 
 func writeDestinationSelectors(ds []kratix.DestinationSelector) error {

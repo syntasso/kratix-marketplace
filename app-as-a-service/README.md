@@ -63,7 +63,7 @@ kubectl label app <app-name> app-as-a-service.marketplace.kratix.io/vault=true -
 If you want this to be automatic, use an admission webhook (for example, a mutating webhook) to inject
 `app-as-a-service.marketplace.kratix.io/vault: "true"` into matching app resources.
 
-When the Vault label is set to `true`, a dedicated `vault-configure` workflow step:
+When the Vault label is set to `true`, the workflow:
 
 - creates a dedicated workload `ServiceAccount` for the app in the target namespace
 - runs the app `Deployment` using that service account
@@ -71,6 +71,7 @@ When the Vault label is set to `true`, a dedicated `vault-configure` workflow st
 - adds Vault Agent injector annotations so credentials are rendered to `/vault/secrets/pg-db.env`
 - wraps application startup with a launcher that reads those credentials into env vars before starting the original image entrypoint/cmd
 - runs a small reloader sidecar that restarts the app container when the credential file rotates
+- blocks in `wait-db-ready` until the PostgreSQL request reports `Reconciled=True`, `WorksSucceeded=True`, and Vault connection fields in status, then runs `vault-configure`
 
 The configure pipeline resolves the image entrypoint/cmd from the registry so the wrapper can preserve normal startup behavior.
 
