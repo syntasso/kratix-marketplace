@@ -1,0 +1,14 @@
+---
+apiVersion: marketplace.kratix.io/v1
+kind: app
+metadata:
+  name: todoer-vault
+  namespace: default
+  labels:
+    app-as-a-service.marketplace.kratix.io/vault: "true"
+spec:
+  name: todoer-vault
+  image: syntasso/sample-todo-app:v1.0.0
+  dbDriver: postgresql
+  service:
+    port: 8080
