@@ -6,4 +6,4 @@ spec:
   version: v1.0.0-beta.4
   sourceRef:
     type: http
-    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/jm/secret-management/promise.yaml
+    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/main/promise.yaml

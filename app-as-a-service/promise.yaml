@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   name: app
   labels:
-    kratix.io/promise-version: v1.0.0-beta.1
+    kratix.io/promise-version: v1.1.0-beta.1
 spec:
   destinationSelectors:
     - matchLabels:
@@ -73,7 +73,7 @@ spec:
           spec:
             containers:
               - name: promise-configure
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 args: ["promise-configure"]
     resource:
       configure:
@@ -84,7 +84,7 @@ spec:
           spec:
             containers:
               - name: create-db-request
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 args: ["database-configure"]
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
@@ -101,10 +101,10 @@ spec:
                     - get
             containers:
               - name: create-base-resources
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 args: ["resource-configure"]
               - name: wait-db-ready
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 args: ["wait-db-ready"]
                 env:
                   - name: POSTGRES_READY_TIMEOUT_SECONDS
@@ -112,7 +112,7 @@ spec:
                   - name: POSTGRES_READY_POLL_INTERVAL_SECONDS
                     value: "5"
               - name: vault-configure
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 args: ["vault-configure"]
                 env:
                   - name: VAULT_ADDR
@@ -137,7 +137,7 @@ spec:
                     - delete
             containers:
               - name: vault-resource-cleanup
-                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5
+                image: ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0
                 args: ["resource-delete"]
                 env:
                   - name: VAULT_ADDR

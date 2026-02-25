@@ -12,7 +12,7 @@ import (
 const (
 	vaultOptInLabelKey         = "app-as-a-service.marketplace.kratix.io/vault"
 	vaultBootstrapImageEnv     = "VAULT_BOOTSTRAP_IMAGE"
-	defaultVaultBootstrapImage = "ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.1.5"
+	defaultVaultBootstrapImage = "ghcr.io/syntasso/kratix-marketplace/app-as-a-service-configure-pipeline:v0.2.0"
 	defaultVaultAuthPath       = "kubernetes"
 )
 
