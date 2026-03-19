@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PWD="$( cd "$(dirname "$0")/.." && pwd )"
+image_dir="${PWD}/jenkins-runtime-image"
+version="$(cat "${image_dir}/VERSION")"
+image_name="${JENKINS_RUNTIME_IMAGE:-ghcr.io/syntasso/kratix-marketplace/jenkins-runtime:${version}}"
+platform="${BUILD_PLATFORM:-linux/arm64,linux/amd64}"
+
+declare -a args=( "$@" )
+declare -a build_args=()
+
+for arg_name in JENKINS_UC JENKINS_UC_DOWNLOAD JENKINS_PLUGIN_INFO JENKINS_INCREMENTALS_REPO_MIRROR; do
+  if [ -n "${!arg_name:-}" ]; then
+    build_args+=(--build-arg "${arg_name}=${!arg_name}")
+  fi
+done
+
+if ! [ -d "${image_dir}" ]; then
+  echo "missing image directory: ${image_dir}"
+  exit 1
+fi
+
+set -- "${args[@]}"
+while [ $# -gt 0 ]; do
+  case "$1" in
+    build)
+      docker build \
+        --tag "${image_name}" \
+        --platform "linux/$(uname -m)" \
+        "${build_args[@]}" \
+        "${image_dir}"
+      ;;
+
+    load)
+      kind load docker-image "${image_name}" --name platform
+      ;;
+
+    push)
+      if ! docker buildx ls | grep -q "kratix-image-builder"; then
+        docker buildx create --name kratix-image-builder
+      fi
+      docker buildx build \
+        --builder kratix-image-builder \
+        --tag "${image_name}" \
+        --platform "${platform}" \
+        "${build_args[@]}" \
+        --push \
+        "${image_dir}"
+      ;;
+
+    pull)
+      docker pull "${image_name}"
+      ;;
+
+    rmi)
+      docker rmi --force "${image_name}"
+      ;;
+
+    *)
+      echo "unknown command $1"
+      exit 1
+      ;;
+  esac
+  shift
+done

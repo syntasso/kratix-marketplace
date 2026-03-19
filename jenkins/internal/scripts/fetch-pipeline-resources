@@ -6,33 +6,29 @@ resources_dir=$PWD/configure-pipeline/resources
 mkdir -p ${resources_dir}
 rm -rf ${resources_dir}/*
 
+runtime_version="$(cat ${PWD}/jenkins-runtime-image/VERSION)"
+runtime_image="${JENKINS_RUNTIME_IMAGE:-ghcr.io/syntasso/kratix-marketplace/jenkins-runtime:${runtime_version}}"
+
 instance_urls=(
-    'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/v0.7.1/config/samples/jenkins.io_v1alpha2_jenkins.yaml'
+    'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/v0.9.0-beta2/config/samples/jenkins.io_v1alpha2_jenkins.yaml'
 )
 
 for url in "${instance_urls[@]}"; do
     curl -sL -o ${resources_dir}/$(basename $url) $url
 done
 
-# basePlugin must be set because operator defaults are out of date
-# version starting point found in: https://github.com/jenkinsci/kubernetes-operator/issues/794#issuecomment-1397889838
-# then updated based on errors on startup
+# Plugins are baked into a dedicated Jenkins runtime image. The operator is configured
+# to skip plugin installation at startup and only reconcile the Jenkins resource.
 yq -i '. | 
-    .spec.master.containers[0].image="jenkins/jenkins:2.504.1-jdk17" |
+    .spec.master.containers[0].image="'${runtime_image}'" |
+    .spec.master.containers[0].imagePullPolicy="IfNotPresent" |
     .spec.master.containers[0].env= [
         { "name": "DEBUG_JENKINS_OPERATOR", "value": "true"},
         { "name": "JAVA_OPTS", "value": "-Xmx2048m -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=80.0 -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true"}
     ] |
-    .spec.master.basePlugins= [
-        { "name": "kubernetes", "version": "3802.vb_b_600831fcb_3"},
-        { "name": "workflow-job", "version": "1284.v2fe8ed4573d4"},
-        { "name": "workflow-aggregator", "version": "2.6"},
-        { "name": "git", "version": "5.7.0"},
-        { "name": "git-client", "version": "6.4.1"},
-        { "name": "job-dsl", "version": "1.90"},
-        { "name": "configuration-as-code", "version": "1985.vdda_32d0c4ea_b_"},
-        { "name": "kubernetes-credentials-provider", "version": "1.273.v15e69b_55ea_8e"}
-    ] |
+    .spec.master.skipPlugins=true |
+    del(.spec.master.basePlugins) |
+    del(.spec.master.plugins) |
     del(.spec.seedJobs)' ${resources_dir}/jenkins.io_v1alpha2_jenkins.yaml
 
 

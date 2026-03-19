@@ -8,7 +8,7 @@ the `dependencies`. To build run:
 ./scripts/inject-deps
 ```
 
-## Pipeline image
+## Configure pipeline image
 To build the image:
 ```
 ./scripts/pipeline-image build
@@ -24,10 +24,42 @@ To push the image to ghcr.io:
 ./scripts/pipeline-image push
 ```
 
+## Jenkins runtime image
+The Jenkins runtime image is isolated in `jenkins-runtime-image/`. It contains the
+fixed plugin set defined in `jenkins-runtime-image/plugins.txt`.
+
+To build the image:
+```
+./scripts/jenkins-runtime-image build
+```
+
+To load the image to the local kind platform cluster:
+```
+./scripts/jenkins-runtime-image load
+```
+
+To push the image to ghcr.io:
+```
+./scripts/jenkins-runtime-image push
+```
+
+To build the image against an internal Jenkins plugin mirror, provide the standard
+Jenkins plugin manager environment variables:
+```
+JENKINS_UC=... \
+JENKINS_UC_DOWNLOAD=... \
+JENKINS_PLUGIN_INFO=... \
+JENKINS_INCREMENTALS_REPO_MIRROR=... \
+./scripts/jenkins-runtime-image build
+```
 
 ## Testing
 To test the promise install kratix, and then:
 ```
+./scripts/pipeline-image build
+./scripts/pipeline-image load
+./scripts/jenkins-runtime-image build
+./scripts/jenkins-runtime-image load
 kubectl apply -f promise.yaml
 ./scripts/test promise
 ```
