@@ -44,7 +44,7 @@ spec:
           name: promise-configure
         spec:
           containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/jenkins-configure-pipeline:v0.2.0
+          - image: ghcr.io/syntasso/kratix-marketplace/jenkins-configure-pipeline:v0.1.0
             name: jenkins-promise-pipeline
     resource:
       configure:
@@ -54,5 +54,5 @@ spec:
           name: instance-configure
         spec:
           containers:
-          - image: ghcr.io/syntasso/kratix-marketplace/jenkins-configure-pipeline:v0.2.0
+          - image: ghcr.io/syntasso/kratix-marketplace/jenkins-configure-pipeline:v0.1.0
             name: jenkins-configure-pipeline
