@@ -6,8 +6,7 @@ resources_dir=$PWD/configure-pipeline/resources
 mkdir -p ${resources_dir}
 rm -rf ${resources_dir}/*
 
-runtime_version="$(cat ${PWD}/jenkins-runtime-image/VERSION)"
-runtime_image="${JENKINS_RUNTIME_IMAGE:-ghcr.io/syntasso/kratix-marketplace/jenkins-runtime:${runtime_version}}"
+runtime_image="ghcr.io/syntasso/kratix-marketplace/jenkins-runtime:v0.1.0"
 
 instance_urls=(
     'https://raw.githubusercontent.com/jenkinsci/kubernetes-operator/v0.9.0-beta2/config/samples/jenkins.io_v1alpha2_jenkins.yaml'

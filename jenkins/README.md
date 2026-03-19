@@ -4,8 +4,6 @@ This Promise provides Jenkins-as-a-Service. The Promise has 1 field `.spec.env`
 which can be `dev` or `prod`.
 
 `prod` Jenkins comes with Backups pre-configured.
-The Jenkins runtime uses a fixed baked-in plugin set; per-request plugin installation
-is not supported.
 
 To install:
 ```
