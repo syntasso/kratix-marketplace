@@ -18,8 +18,8 @@ spec:
     disableCSRFProtection: false
     containers:
       - name: jenkins-master
-        image: jenkins/jenkins:2.504.1-jdk17
-        imagePullPolicy: Always
+        image: ghcr.io/syntasso/kratix-marketplace/jenkins-runtime:v0.1.0
+        imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 12
           httpGet:
@@ -52,28 +52,4 @@ spec:
             value: "true"
           - name: JAVA_OPTS
             value: -Xmx2048m -XX:MinRAMPercentage=50.0 -XX:MaxRAMPercentage=80.0 -Djenkins.install.runSetupWizard=false -Djava.awt.headless=true
-    basePlugins:
-      - name: kubernetes
-        version: 4306.vc91e951ea_eb_d
-      - name: workflow-job
-        version: 1505.vea_4b_20a_4a_495
-      - name: workflow-cps
-        version: 4018.vf02e01888da_f
-      - name: workflow-multibranch
-        version: 800.v5f0a_a_660950e
-      - name: workflow-aggregator
-        version: 600.vb_57cdd26fdd7
-      - name: git
-        version: 5.7.0
-      - name: git-client
-        version: 6.4.1
-      - name: job-dsl
-        version: "1.90"
-      - name: configuration-as-code
-        version: 1985.vdda_32d0c4ea_b_
-      - name: kubernetes-credentials-provider
-        version: 1.273.v15e69b_55ea_8e
-      - name: pipeline-model-definition
-        version: 2.2221.vc657003fb_d93
-      - name: pipeline-model-extensions
-        version: 2.2221.vc657003fb_d93
+    skipPlugins: true

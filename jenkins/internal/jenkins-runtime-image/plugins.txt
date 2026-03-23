@@ -1,0 +1,16 @@
+# Fixed Jenkins plugin set baked into the runtime image.
+# Keep versions pinned and update deliberately.
+configuration-as-code:1985.vdda_32d0c4ea_b_
+eddsa-api:0.3.0.1-19.vc432d923e5ee
+git:5.7.0
+git-client:6.4.1
+job-dsl:1.90
+javax-activation-api:1.2.0-7
+kubernetes:4306.vc91e951ea_eb_d
+kubernetes-credentials-provider:1.273.v15e69b_55ea_8e
+pipeline-model-definition:2.2221.vc657003fb_d93
+pipeline-model-extensions:2.2221.vc657003fb_d93
+workflow-aggregator:600.vb_57cdd26fdd7
+workflow-cps:4018.vf02e01888da_f
+workflow-job:1505.vea_4b_20a_4a_495
+workflow-multibranch:800.v5f0a_a_660950e

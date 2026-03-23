@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PWD="$( cd "$(dirname "$0")/.." && pwd )"
+
+export PIPELINE_DIR="jenkins-runtime-image"
+export PIPELINE_IMAGE="${JENKINS_RUNTIME_IMAGE:-ghcr.io/syntasso/kratix-marketplace/jenkins-runtime:v0.1.0}"
+
+source "${PWD}/../../scripts/pipeline-image" "$@"
