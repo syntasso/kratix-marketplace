@@ -1,0 +1,8 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: AppStack
+metadata:
+  name: my-app-stack
+spec:
+  image: syntasso/sample-todo:v0.1.0
+  database:
+    driver: postgresql

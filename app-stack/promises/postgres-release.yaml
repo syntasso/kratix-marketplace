@@ -1,0 +1,9 @@
+apiVersion: platform.kratix.io/v1alpha1
+kind: PromiseRelease
+metadata:
+  name: postgresql
+spec:
+  version: v1.0.0-beta.5
+  sourceRef:
+    type: http
+    url: https://raw.githubusercontent.com/syntasso/promise-postgresql/refs/tags/v1.0.0-beta.5/promise.yaml
