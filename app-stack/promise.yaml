@@ -85,13 +85,6 @@ spec:
             - apiGroups:
               - marketplace.kratix.io
               resources:
-              - buckets
-              verbs:
-              - get
-              - list
-            - apiGroups:
-              - marketplace.kratix.io
-              resources:
               - postgresqls
               verbs:
               - get
