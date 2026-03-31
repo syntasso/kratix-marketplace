@@ -39,8 +39,7 @@ spec:
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
           metadata:
-            name: approval-gate
-            namespace: default
+            name: create-issue
           spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/pipeline-github-sign-off-image:v0.1.0
@@ -48,7 +47,7 @@ spec:
                 command: [ "create-issue" ]
                 env:
                 - name: GITHUB_REPOSITORY
-                  value: kirederik/playground
+                  value: A-REPO-OF-YOUR-CHOICE
                 - name: GITHUB_TOKEN
                   valueFrom:
                     secretKeyRef:
@@ -57,19 +56,27 @@ spec:
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
           metadata:
-            name: instance-configure
-            namespace: default
+            name: approval-gate
           spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/pipeline-github-sign-off-image:v0.1.0
                 name: wait-approval
                 command: [ "wait-approval" ]
                 env:
-                - name: GITHUB_TOKEN
-                  valueFrom:
-                    secretKeyRef:
-                      name: github-token
-                      key: token
+                  - name: GITHUB_REPOSITORY
+                    value: A-REPO-OF-YOUR-CHOICE
+                  - name: GITHUB_TOKEN
+                    valueFrom:
+                      secretKeyRef:
+                        name: github-token
+                        key: token
+        - apiVersion: platform.kratix.io/v1alpha1
+          kind: Pipeline
+          metadata:
+            name: instance-configure
+            namespace: default
+          spec:
+            containers:
               - image: ghcr.io/syntasso/kratix-pipeline-utility:v0.0.1
                 name: namespace-configure-pipeline
                 command: ["sh"]

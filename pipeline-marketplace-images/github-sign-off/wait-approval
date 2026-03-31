@@ -11,15 +11,17 @@ function wait_for_approval() {
 
   echo "Waiting for approval on issue ${issue}."
   GITHUB_REPOSITORY=$(echo $issue | cut -d"/" -f4-5)
-  current_state=$(gh issue view ${issue} --json state --jq .state)
-  while [ "$current_state" != "CLOSED" ]; do
-    echo -n "."
-    sleep 5
-    current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issue} --json state --jq .state)
-  done
+  current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issue} --json state --jq .state)
+  if [ "$current_state" != "CLOSED" ]; then
+    echo "Issue ${issue} is not yet closed. Retrying in 30s..."
+    cat <<EOF > /kratix/metadata/workflow-control.yaml
+retryAfter: 30s
+message: Waiting for approval on issue ${issue}
+EOF
+    exit 0
+  fi
 
   echo "Issue ${issue} is closed. Checking if it was approved"
-  sleep 5
 
   issueNumber=$(basename ${issue})
   result=$(gh --repo $GITHUB_REPOSITORY issue list \
