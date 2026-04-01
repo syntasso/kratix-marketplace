@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+test_promise() {
+  kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/runtime-release.yaml
+  kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/postgres-release.yaml
+  kubectl wait --for=condition=Available --namespace default deployment/postgres-operator
+  kubectl get crd appstacks.marketplace.kratix.io
+}
+
+test_resource_request() {
+  exit 0
+}
+
+if [ "$1" = "promise" ]; then
+  test_promise
+else
+  test_resource_request
+fi
