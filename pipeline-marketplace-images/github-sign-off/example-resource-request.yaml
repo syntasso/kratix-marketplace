@@ -1,0 +1,7 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: namespace
+metadata:
+  name: my-ns-request
+  namespace: default
+spec:
+  namespaceName: strawberry-ns

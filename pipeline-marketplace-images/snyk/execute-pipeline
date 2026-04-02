@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ -f /kratix/metadata/workflow-control.yaml ]; then
+  echo "Workflow control file found, skipping pipeline execution"
+  exit 0
+fi
+
 export SNYK_TOKEN="$(kubectl get secret snyk-token -o=jsonpath='{.data.token}' | base64 -d)"
 
 images="$(grep -hoE 'image:\s*.*' /kratix/output/* | sed -E 's/.*image:\s*//' | sort -u)"

@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+RETRY_AFTER="${RETRY_AFTER:-""}"
+
 function wait_for_approval() {
   issue=${1:-$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)}
   if [ "$issue" == "null" ]; then
@@ -11,15 +13,26 @@ function wait_for_approval() {
 
   echo "Waiting for approval on issue ${issue}."
   GITHUB_REPOSITORY=$(echo $issue | cut -d"/" -f4-5)
-  current_state=$(gh issue view ${issue} --json state --jq .state)
-  while [ "$current_state" != "CLOSED" ]; do
-    echo -n "."
-    sleep 5
-    current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issue} --json state --jq .state)
-  done
+  current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issue} --json state --jq .state)
+  if [ "$current_state" != "CLOSED" ]; then
+    if [ -n "$RETRY_AFTER" ]; then
+      echo "Issue ${issue} is not yet closed. Retrying in $RETRY_AFTER..."
+      cat <<EOF > /kratix/metadata/workflow-control.yaml
+retryAfter: 30s
+message: Waiting for approval on issue ${issue}
+EOF
+      update_status_as_pending "$issue"
+      exit 0
+    else
+      while [ "$current_state" != "CLOSED" ]; do
+        echo -n "."
+        sleep 5
+        current_state=$(gh --repo $GITHUB_REPOSITORY issue view ${issue} --json state --jq .state)
+      done
+    fi
+  fi
 
   echo "Issue ${issue} is closed. Checking if it was approved"
-  sleep 5
 
   issueNumber=$(basename ${issue})
   result=$(gh --repo $GITHUB_REPOSITORY issue list \
@@ -38,6 +51,11 @@ function wait_for_approval() {
 
 function update_status(){
   echo "message: Request $(cat /kratix/metadata/approval-state)" >> /kratix/metadata/status.yaml
+}
+
+function update_status_as_pending(){
+  echo "message: Waiting for approval on issue ${issue}" >> /kratix/metadata/status.yaml
+  echo "approvalIssue: ${issue}" >> /kratix/metadata/status.yaml
 }
 
 function main(){

@@ -49,6 +49,9 @@ workflows:
               name: create-issue
               command: [ "create-issue" ]
               env:
+              # If RETRY_AFTER is not set, the pipeline will wait indefinitely for the issue to be closed.
+              - name: RETRY_AFTER
+                value: 30s 
               - name: GITHUB_REPOSITORY
                 value: myorg/myrepo
               - name: GITHUB_TOKEN
