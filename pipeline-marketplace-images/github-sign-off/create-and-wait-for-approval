@@ -19,16 +19,9 @@ if [ "$exit_code" -eq "$ISSUE_ALREADY_EXISTS_EXIT_CODE" ]; then
   issue=$(yq -r '.status.approvalIssue' /kratix/input/object.yaml)
 fi
 
-if [ "$exit_code" -eq 0 ]; then
-  if [ -z "$issue" ] || [ "$issue" == "null" ]; then
-    echo "❌ ERROR: No approval issue found or created. Cannot continue."
-    exit 1
-  fi
-
-  wait_for_approval "$issue"
-  exit 0
+if [ -z "$issue" ] || [ "$issue" == "null" ]; then
+  echo "❌ ERROR: No approval issue found or created. Cannot continue."
+  exit 1
 fi
 
-echo "❌ ERROR: Failed to create or retrieve approval issue. Exit code: $exit_code"
-exit 1
-
+wait_for_approval "$issue"
