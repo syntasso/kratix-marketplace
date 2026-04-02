@@ -1,0 +1,58 @@
+#!/usr/bin/env sh
+
+set -eu
+
+app_name="$(yq eval '.metadata.name' /kratix/input/object.yaml)"
+app_namespace="$(yq eval '.metadata.namespace // "default"' /kratix/input/object.yaml)"
+app_image="$(yq eval '.spec.image' /kratix/input/object.yaml)"
+
+database_requested="$(yq eval '.status.dependencies.database.requested // false' /kratix/input/object.yaml)"
+database_host="$(yq eval '.status.dependencies.database.host // ""' /kratix/input/object.yaml)"
+database_db_name="$(yq eval '.status.dependencies.database.dbName // ""' /kratix/input/object.yaml)"
+database_secret_name="$(yq eval '.status.dependencies.database.secretName // ""' /kratix/input/object.yaml)"
+
+if [ "${database_requested}" = "true" ]; then
+  if [ -z "${database_host}" ] || [ -z "${database_db_name}" ] || [ -z "${database_secret_name}" ]; then
+    echo "database requested but runtime inputs are incomplete" >&2
+    exit 1
+  fi
+fi
+
+cat > /kratix/output/runtime-request.yaml <<EOF
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: Runtime
+metadata:
+  name: ${app_name}
+  namespace: ${app_namespace}
+  labels:
+    kratix.io/component-of-promise-name: app-stack
+    kratix.io/component-of-resource-name: ${app_name}
+    kratix.io/component-of-resource-namespace: ${app_namespace}
+spec:
+  lifecycle: dev
+  image: ${app_image}
+  servicePort: 8080
+  replicas: 1
+  applicationEnv:
+    - name: PORT
+      value: "8080"
+EOF
+
+if [ "${database_requested}" = "true" ]; then
+  cat >> /kratix/output/runtime-request.yaml <<EOF
+    - name: PGHOST
+      value: ${database_host}
+    - name: DBNAME
+      value: ${database_db_name}
+    - name: PGUSER
+      valueFrom:
+        secretKeyRef:
+          name: ${database_secret_name}
+          key: username
+    - name: PGPASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: ${database_secret_name}
+          key: password
+EOF
+fi

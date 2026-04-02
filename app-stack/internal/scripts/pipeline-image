@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+PWD="$( cd $(dirname $0)/.. && pwd)"
+
+for step in create-dependencies wait-for-dependencies create-runtime; do
+  version=v0.1.0
+  build_dir="${PWD}/../workflows/resource/configure/${step}/${step}"
+  if [ -f "${build_dir}/VERSION" ]; then
+    version=$(cat "${build_dir}/VERSION")
+  fi
+
+  export PIPELINE_DIR="../workflows/resource/configure/${step}/${step}"
+  export PIPELINE_IMAGE="ghcr.io/syntasso/kratix-marketplace/app-stack-${step}:${version}"
+  source "${PWD}/../../scripts/pipeline-image" "$@"
+  unset PIPELINE_DIR
+  unset PIPELINE_IMAGE
+done
