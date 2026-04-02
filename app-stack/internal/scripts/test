@@ -9,7 +9,7 @@ test_promise() {
 }
 
 test_resource_request() {
-  exit 0
+  kubectl describe appstack my-app-stack | grep -F "Suspended"
 }
 
 if [ "$1" = "promise" ]; then
