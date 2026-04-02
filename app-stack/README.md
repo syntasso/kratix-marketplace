@@ -29,6 +29,7 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 ```
 
 To make a resource request:
+
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/resource-request.yaml
 ```
