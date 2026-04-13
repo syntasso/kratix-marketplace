@@ -54,7 +54,7 @@ kubectl apply -f resource-request.yaml
 
 You've now setup permissions for a userGroup specified in the `resource-request.yaml` to have access to login to the worker
 cluster via OIDC. Use [KubeLogin](https://github.com/int128/kubelogin#setup) to verify this works (ensure `DEX_PATH` env var
-is exported, for example `export DEX_PATH=~/workspace/kratix-marketplace/dex-group-auth`:
+is exported, for example `export DEX_PATH=~/workspace/kratix-marketplace/dex-group-auth`):
 
 1. Set up KubeLogin
     ```
@@ -84,7 +84,6 @@ is exported, for example `export DEX_PATH=~/workspace/kratix-marketplace/dex-gro
 You should now be able to issue kubectl commands via the OIDC session. When the users attempts
 to run a kubectl command they will be prompted to login via the GitHub auth flow, and will need to ensure they
 grant access to the related org when prompted.
-
 
 ## Development
 
