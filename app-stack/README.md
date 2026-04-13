@@ -23,7 +23,7 @@ kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/m
 
 These prerequisite promises can be installed via the `PromiseRelease`s in this repo:
 
-```
+```bash
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/runtime-release.yaml
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/postgres-release.yaml
 ```
