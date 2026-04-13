@@ -47,11 +47,6 @@ jobs:
       - name: Deploy Kratix
         working-directory: kratix
         run: |
-          kubectl apply --filename https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
-          kubectl wait --for condition=available -n cert-manager deployment/cert-manager --timeout 60s
-          kubectl wait --for condition=available -n cert-manager deployment/cert-manager-cainjector --timeout 60s
-          kubectl wait --for condition=available -n cert-manager deployment/cert-manager-webhook --timeout 60s
-
           make quick-start
           ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
           
