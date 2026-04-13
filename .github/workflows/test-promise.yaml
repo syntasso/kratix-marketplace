@@ -1,0 +1,75 @@
+name: Test Promise
+
+on:
+    workflow_dispatch:
+    push:
+
+jobs:
+    detect-changes:
+      runs-on: ubuntu-latest
+      outputs:
+        matrix: ${{ steps.changed.outputs.matrix }}
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            fetch-depth: 2
+        - id: changed
+          run: |
+            matrix=$(git diff --name-only HEAD~1 HEAD \
+              | grep -oE '^[^/]+' \
+              | sort -u \
+              | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
+              | jq -Rnc '[inputs]')
+            echo "matrix=$matrix" >> $GITHUB_OUTPUT
+            echo "changed promises: $matrix"
+
+    test-promise:
+      needs: detect-changes
+      if: needs.detect-changes.outputs.matrix != '[]'
+      strategy:
+        matrix:
+          promise_dir: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+      runs-on: ubuntu-latest
+      steps:
+      - name: Checkout Kratix Marketplace repository
+        uses: actions/checkout@v4
+      - name: Install Kind
+        uses: helm/kind-action@v1
+        with:
+          install_only: true
+          version: v0.29.0   
+      - name: Checkout Kratix repository
+        uses: actions/checkout@v4
+        with:
+          repository: syntasso/kratix
+          path: kratix
+          tag: latest
+      - name: Deploy Kratix
+        working-directory: kratix
+        run: 
+          kubectl apply --filename https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
+          kubectl wait --for condition=available -n cert-manager deployment/cert-manager --timeout 60s
+          kubectl wait --for condition=available -n cert-manager deployment/cert-manager-cainjector --timeout 60s
+          kubectl wait --for condition=available -n cert-manager deployment/cert-manager-webhook --timeout 60s
+
+          make quick-start
+          ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
+          
+          kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 60s
+      - name: Install worker-resource-builder
+        if: matrix.promise_dir == 'dex-group-authentication'
+        run:
+          curl -sLo ~/bin/worker-resource-builder.tar.gz https://github.com/syntasso/kratix/releases/download/v0.0.5/worker-resource-builder_0.0.5_linux_amd64.tar.gz
+          tar -xvf ~/bin/worker-resource-builder.tar.gz -C ~/bin
+          mv ~/bin/worker-resource-builder-v* ~/bin/worker-resource-builder
+          chmod +x ~/bin/worker-resource-builder
+      - name: Validate that there are no pending changes
+        if: matrix.promise_dir == 'dex-group-authentication'
+        run: 
+          ./internal/scripts/inject-deps
+          if ! git diff --exit-code .; then
+            echo ""
+            echo "Changes in the dependencies were detected"
+            echo "Injection of dependencies via CI is not supported. Please commit and push them manually."
+            exit 1
+          fi
