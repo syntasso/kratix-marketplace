@@ -12,6 +12,7 @@ The promise uses three `resource.configure` Pipelines:
 - `create-runtime`: Creates the application once the dependencies are met
 
 Together these Pipelines can output up to two sub-requests:
+
 - a `postgresql` request for the PostgreSQL Promise when `spec.database.driver` is `postgresql`
 - a `Runtime` request for an application image after requested dependencies are ready
 
