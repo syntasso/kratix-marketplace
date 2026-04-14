@@ -9,7 +9,7 @@ test_promise() {
 }
 
 test_resource_request() {
-  kubectl describe appstack my-app-stack | grep -F "Suspended"
+  kubectl --context kind-platform describe appstack my-app-stack | grep -F "Suspended"
 }
 
 if [ "$1" = "promise" ]; then
