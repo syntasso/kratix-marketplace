@@ -1,6 +1,6 @@
 # Compound Promise with Waits and Retries
 
-This Promise provides an App-as-a-Service, with waits and retries. The Promise has 2 fields `spec.database.driver` which can be `postgresql`
+This Promise provides an App-as-a-Service, with waits and retries. The Promise has two fields `spec.database.driver` which can be `postgresql`
 and `spec.image` which can be any application image.
 
 ## Promise Resource Workflows
