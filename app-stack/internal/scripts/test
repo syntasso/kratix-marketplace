@@ -2,10 +2,10 @@
 set -e
 
 test_promise() {
-  kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/runtime-release.yaml
-  kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/postgres-release.yaml
-  kubectl wait --for=condition=Available --namespace default deployment/postgres-operator
-  kubectl get crd appstacks.marketplace.kratix.io
+  kubectl --context kind-platform apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/runtime-release.yaml
+  kubectl --context kind-platform apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promises/postgres-release.yaml
+  kubectl --context kind-worker wait --for=condition=Available --namespace default deployment/postgres-operator
+  kubectl --context kind-platform get crd appstacks.marketplace.kratix.io
 }
 
 test_resource_request() {
