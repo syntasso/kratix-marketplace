@@ -43,7 +43,7 @@ jobs:
         with:
           repository: syntasso/kratix
           path: kratix
-          tag: latest
+          ref: latest
       - name: Deploy Kratix
         working-directory: kratix
         run: |
