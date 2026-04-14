@@ -111,7 +111,7 @@ jobs:
         working-directory: ${{ matrix.promise_dir }}
         run: |
           for i in $(seq 1 100); do
-            ./internal/scripts/test resource-request
+            ./internal/scripts/test resource-request  && exit 0
             sleep 10
           done
           echo "test failed after 100 attempts, exiting"
@@ -131,7 +131,7 @@ jobs:
           fi
 
           for i in $(seq 1 100); do
-            ./internal/scripts/test resource-request
+            ./internal/scripts/test-delete && exit 0
             sleep 6
           done
 
