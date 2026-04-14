@@ -18,7 +18,7 @@ Together these Pipelines can output up to two sub-requests:
 
 To install, run the following command while targeting your Platform cluster:
 
-```sh
+```bash
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/app-stack/promise.yaml
 ```
 
