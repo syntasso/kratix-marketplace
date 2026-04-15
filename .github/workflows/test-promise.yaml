@@ -2,6 +2,10 @@ name: Test Promise
 
 on:
     workflow_dispatch:
+      inputs:
+        promise-dir:
+          type: string
+          description: The directory containing the promise to test
     push:
 
 jobs:
@@ -15,11 +19,15 @@ jobs:
             fetch-depth: 2
         - id: changed
           run: |
-            matrix=$(git diff --name-only HEAD~1 HEAD \
-              | grep -oE '^[^/]+' \
-              | sort -u \
-              | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
-              | jq -Rnc '[inputs]')
+            if [ -n "${{ inputs.promise-dir }}" ]; then
+              matrix=$(echo '${{ inputs.promise-dir }}' | jq -Rnc '[inputs]')
+            else
+              matrix=$(git diff --name-only HEAD~1 HEAD \
+                | grep -oE '^[^/]+' \
+                | sort -u \
+                | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
+                | jq -Rnc '[inputs]')
+            fi
             echo "matrix=$matrix" >> $GITHUB_OUTPUT
             echo "changed promises: $matrix"
 
@@ -43,29 +51,24 @@ jobs:
         with:
           repository: syntasso/kratix
           path: kratix
-          tag: latest
+          ref: latest
       - name: Deploy Kratix
         working-directory: kratix
-        run: 
-          kubectl apply --filename https://github.com/cert-manager/cert-manager/releases/download/v1.12.0/cert-manager.yaml
-          kubectl wait --for condition=available -n cert-manager deployment/cert-manager --timeout 60s
-          kubectl wait --for condition=available -n cert-manager deployment/cert-manager-cainjector --timeout 60s
-          kubectl wait --for condition=available -n cert-manager deployment/cert-manager-webhook --timeout 60s
-
+        run: |
           make quick-start
           ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
           
           kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 60s
       - name: Install worker-resource-builder
-        if: matrix.promise_dir == 'dex-group-authentication'
-        run:
+        if: ${{ matrix.promise_dir == 'dex-group-authentication' }}
+        run: |
           curl -sLo ~/bin/worker-resource-builder.tar.gz https://github.com/syntasso/kratix/releases/download/v0.0.5/worker-resource-builder_0.0.5_linux_amd64.tar.gz
           tar -xvf ~/bin/worker-resource-builder.tar.gz -C ~/bin
           mv ~/bin/worker-resource-builder-v* ~/bin/worker-resource-builder
           chmod +x ~/bin/worker-resource-builder
       - name: Validate that there are no pending changes
-        if: matrix.promise_dir == 'dex-group-authentication'
-        run: 
+        if: ${{ matrix.promise_dir == 'dex-group-authentication' }}
+        run: |
           ./internal/scripts/inject-deps
           if ! git diff --exit-code .; then
             echo ""
@@ -73,3 +76,111 @@ jobs:
             echo "Injection of dependencies via CI is not supported. Please commit and push them manually."
             exit 1
           fi
+      - name: Install Promise
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          if test -f ./internal/scripts/pipeline-image; then
+            ./internal/scripts/pipeline-image build load
+          fi
+
+          if test -f "internal/scripts/pre-test"; then
+            ./internal/scripts/pre-test
+          fi
+
+          kubectl create --filename promise.yaml
+      - name: Test Promise
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          for i in $(seq 1 100); do
+            ./internal/scripts/test promise && exit 0
+            sleep 6
+          done
+          echo "pre-test failed after 100 attempts, exiting"
+          exit 1
+      - name: Wait for CRDs
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          if test -f "resource-request.yaml"; then
+            crd=$(yq e 'select(.kind == "Promise") | .spec.api.metadata.name' promise.yaml)
+
+            while ! kubectl get crd ${crd} 2>/dev/null; do
+              sleep 1
+            done
+
+            kubectl wait crd/${crd} --for condition=established --timeout=60s
+          fi
+      - name: Apply Resource Request
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          if test -f "resource-request.yaml"; then
+            kubectl apply --filename resource-request.yaml
+          fi
+      - name: Test Resource Request
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          for i in $(seq 1 100); do
+            ./internal/scripts/test resource-request  && exit 0
+            sleep 10
+          done
+          echo "test failed after 100 attempts, exiting"
+          exit 1
+      - name: Delete Resource Request
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          if test -f "resource-request.yaml"; then
+            kubectl delete --filename resource-request.yaml
+          fi
+      - name: Test Resource Request Deletion
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          if ! test -f "internal/scripts/test-delete"; then
+            echo "no test-delete file found, exiting"
+            exit 0
+          fi
+
+          for i in $(seq 1 100); do
+            ./internal/scripts/test-delete && exit 0
+            sleep 6
+          done
+
+          echo "delete-test failed after 100 attempts, exiting"
+          exit 1
+      - name: Docker login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Docker (Pinned)
+        uses: docker/setup-docker-action@v4
+        with:
+          version: 29.1.5
+      - name: Push Image
+        if: ${{ github.ref == 'refs/heads/main' }}
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          ./internal/scripts/pipeline-image push
+      - name: Verify package is public
+        if: ${{ github.ref == 'refs/heads/main' }}
+        working-directory: ${{ matrix.promise_dir }}
+        run: |
+          if test -f "internal/configure-pipeline/Dockerfile"; then
+            resource_image=$(yq 'select(document_index == 0) | .spec.workflows.resource.configure[0].spec.containers[0].image' promise.yaml | cut -d "/" -f 3,4 | cut -d ":" -f 1)
+            promise_image=$(yq 'select(document_index == 0) | .spec.workflows.promise.configure[0].spec.containers[0].image' promise.yaml | cut -d "/" -f 3,4 | cut -d ":" -f 1)
+
+            for image in $resource_image $promise_image; do
+              if [ "$image" != "null" ]; then
+
+                visibility=$(curl -sL \
+                  -H "Accept: application/vnd.github+json"\
+                  -H "Authorization: Bearer $GHCR_TOKEN" \
+                  -H "X-GitHub-Api-Version: 2022-11-28" \
+                  "https://api.github.com/orgs/syntasso/packages?package_type=container&per_page=150" |
+                jq -r ".[] | select(.name | contains (\"${image}\")) | .visibility")
+
+                test "${visibility}" = "public"
+              fi
+            done
+          fi
+        env:
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}

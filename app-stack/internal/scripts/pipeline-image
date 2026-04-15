@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
+set -x
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
+
+ORIGINAL_ARGS=("$@")
 
 for step in create-dependencies wait-for-dependencies create-runtime; do
   version=v0.1.0
@@ -11,7 +14,8 @@ for step in create-dependencies wait-for-dependencies create-runtime; do
 
   export PIPELINE_DIR="../workflows/resource/configure/${step}/${step}"
   export PIPELINE_IMAGE="ghcr.io/syntasso/kratix-marketplace/app-stack-${step}:${version}"
-  source "${PWD}/../../scripts/pipeline-image" "$@"
+
+  source "${PWD}/../../scripts/pipeline-image" "${ORIGINAL_ARGS[@]}"
   unset PIPELINE_DIR
   unset PIPELINE_IMAGE
 done
