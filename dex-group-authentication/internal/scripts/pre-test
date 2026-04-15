@@ -2,4 +2,6 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-.${PWD}/setup
+echo $PWD
+
+${PWD}/scripts/setup
