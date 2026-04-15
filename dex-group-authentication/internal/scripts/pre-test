@@ -2,4 +2,4 @@
 
 PWD="$( cd $(dirname $0)/.. && pwd)"
 
-./${PWD}/setup
+.${PWD}/setup
