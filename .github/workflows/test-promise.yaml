@@ -2,6 +2,10 @@ name: Test Promise
 
 on:
     workflow_dispatch:
+      inputs:
+        promise-dir:
+          type: string
+          description: The directory containing the promise to test
     push:
 
 jobs:
