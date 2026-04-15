@@ -7,7 +7,7 @@ RUN [ "mkdir", "/tmp/transfer" ]
 RUN apk update && apk add --no-cache yq
 
 ADD resources/* /tmp/transfer/
-ADD execute-pipeline execute-pipeline
+ADD resource-configure /usr/local/bin/resource-configure
+ADD promise-configure /usr/local/bin/promise-configure
 
-CMD [ "sh", "-c", "./execute-pipeline" ]
-ENTRYPOINT []
+RUN chmod +x /usr/local/bin/*
