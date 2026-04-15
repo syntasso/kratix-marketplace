@@ -4,14 +4,12 @@ This Promise provides Redis-as-a-Service. The Promise has 1 field `.spec.size`
 which can be `small` or `large`.
 
 To install:
-
-```bash
+```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/promise.yaml
 ```
 
 To make a resource request (small by default):
-
-```bash
+```
 kubectl apply -f https://raw.githubusercontent.com/syntasso/kratix-marketplace/main/redis/resource-request.yaml
 ```
 
