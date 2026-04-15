@@ -19,11 +19,15 @@ jobs:
             fetch-depth: 2
         - id: changed
           run: |
-            matrix=$(git diff --name-only HEAD~1 HEAD \
-              | grep -oE '^[^/]+' \
-              | sort -u \
-              | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
-              | jq -Rnc '[inputs]')
+            if [ -n "${{ inputs.promise-dir }}" ]; then
+              matrix=$(echo '${{ inputs.promise-dir }}' | jq -Rnc '[inputs]')
+            else
+              matrix=$(git diff --name-only HEAD~1 HEAD \
+                | grep -oE '^[^/]+' \
+                | sort -u \
+                | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
+                | jq -Rnc '[inputs]')
+            fi
             echo "matrix=$matrix" >> $GITHUB_OUTPUT
             echo "changed promises: $matrix"
 
