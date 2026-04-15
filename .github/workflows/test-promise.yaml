@@ -78,7 +78,7 @@ jobs:
             ./internal/scripts/test promise && exit 0
             sleep 6
           done
-          echo "pre-test failed after 100 attempts, exiting"
+          echo "test failed after 100 attempts, exiting"
           exit 1
       - name: Wait for CRDs
         working-directory: ${{ matrix.promise_dir }}
