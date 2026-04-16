@@ -1,4 +1,7 @@
-# Dex
+# (DEPRECATED) Dex
+
+> **Warning**
+> **Please note this Promise is no longer maintained. If you require help with building a Dex Promise, please get in touch, by [opening an issue](https://github.com/syntasso/kratix-marketplace/issues/new/choose)**
 
 > **Warning**
 > 
