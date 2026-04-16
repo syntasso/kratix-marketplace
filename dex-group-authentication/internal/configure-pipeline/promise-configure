@@ -1,7 +1,0 @@
-#!/usr/bin/env sh
-
-set -eux
-
-echo "copying deps"
-
-cp /dependencies/* /kratix/output/

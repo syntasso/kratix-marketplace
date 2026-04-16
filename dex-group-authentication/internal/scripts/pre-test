@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-exit 0
-
-PWD="$( cd $(dirname $0)/.. && pwd)"
-
-echo $PWD
-
-${PWD}/scripts/setup
