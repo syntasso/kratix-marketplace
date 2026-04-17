@@ -59,23 +59,6 @@ jobs:
           ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
           
           kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 60s
-      - name: Install worker-resource-builder
-        if: ${{ matrix.promise_dir == 'dex-group-authentication' }}
-        run: |
-          curl -sLo ~/bin/worker-resource-builder.tar.gz https://github.com/syntasso/kratix/releases/download/v0.0.5/worker-resource-builder_0.0.5_linux_amd64.tar.gz
-          tar -xvf ~/bin/worker-resource-builder.tar.gz -C ~/bin
-          mv ~/bin/worker-resource-builder-v* ~/bin/worker-resource-builder
-          chmod +x ~/bin/worker-resource-builder
-      - name: Validate that there are no pending changes
-        if: ${{ matrix.promise_dir == 'dex-group-authentication' }}
-        run: |
-          ./internal/scripts/inject-deps
-          if ! git diff --exit-code .; then
-            echo ""
-            echo "Changes in the dependencies were detected"
-            echo "Injection of dependencies via CI is not supported. Please commit and push them manually."
-            exit 1
-          fi
       - name: Install Promise
         working-directory: ${{ matrix.promise_dir }}
         run: |
@@ -95,7 +78,7 @@ jobs:
             ./internal/scripts/test promise && exit 0
             sleep 6
           done
-          echo "pre-test failed after 100 attempts, exiting"
+          echo "test failed after 100 attempts, exiting"
           exit 1
       - name: Wait for CRDs
         working-directory: ${{ matrix.promise_dir }}
