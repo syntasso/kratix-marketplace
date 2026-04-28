@@ -9,8 +9,29 @@ helm repo add crossplane-master https://charts.crossplane.io/master/
 helm repo update
 
 mkdir -p $PWD/configure-pipeline/dependencies
-helm template crossplane --devel --namespace crossplane-system \
+helm template crossplane --devel --namespace crossplane-system --include-crds \
     crossplane-master/crossplane > $PWD/configure-pipeline/dependencies/crossplane.yaml
+
+# Get the Crossplane appVersion from the chart (e.g. "2.3.0-rc.0.176.g8f231230e" or "2.3.0")
+APP_VERSION=$(helm show chart --devel crossplane-master/crossplane | grep '^appVersion:' | awk '{print $2}' | tr -d '"')
+
+# For dev builds (containing a git hash like g8f231230e), use the commit hash.
+# For release builds, use the version tag.
+if echo "$APP_VERSION" | grep -qE '\.g[0-9a-f]+$'; then
+  GIT_REF=$(echo "$APP_VERSION" | grep -oE 'g[0-9a-f]+$' | cut -c2-)
+else
+  GIT_REF="v${APP_VERSION}"
+fi
+
+# Download CRDs from Crossplane GitHub at the exact commit/tag so they stay in sync
+# with the installed version. Storing them as individual files means Kratix will
+# clean them up when the Promise is deleted.
+curl -sf "https://api.github.com/repos/crossplane/crossplane/contents/cluster/crds?ref=${GIT_REF}" \
+  | python3 -c "import sys,json; [print(f['name']) for f in json.load(sys.stdin)]" \
+  | while read -r crd_file; do
+      curl -sfL "https://raw.githubusercontent.com/crossplane/crossplane/${GIT_REF}/cluster/crds/${crd_file}" \
+        > "$PWD/configure-pipeline/dependencies/${crd_file}"
+    done
 
 echo """---
 apiVersion: v1

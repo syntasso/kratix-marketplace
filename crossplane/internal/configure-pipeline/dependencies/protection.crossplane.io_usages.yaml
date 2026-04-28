@@ -1,11 +1,12 @@
+---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
-  name: usages.apiextensions.crossplane.io
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.19.0
+  name: usages.protection.crossplane.io
 spec:
-  conversion:
-    strategy: None
-  group: apiextensions.crossplane.io
+  group: protection.crossplane.io
   names:
     categories:
     - crossplane
@@ -13,7 +14,7 @@ spec:
     listKind: UsageList
     plural: usages
     singular: usage
-  scope: Cluster
+  scope: Namespaced
   versions:
   - additionalPrinterColumns:
     - jsonPath: .metadata.annotations.crossplane\.io/usage-details
@@ -25,21 +26,32 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: AGE
       type: date
-    name: v1alpha1
+    name: v1beta1
     schema:
       openAPIV3Schema:
-        description: A Usage defines a deletion blocking relationship between two
-          resources.
+        description: |-
+          A Usage defines a deletion blocking relationship between two resources.
+
+          Usages prevent accidental deletion of a single resource or deletion of
+          resources with dependent resources.
+
+          Read the Crossplane documentation for
+          [more information about Usages](https://docs.crossplane.io/latest/managed-resources/usages/).
         properties:
           apiVersion:
-            description: 'APIVersion defines the versioned schema of this representation
-              of an object. Servers should convert recognized schemas to the latest
-              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
             type: string
           kind:
-            description: 'Kind is a string value representing the REST resource this
-              object represents. Servers may infer this from the endpoint the client
-              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
             type: string
           metadata:
             type: object
@@ -53,7 +65,9 @@ spec:
                     description: API version of the referent.
                     type: string
                   kind:
-                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    description: |-
+                      Kind of the referent.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
                     type: string
                   resourceRef:
                     description: Reference to the resource.
@@ -65,12 +79,14 @@ spec:
                     - name
                     type: object
                   resourceSelector:
-                    description: Selector to the resource. This field will be ignored
-                      if ResourceRef is set.
+                    description: |-
+                      Selector to the resource.
+                      This field will be ignored if ResourceRef is set.
                     properties:
                       matchControllerRef:
-                        description: MatchControllerRef ensures an object with the
-                          same controller reference as the selecting object is selected.
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
                         type: boolean
                       matchLabels:
                         additionalProperties:
@@ -91,7 +107,9 @@ spec:
                     description: API version of the referent.
                     type: string
                   kind:
-                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    description: |-
+                      Kind of the referent.
+                      More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
                     type: string
                   resourceRef:
                     description: Reference to the resource.
@@ -99,16 +117,21 @@ spec:
                       name:
                         description: Name of the referent.
                         type: string
+                      namespace:
+                        description: Namespace of the referent.
+                        type: string
                     required:
                     - name
                     type: object
                   resourceSelector:
-                    description: Selector to the resource. This field will be ignored
-                      if ResourceRef is set.
+                    description: |-
+                      Selector to the resource.
+                      This field will be ignored if ResourceRef is set.
                     properties:
                       matchControllerRef:
-                        description: MatchControllerRef ensures an object with the
-                          same controller reference as the selecting object is selected.
+                        description: |-
+                          MatchControllerRef ensures an object with the same controller reference
+                          as the selecting object is selected.
                         type: boolean
                       matchLabels:
                         additionalProperties:
@@ -116,6 +139,11 @@ spec:
                         description: MatchLabels ensures an object with matching labels
                           is selected.
                         type: object
+                      namespace:
+                        description: |-
+                          Namespace ensures an object in the supplied namespace is selected.
+                          Omit namespace to only match resources in the Usage's namespace.
+                        type: string
                     type: object
                 type: object
                 x-kubernetes-validations:
@@ -125,12 +153,21 @@ spec:
               reason:
                 description: Reason is the reason for blocking deletion of the resource.
                 type: string
+              replayDeletion:
+                description: ReplayDeletion will trigger a deletion on the used resource
+                  during the deletion of the usage itself, if it was attempted to
+                  be deleted at least once.
+                type: boolean
             required:
             - of
             type: object
             x-kubernetes-validations:
             - message: either "spec.by" or "spec.reason" must be specified.
               rule: has(self.by) || has(self.reason)
+            - message: cross-namespace "spec.of" is not allowed without "spec.by"
+                resource.
+              rule: has(self.by) || (!has(self.of.resourceRef) || !has(self.of.resourceRef.__namespace__))
+                && (!has(self.of.resourceSelector) || !has(self.of.resourceSelector.__namespace__))
           status:
             description: UsageStatus defines the observed state of Usage.
             properties:
@@ -140,14 +177,23 @@ spec:
                   description: A Condition that may apply to a resource.
                   properties:
                     lastTransitionTime:
-                      description: LastTransitionTime is the last time this condition
-                        transitioned from one status to another.
+                      description: |-
+                        LastTransitionTime is the last time this condition transitioned from one
+                        status to another.
                       format: date-time
                       type: string
                     message:
-                      description: A Message containing details about this condition's
-                        last transition from one status to another, if any.
+                      description: |-
+                        A Message containing details about this condition's last transition from
+                        one status to another, if any.
                       type: string
+                    observedGeneration:
+                      description: |-
+                        ObservedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: A Reason for this condition's last transition from
                         one status to another.
@@ -157,8 +203,9 @@ spec:
                         False, or Unknown?
                       type: string
                     type:
-                      description: Type of this condition. At most one of each condition
-                        type may apply to a resource at any point in time.
+                      description: |-
+                        Type of this condition. At most one of each condition type may apply to
+                        a resource at any point in time.
                       type: string
                   required:
                   - lastTransitionTime

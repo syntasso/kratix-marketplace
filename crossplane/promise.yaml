@@ -4,6 +4,9 @@ metadata:
   creationTimestamp: null
   name: crossplane
 spec:
+  destinationSelectors:
+    - matchLabels:
+        crossplane: enabled
   workflows:
     promise:
       configure:
@@ -13,7 +16,7 @@ spec:
             name: promise-configure
           spec:
             containers:
-              - image: ghcr.io/syntasso/kratix-marketplace/crossplane-configure-pipeline:v0.1.0
+              - image: ghcr.io/syntasso/kratix-marketplace/crossplane-configure-pipeline:v0.2.0
                 name: crossplane-configure-pipeline
     resource: {}
 status: {}
