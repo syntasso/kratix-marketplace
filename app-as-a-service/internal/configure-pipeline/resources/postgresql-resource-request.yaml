@@ -5,5 +5,11 @@ metadata:
   namespace: default
 spec:
   env: dev
+  namespace: default
   teamId: acid
   dbName: bestdb
+  vault:
+    enabled: true
+    appServiceAccount: example-app-sa
+    appServiceAccountNamespace: default
+    kubernetesAuthPath: kubernetes
