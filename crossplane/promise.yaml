@@ -4,6 +4,9 @@ metadata:
   creationTimestamp: null
   name: crossplane
 spec:
+  destinationSelectors:
+    - matchLabels:
+        crossplane: enabled
   workflows:
     promise:
       configure:
