@@ -1,0 +1,88 @@
+#!/usr/bin/env sh
+# claim — ref-counted "claims" pipeline for the NamespaceClaim promise.
+#
+# Run as:
+#   claim --ensure    configure workflow: create the shared resource if absent
+#   claim --release   delete workflow: delete the shared resource iff this is
+#                      the last live claim for the same target
+#
+# Generic ref-counting is driven by two values (overridable via env):
+#   CLAIM_KIND    plural.group of the claim CR
+#   TARGET_FIELD  yq path to the shared-resource identity
+# Optional: KRATIX_INPUT (default /kratix/input/object.yaml).
+#
+# To make another resource claimable, copy this file, adjust CLAIM_KIND /
+# TARGET_FIELD, and reimplement ensure_shared / destroy_shared.
+set -eu
+
+CLAIM_KIND="${CLAIM_KIND:-namespaceclaims.marketplace.kratix.io}"
+TARGET_FIELD="${TARGET_FIELD:-.spec.namespaceName}"
+KRATIX_INPUT="${KRATIX_INPUT:-/kratix/input/object.yaml}"
+
+# --- namespace-specific hooks ------------------------------------------------
+
+# Idempotently create the provider resource request (a request to the Namespace
+# promise) named after the target, so every claim of the same namespace
+# converges on one provider RR. Owned by nothing, so it survives any single
+# claim's deletion.
+ensure_shared() {
+  target="$1"
+  clusterName="$(yq e '.spec.clusterName // ""' "$KRATIX_INPUT" 2>/dev/null || true)"
+  clusterName="${CLUSTER_NAME:-$clusterName}"
+  cat <<EOF | kubectl apply -f -
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: namespace
+metadata:
+  name: ${target}
+  namespace: default
+spec:
+  namespaceName: ${target}
+  clusterName: ${clusterName}
+EOF
+}
+
+# Delete the provider RR; the namespace promise then prunes the real Namespace.
+# --wait=false avoids blocking on the provider RR's finalizer cascade, which
+# would otherwise need list/watch RBAC the pipeline isn't granted. Idempotent.
+destroy_shared() {
+  target="$1"
+  kubectl delete namespace.marketplace.kratix.io "$target" -n default --ignore-not-found --wait=false
+}
+
+# --- generic ref-counting ----------------------------------------------------
+
+claim_target() {
+  yq e "${TARGET_FIELD}" "$KRATIX_INPUT"
+}
+
+# Count sibling claims targeting $1 that are NOT terminating (deletionTimestamp null).
+claim_live_count() {
+  target="$1"
+  kubectl get "${CLAIM_KIND}" -A -o json \
+    | yq -p json "[.items[] | select(${TARGET_FIELD} == \"${target}\") | select(.metadata.deletionTimestamp == null)] | length"
+}
+
+claim_ensure() {
+  ensure_shared "$(claim_target)"
+}
+
+claim_release() {
+  target="$(claim_target)"
+  count="$(claim_live_count "$target")"
+  echo "claim: ${count} live claim(s) for ${target}"
+  if ! { [ -n "$count" ] && [ "$count" -eq "$count" ] 2>/dev/null; }; then
+    echo "claim: non-numeric live count '${count}' for ${target}; aborting without delete" >&2
+    return 1
+  fi
+  if [ "$count" -eq 0 ]; then
+    destroy_shared "$target"
+  fi
+}
+
+# --- dispatch ----------------------------------------------------------------
+
+case "${1:-}" in
+  --ensure)  claim_ensure ;;
+  --release) claim_release ;;
+  *) echo "usage: claim --ensure|--release" >&2; exit 2 ;;
+esac

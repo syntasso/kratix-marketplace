@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Single-cluster setup (CI): platform == worker, so the shared Namespace is
+# created on, and observed from, the current (platform) context.
+
+test_promise() {
+    kubectl get crds namespaceclaims.marketplace.kratix.io
+}
+
+apply_claim() { # $1 = claim name, $2 = namespaceName
+    kubectl apply -f - <<EOF
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: NamespaceClaim
+metadata: { name: ${1}, namespace: default }
+spec: { namespaceName: ${2} }
+EOF
+}
+
+# Two claims on one namespace; delete first keeps it, delete last removes it.
+test_resource_request() {
+    NS="shared-team-namespace"
+
+    kubectl wait --for=condition=Established crd/namespaceclaims.marketplace.kratix.io --timeout=60s
+
+    apply_claim team-a-claim "${NS}"
+
+    echo "waiting for namespace ${NS} to be created by the first claim..."
+    for i in $(seq 1 60); do
+        kubectl get namespace "${NS}" >/dev/null 2>&1 && break || sleep 5
+    done
+    kubectl get namespace "${NS}" || {
+        echo "FAIL: namespace never created"
+        exit 1
+    }
+
+    apply_claim team-b-claim "${NS}"
+
+    echo "deleting first claim; namespace must survive..."
+    kubectl delete namespaceclaim team-a-claim -n default --wait=true --timeout=120s
+    sleep 10
+    kubectl get namespace "${NS}" >/dev/null 2>&1 || {
+        echo "FAIL: namespace removed while team-b still claims it"
+        exit 1
+    }
+    echo "PASS: namespace survived deletion of the original claim"
+
+    echo "deleting last claim; namespace must be removed..."
+    kubectl delete namespaceclaim team-b-claim -n default --wait=true --timeout=120s
+    for i in $(seq 1 60); do
+        kubectl get namespace "${NS}" >/dev/null 2>&1 || break
+        sleep 5
+    done
+    if kubectl get namespace "${NS}" >/dev/null 2>&1; then
+        echo "FAIL: namespace still present after last claim deleted"
+        exit 1
+    fi
+    echo "PASS: namespace removed after last claim released"
+}
+
+if [ "${1:-}" = "promise" ]; then
+    test_promise
+else
+    test_resource_request
+fi
