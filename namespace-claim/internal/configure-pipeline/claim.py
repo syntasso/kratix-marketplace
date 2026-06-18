@@ -14,6 +14,7 @@ claim -- the bug this whole pattern exists to avoid.)
 To make another resource claimable: copy this file, set TARGET_FIELD, and adjust
 the PROVIDER_* constants and the manifest built in ensure().
 """
+
 import os
 
 # The shared resource this claim manages: a request to the existing `namespace`
@@ -58,6 +59,7 @@ def count_live_claims(items, field, target):
 
 def _api():
     from kubernetes import client, config
+
     try:
         config.load_incluster_config()
     except Exception:

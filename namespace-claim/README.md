@@ -15,6 +15,7 @@ the namespace is created once and deleted only when the **last** claim is gone.
 
 ## Try it
 
+```
     kubectl apply -f resource-request.yaml          # first claim -> namespace created
     kubectl apply -f - <<EOF                         # second claim, same namespace
     apiVersion: marketplace.kratix.io/v1alpha1
@@ -24,6 +25,7 @@ the namespace is created once and deleted only when the **last** claim is gone.
     EOF
     kubectl delete namespaceclaim team-a-claim       # namespace stays (team-b still claims it)
     kubectl delete namespaceclaim team-b-claim       # last claim gone -> namespace removed
+```
 
 ## Reusing this pattern
 
@@ -41,4 +43,4 @@ delete the namespace just after the new claim's pipeline already ran. Recovery
 is not automatic: Kratix re-runs a claim's pipeline on claim/promise change, not
 when the provider request is deleted out-of-band, so the namespace stays gone
 until the claim is re-applied. A finalizer/controller guard is the hardening
-path — see the design spec.
+path.
