@@ -69,12 +69,6 @@ spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/namespace-claim-configure-pipeline:v0.1.0
                 name: claim-ensure
-                command: ["claim", "--ensure"]
-                env:
-                  - name: CLAIM_KIND
-                    value: namespaceclaims.marketplace.kratix.io
-                  - name: TARGET_FIELD
-                    value: .spec.namespaceName
       delete:
         - apiVersion: platform.kratix.io/v1alpha1
           kind: Pipeline
@@ -102,9 +96,3 @@ spec:
             containers:
               - image: ghcr.io/syntasso/kratix-marketplace/namespace-claim-configure-pipeline:v0.1.0
                 name: claim-release
-                command: ["claim", "--release"]
-                env:
-                  - name: CLAIM_KIND
-                    value: namespaceclaims.marketplace.kratix.io
-                  - name: TARGET_FIELD
-                    value: .spec.namespaceName

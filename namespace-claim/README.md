@@ -27,10 +27,12 @@ the namespace is created once and deleted only when the **last** claim is gone.
 
 ## Reusing this pattern
 
-The ref-counting in `internal/configure-pipeline/claim` is generic. To make
-another resource claimable (DB server, Kafka cluster), copy the `claim` script,
-adjust the `CLAIM_KIND` / `TARGET_FIELD` defaults, and reimplement its
-`ensure_shared` / `destroy_shared` functions.
+The pipeline is a Python script (`internal/configure-pipeline/claim.py`) built on
+the [kratix-python SDK](https://github.com/syntasso/kratix-python). The
+ref-counting (`count_live_claims` + workflow-action dispatch) is generic. To make
+another resource claimable (DB server, Kafka cluster), copy `claim.py`, set
+`TARGET_FIELD`, and reimplement its `ensure` / `release` functions and the
+`PROVIDER_*` constants.
 
 ## Known limitation
 

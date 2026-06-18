@@ -5,12 +5,12 @@ Build the pipeline image:
     cd namespace-claim
     PIPELINE_DIR=configure-pipeline ./internal/scripts/pipeline-image build load
 
-Run unit tests (no cluster needed):
+Run unit tests (no cluster or SDK install needed):
 
-    ./internal/configure-pipeline/test/test-claim.sh
+    python3 ./internal/configure-pipeline/test/test_claim.py
     ./internal/configure-pipeline/test/test-promise.sh
 
 Run the lifecycle integration test (single-cluster; needs a Kratix platform
-with the `Namespace` promise installed):
+with the `namespace` promise installed):
 
     ./internal/scripts/test
