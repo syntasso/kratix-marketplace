@@ -1,51 +1,51 @@
 name: Test Promise
 
 on:
-    workflow_dispatch:
-      inputs:
-        promise-dir:
-          type: string
-          description: The directory containing the promise to test
-    push:
+  workflow_dispatch:
+    inputs:
+      promise-dir:
+        type: string
+        description: The directory containing the promise to test
+  push:
 
 jobs:
-    detect-changes:
-      runs-on: ubuntu-latest
-      outputs:
-        matrix: ${{ steps.changed.outputs.matrix }}
-      steps:
-        - uses: actions/checkout@v4
-          with:
-            fetch-depth: 2
-        - id: changed
-          run: |
-            if [ -n "${{ inputs.promise-dir }}" ]; then
-              matrix=$(echo '${{ inputs.promise-dir }}' | jq -Rnc '[inputs]')
-            else
-              matrix=$(git diff --name-only HEAD~1 HEAD \
-                | grep -oE '^[^/]+' \
-                | sort -u \
-                | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
-                | jq -Rnc '[inputs]')
-            fi
-            echo "matrix=$matrix" >> $GITHUB_OUTPUT
-            echo "changed promises: $matrix"
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.changed.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: changed
+        run: |
+          if [ -n "${{ inputs.promise-dir }}" ]; then
+            matrix=$(echo '${{ inputs.promise-dir }}' | jq -Rnc '[inputs]')
+          else
+            matrix=$(git diff --name-only HEAD~1 HEAD \
+              | grep -oE '^[^/]+' \
+              | sort -u \
+              | while read dir; do [ -f "$dir/promise.yaml" ] && echo "$dir"; done \
+              | jq -Rnc '[inputs]')
+          fi
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "changed promises: $matrix"
 
-    test-promise:
-      needs: detect-changes
-      if: needs.detect-changes.outputs.matrix != '[]'
-      strategy:
-        matrix:
-          promise_dir: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
-      runs-on: ubuntu-latest
-      steps:
+  test-promise:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.matrix != '[]'
+    strategy:
+      matrix:
+        promise_dir: ${{ fromJson(needs.detect-changes.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Checkout Kratix Marketplace repository
         uses: actions/checkout@v4
       - name: Install Kind
         uses: helm/kind-action@v1
         with:
           install_only: true
-          version: v0.29.0   
+          version: v0.29.0
       - name: Checkout Kratix repository
         uses: actions/checkout@v4
         with:
@@ -57,7 +57,7 @@ jobs:
         run: |
           make quick-start
           ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
-          
+
           kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 60s
       - name: Install Promise
         working-directory: ${{ matrix.promise_dir }}
@@ -111,7 +111,7 @@ jobs:
         working-directory: ${{ matrix.promise_dir }}
         run: |
           if test -f "resource-request.yaml"; then
-            kubectl delete --filename resource-request.yaml
+            kubectl delete --filename resource-request.yaml --ignore-not-found
           fi
       - name: Test Resource Request Deletion
         working-directory: ${{ matrix.promise_dir }}
