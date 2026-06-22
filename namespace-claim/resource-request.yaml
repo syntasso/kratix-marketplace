@@ -1,0 +1,7 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: NamespaceClaim
+metadata:
+  name: team-a-claim
+  namespace: default
+spec:
+  namespaceName: shared-team-namespace
