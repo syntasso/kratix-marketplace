@@ -3,4 +3,5 @@
 kubectl apply -f ../namespace/promise.yaml
 ../namespace/internal/scripts/pipeline-image build load
 
-kubectl wait --for=condition=Established crd/namespaces.marketplace.kratix.io --timeout=100s
+kubectl wait --for=condition=Available promise/namespace --timeout=180s
+
