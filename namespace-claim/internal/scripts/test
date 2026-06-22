@@ -5,7 +5,6 @@ set -euo pipefail
 # created on, and observed from, the current (platform) context.
 
 test_promise() {
-    kubectl apply -f ../namespace/promise.yaml
     kubectl get crds namespaceclaims.marketplace.kratix.io
 }
 
