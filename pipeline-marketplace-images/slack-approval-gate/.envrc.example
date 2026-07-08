@@ -1,0 +1,17 @@
+# Copy this to .envrc (or .env) and fill in your values.
+# Source it before running the deploy/local scripts.
+
+# ── Cloudflare Worker deploy (approval-server/deploy.sh) ──
+export SLACK_SIGNING_SECRET=your-signing-secret
+export SLACK_BOT_TOKEN=xoxb-your-bot-token
+export SLACK_APPROVAL_CHANNEL=#platform-approvals
+export APPROVAL_SERVER_TOKEN=generate-a-long-random-string
+
+# ── Pipeline + local testing (scripts/*.sh) ──
+# APPROVAL_SERVER_URL is the deployed Worker base URL; APPROVAL_SERVER_TOKEN is reused from above.
+export APPROVAL_SERVER_URL=https://kratix-approvals.your-subdomain.workers.dev
+
+# For local testing only — simulates Kratix-injected values
+export KRATIX_PROMISE_NAME=redis
+export KRATIX_OBJECT_NAME=my-database
+export REQUESTER_EMAIL=john@example.com

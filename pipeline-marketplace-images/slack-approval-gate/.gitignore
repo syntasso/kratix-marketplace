@@ -1,0 +1,4 @@
+wrangler-account.json
+approval-server/.dev.vars
+__pycache__/
+*.pyc

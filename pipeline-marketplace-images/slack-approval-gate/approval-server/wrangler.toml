@@ -1,0 +1,8 @@
+name = "kratix-approvals"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Run `wrangler kv namespace create APPROVALS` and paste the id below.
+[[kv_namespaces]]
+binding = "APPROVALS"
+id = "REPLACE_ME"

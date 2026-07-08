@@ -1,0 +1,8 @@
+apiVersion: marketplace.kratix.io/v1alpha1
+kind: redis
+metadata:
+  name: supercache
+  namespace: default
+spec:
+  requester: derik@syntasso.io
+  size: small
