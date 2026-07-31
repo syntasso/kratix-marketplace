@@ -1,0 +1,119 @@
+#!/usr/bin/env bash
+
+# Reproduces the CI setup and test steps from
+# .github/workflows/test-promise.yaml so a promise can be tested without
+# pushing to CI: deploys Kratix onto a local kind cluster, then runs the
+# "Install Promise" / "Test Promise" / "Apply Resource Request" /
+# "Test Resource Request" / "Delete Resource Request" steps against it.
+#
+# Usage: scripts/local-promise-test <promise-dir>
+
+set -eu
+
+promise_dir="${1:-}"
+
+if [ -z "${promise_dir}" ]; then
+  echo "usage: $0 <promise-dir>" >&2
+  exit 1
+fi
+
+if [ ! -f "${promise_dir}/promise.yaml" ]; then
+  echo "error: ${promise_dir}/promise.yaml not found" >&2
+  exit 1
+fi
+
+for bin in kind kubectl docker yq git; do
+  if ! which "${bin}" >/dev/null 2>&1; then
+    echo "error: ${bin} is required but not installed" >&2
+    exit 1
+  fi
+done
+
+promise_dir="$(cd "${promise_dir}" && pwd)"
+kratix_checkout="$(mktemp -d)"
+trap 'rm -rf "${kratix_checkout}"' EXIT
+
+echo "==> Checking out syntasso/kratix@latest"
+git clone --quiet --branch latest --depth 1 https://github.com/syntasso/kratix "${kratix_checkout}"
+
+echo "==> Deploying Kratix to a local kind cluster"
+(
+  cd "${kratix_checkout}"
+  make quick-start
+  ./scripts/register-destination --name platform-cluster --context kind-platform --state-store default --with-label environment=platform
+  kubectl wait --for condition=available -n kratix-platform-system deployment/kratix-platform-controller-manager --timeout 60s
+)
+
+echo "==> Installing Promise (${promise_dir})"
+(
+  cd "${promise_dir}"
+
+  if test -f ./internal/scripts/pipeline-image; then
+    ./internal/scripts/pipeline-image build load
+  fi
+
+  if test -f "internal/scripts/pre-test"; then
+    ./internal/scripts/pre-test
+  fi
+
+  kubectl create --filename promise.yaml
+)
+
+echo "==> Testing Promise"
+(
+  cd "${promise_dir}"
+  for i in $(seq 1 100); do
+    ./internal/scripts/test promise && exit 0
+    sleep 6
+  done
+  echo "test failed after 100 attempts, exiting"
+  exit 1
+)
+
+if test -f "${promise_dir}/resource-request.yaml"; then
+  echo "==> Waiting for CRDs"
+  (
+    cd "${promise_dir}"
+    crd=$(yq e 'select(.kind == "Promise") | .spec.api.metadata.name' promise.yaml)
+
+    while ! kubectl get crd "${crd}" 2>/dev/null; do
+      sleep 1
+    done
+
+    kubectl wait "crd/${crd}" --for condition=established --timeout=60s
+  )
+
+  echo "==> Applying Resource Request"
+  kubectl apply --filename "${promise_dir}/resource-request.yaml"
+
+  echo "==> Testing Resource Request"
+  (
+    cd "${promise_dir}"
+    for i in $(seq 1 100); do
+      ./internal/scripts/test resource-request && exit 0
+      sleep 10
+    done
+    echo "test failed after 100 attempts, exiting"
+    exit 1
+  )
+
+  echo "==> Deleting Resource Request"
+  kubectl delete --filename "${promise_dir}/resource-request.yaml" --ignore-not-found
+
+  echo "==> Testing Resource Request Deletion"
+  if test -f "${promise_dir}/internal/scripts/test-delete"; then
+    (
+      cd "${promise_dir}"
+      for i in $(seq 1 100); do
+        ./internal/scripts/test-delete && exit 0
+        sleep 6
+      done
+      echo "delete-test failed after 100 attempts, exiting"
+      exit 1
+    )
+  else
+    echo "no test-delete file found, skipping"
+  fi
+fi
+
+echo "==> All checks passed for ${promise_dir}"
