@@ -1,4 +1,4 @@
-FROM jenkins/jenkins:2.504.1-jdk17
+FROM jenkins/jenkins:2.504.3-jdk17
 
 LABEL org.opencontainers.image.authors="kratix@syntasso.io"
 LABEL org.opencontainers.image.source=https://github.com/syntasso/kratix-marketplace
