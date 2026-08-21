@@ -83,17 +83,17 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: endpoint
-                  name: app-promise-minio-creds
+                  name: app-promise-bucket-creds
             - name: MINIO_USER
               valueFrom:
                 secretKeyRef:
                   key: username
-                  name: app-promise-minio-creds
+                  name: app-promise-bucket-creds
             - name: MINIO_PASSWORD
               valueFrom:
                 secretKeyRef:
                   key: password
-                  name: app-promise-minio-creds
+                  name: app-promise-bucket-creds
           - name: database-configure
             image: kratix-workshop/app-pipeline-image:v1.0.0
             command: [ database-configure ]
