@@ -92,6 +92,7 @@ spec:
             - name: MINIO_PASSWORD
               valueFrom:
                 secretKeyRef:
+                  key: password
                   name: app-promise-minio-creds
           - name: database-configure
             image: kratix-workshop/app-pipeline-image:v1.0.0
