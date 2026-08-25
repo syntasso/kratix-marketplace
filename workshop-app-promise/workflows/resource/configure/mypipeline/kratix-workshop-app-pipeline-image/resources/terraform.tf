@@ -16,10 +16,10 @@ resource "minio_s3_bucket" "state_terraform_s3" {
     acl    = "public"
 }
 
-output "minio_id" {
+output "bucket_id" {
     value = "${minio_s3_bucket.state_terraform_s3.id}"
 }
 
-output "minio_url" {
+output "bucket_url" {
     value = "${minio_s3_bucket.state_terraform_s3.bucket_domain_name}"
 }
