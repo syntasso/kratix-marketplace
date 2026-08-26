@@ -5,9 +5,10 @@ Workshop](https://docs.kratix.io/workshop/part-ii/intro) on Promise writing.
 
 ## Setup
 
-* Run Minio in your Platform cluster, and make sure a secret with the MinIO
-  credentials exists. See [./secret-example.yaml](./secret-example.yaml) for an
-  example.
+* Run an S3-compatible state store in your Platform cluster (the Kratix quick
+  start installs [SeaweedFS](https://github.com/seaweedfs/seaweedfs)), and make
+  sure a secret with the bucket credentials exists. See
+  [./secret-example.yaml](./secret-example.yaml) for an example.
 
 * Install the Postgresql Promise
 

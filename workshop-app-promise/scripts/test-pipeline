@@ -18,7 +18,7 @@ docker run \
     --volume ${outputDir}:/kratix/output \
     --volume ${inputDir}:/kratix/input \
     --volume ${metadataDir}:/kratix/metadata \
-    --env MINIO_USER=minioadmin \
-    --env MINIO_PASSWORD=minioadmin \
+    --env MINIO_USER=kratixadmin \
+    --env MINIO_PASSWORD=kratixadmin \
     --env MINIO_ENDPOINT=localhost:31337 \
     kratix-workshop/app-pipeline-image:v1.0.0 sh -c "$command"
